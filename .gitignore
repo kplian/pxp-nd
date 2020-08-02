@@ -1,0 +1,45 @@
+# Dependency directories
+node_modules/
+
+# dotenv environment variables file
+.env
+.env.test
+
+# Config file
+config.js
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
+# Optional eslint cache
+.eslintcache
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release

@@ -1,0 +1,25 @@
+{
+  "name": "pxp-nd",
+  "version": "1.0.0",
+  "description": "pXP Node Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kplian/pxp-nd.git"
+  },
+  "keywords": [
+    "pxp",
+    "nodejs",
+    "backend",
+    "kplian"
+  ],
+  "author": "KPLIAN",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kplian/pxp-nd/issues"
+  },
+  "homepage": "https://github.com/kplian/pxp-nd#readme"
+}

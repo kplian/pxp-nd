@@ -1,3 +1,13 @@
+/**
+ * User Model.
+ *
+ * All User functionality (not includes authentication).
+ *
+ * @link   src/modules/pxp/models/User.js
+ * @file   User Class.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
 const { PxpError, __ } = require('../../../lib/PxpError');
 const BaseModel = require('../../../lib/BaseModel');
 

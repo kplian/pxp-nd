@@ -1,3 +1,13 @@
+/**
+ * BaseModel Class.
+ *
+ * All common models functionality should go here (all models should inherit this class).
+ *
+ * @link   src/lib/BaseModel.js
+ * @file   BaseModel Class.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
 const { PxpError, __ } = require('./PxpError');
 const config = require('../../config');
 class BaseModel {

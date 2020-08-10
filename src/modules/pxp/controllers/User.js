@@ -1,3 +1,14 @@
+/**
+ * User Controller.
+ *
+ * All User functionality (not includes authentication).
+ *
+ * @link   src/modules/pxp/controllers/User.js
+ * @file   User Class.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
+
 const Joi = require('@hapi/joi');
 const { __ } = require('../../../lib/PxpError');
 const BaseController = require('../../../lib/BaseController');

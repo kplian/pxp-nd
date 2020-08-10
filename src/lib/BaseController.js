@@ -1,3 +1,14 @@
+/**
+ * BaseController Class.
+ *
+ * All common controllers functionality should go here (all controllers should inherit this class).
+ *
+ * @link   src/lib/ControlMiddle.js
+ * @file   BaseController Class.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
+
 const fs = require('fs');
 const { split } = require('lodash');
 const config = require('../../config');
@@ -105,7 +116,7 @@ class BaseController {
   }
 
   response(data) {
-    this.res.json({ error: false, data });
+    this.res.json({ data });
   }
 
   // @todo make available calls to db without middle

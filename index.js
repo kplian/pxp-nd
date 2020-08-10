@@ -1,3 +1,13 @@
+/**
+ * Index file for pxp-nd.
+ *
+ * Handles all requests for pxp-ui or pxp-nd.
+ *
+ * @link   index.js
+ * @file   index script.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
 const express = require("express");
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');

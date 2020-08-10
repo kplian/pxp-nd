@@ -1,7 +1,17 @@
 const genericMessage = 'Web server error. Contact the administrator';
 let showError = false;
 
-// Pxp Error class
+/**
+ * Error class and middlewares.
+ *
+ * Here is defined Pxp error class, middleware and promise handler __.
+ *
+ * @link   src/lib/PxpError.js
+ * @file   pool object.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
+
 class PxpError extends Error {
   constructor(statusCode, message, stack = undefined) {
     super();
@@ -30,26 +40,30 @@ const __ = (promise, myShowError = false) => (
 const handleError = (err, res) => {
   if (err instanceof PxpError) {
     const { statusCode, message, stack, tecMessage } = err;
-    const extraObj = process.env.NODE_ENV === 'production' ? {} : { tecMessage, stack };
+    const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
     // @todo if production not show tecMessage and stack
-    res.status(statusCode).json({
-      ...{
-        status: "error",
-        statusCode,
-        message
-      }, ...extraObj
-    });
+    res.status(statusCode).json(
+      {
+        error: {
+          ...{
+            code: statusCode,
+            message
+          }, ...extraObj
+        }
+      });
   } else {
     const { message, stack } = err;
     // @todo if production not show message and stack
-    const extraObj = process.env.NODE_ENV === 'production' ? {} : { tecMessage: message, stack };
-    res.status(500).json({
-      ...{
-        status: "error",
-        statusCode: 500,
-        message: genericMessage
-      }, ...extraObj
-    });
+    const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: message, stack };
+    res.status(500).json(
+      {
+        error: {
+          ...{
+            code: 500,
+            message: genericMessage
+          }, ...extraObj
+        }
+      });
 
   }
 

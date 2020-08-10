@@ -1,3 +1,13 @@
+/**
+ * Control Middle Class.
+ *
+ * All request must go by this middleware.
+ *
+ * @link   src/lib/ControlMiddle.js
+ * @file   Control Middle Class.
+ * @author Jaime Rivera (Kplian).
+ * @since  10.06.2020
+ */
 const fs = require('fs');
 const { PxpError } = require('./PxpError');
 class ControlMiddle {

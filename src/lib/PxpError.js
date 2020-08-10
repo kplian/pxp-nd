@@ -1,5 +1,4 @@
 const genericMessage = 'Web server error. Contact the administrator';
-const APP_ENV = 'development'; //development, production
 let showError = false;
 
 // Pxp Error class
@@ -31,7 +30,7 @@ const __ = (promise, myShowError = false) => (
 const handleError = (err, res) => {
   if (err instanceof PxpError) {
     const { statusCode, message, stack, tecMessage } = err;
-    const extraObj = APP_ENV === 'production' ? {} : { tecMessage, stack };
+    const extraObj = process.env.NODE_ENV === 'production' ? {} : { tecMessage, stack };
     // @todo if production not show tecMessage and stack
     res.status(statusCode).json({
       ...{
@@ -43,7 +42,7 @@ const handleError = (err, res) => {
   } else {
     const { message, stack } = err;
     // @todo if production not show message and stack
-    const extraObj = APP_ENV === 'production' ? {} : { tecMessage: message, stack };
+    const extraObj = process.env.NODE_ENV === 'production' ? {} : { tecMessage: message, stack };
     res.status(500).json({
       ...{
         status: "error",

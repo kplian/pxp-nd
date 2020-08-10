@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { split } = require('lodash');
-const config = require('./Config');
+const config = require('../../config');
 const { __, PxpError } = require('./PxpError');
 
 class BaseController {
@@ -84,14 +84,14 @@ class BaseController {
     }
 
     // check if postgres model exists and save path
-    let modelPath = __dirname + '/' + subMod[0] + '/' + subMod[1] + '.js';
+    let modelPath = __dirname + '/../modules/' + subMod[0] + '/models/' + subMod[1] + '.js';
     if (!fs.existsSync(modelPath)) {
       throw new PxpError(500, 'Not found Model');
     }
 
-    const auxPath = __dirname + '/' + subMod[0] + '/' + config.database + '/' + subMod[1] + '.js'
+    const auxPath = __dirname + '/../modules/' + subMod[0] + '/models/' + config.database + '/' + subMod[1] + '.js'
     // if db != postgres check if db model exists and save path
-    if (config.database !== 'postgres' && fs.existsSync()) {
+    if (config.dbms !== 'postgres' && fs.existsSync()) {
       modelPath = auxPath;
     }
 

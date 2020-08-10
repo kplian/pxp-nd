@@ -1,9 +1,9 @@
 const { PxpError, __ } = require('./PxpError');
-const config = require('./Config');
+const config = require('../../config');
 class BaseModel {
 
   constructor() {
-    if (config.database === 'postgres') {
+    if (config.dbms === 'postgres') {
       this.pool = require('./PgPool');
     }
   }
@@ -29,7 +29,7 @@ class BaseModel {
       client.release();
     }
     // return res;
-    return { fdafd: 'fdafdsaf', gfdgfds: 'gfsgfsd' }
+    return res;
   }
 
 }

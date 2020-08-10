@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi');
-const { __ } = require('../PxpError');
-const BaseController = require('../BaseController');
+const { __ } = require('../../../lib/PxpError');
+const BaseController = require('../../../lib/BaseController');
 
 class User extends BaseController {
 
@@ -12,7 +12,7 @@ class User extends BaseController {
     this.setMethod('POST');
     this.setTransaction('SEGU_ADDUSER');
     //this.setStoreProcedure('pxp.ft_user');
-    this.setModel('pxp/UserModel', 'addUser');
+    this.setModel('pxp/User', 'addUser');
     //this.setAsync(true);
     const schema = Joi.object({
       userName: Joi.string().required(),

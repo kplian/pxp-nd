@@ -1,30 +1,30 @@
 const config = {
-  database: 'postgres', //postgres, mysql, sqlserver, oracle
+  dbms: 'postgres', //postgres, mysql, sqlserver, oracle
   pgPoolConfig: {
-    user: PG_USER, // name of the user account
-    database: PG_DATABASE, // name of the database
-    host: PG_HOST,
-    password: PG_PASSWORD,
-    port: PG_PORT,
-    max: PG_MAX_CLIENTS, // max number of clients in the pool
+    user: process.env.PG_USER, // name of the user account
+    database: process.env.PG_DATABASE, // name of the database
+    host: process.env.PG_HOST,
+    password: process.env.PG_PASSWORD,
+    port: process.env.PG_PORT,
+    max: process.env.PG_MAX_CLIENTS, // max number of clients in the pool
     idleTimeoutMillis: 30000
   },
   myPoolConfig: {
-    user: MY_USER, // name of the user account
-    database: MY_DATABASE, // name of the database
-    max: MY_MAX_CLIENTS, // max number of clients in the pool
+    user: process.env.MY_USER, // name of the user account
+    database: process.env.MY_DATABASE, // name of the database
+    max: process.env.MY_MAX_CLIENTS, // max number of clients in the pool
     idleTimeoutMillis: 30000
   },
   msPoolConfig: {
-    user: MS_USER, // name of the user account
-    database: MS_DATABASE, // name of the database
-    max: MS_MAX_CLIENTS, // max number of clients in the pool
+    user: process.env.MS_USER, // name of the user account
+    database: process.env.MS_DATABASE, // name of the database
+    max: process.env.MS_MAX_CLIENTS, // max number of clients in the pool
     idleTimeoutMillis: 30000
   },
   orPoolConfig: {
-    user: OR_USER, // name of the user account
-    database: OR_DATABASE, // name of the database
-    max: OR_MAX_CLIENTS, // max number of clients in the pool
+    user: process.env.OR_USER, // name of the user account
+    database: process.env.OR_DATABASE, // name of the database
+    max: process.env.OR_MAX_CLIENTS, // max number of clients in the pool
     idleTimeoutMillis: 30000
   },
 }

@@ -1,6 +1,5 @@
-const { __ } = require('../PxpError');
-const BaseModel = require('../BaseModel');
-const PxpError = require('../PxpError');
+const { PxpError, __ } = require('../../../lib/PxpError');
+const BaseModel = require('../../../lib/BaseModel');
 
 class User extends BaseModel {
   insertUser = 'INSERT INTO pxp.user1(username, email, password) VALUES($1, $2, $3) RETURNING username';

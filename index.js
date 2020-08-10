@@ -1,7 +1,9 @@
 const express = require("express");
 const bodyParser = require('body-parser');
-const { handleError } = require('./api/PxpError');
-const CM = require("./api/ControlMiddle");
+const dotenv = require('dotenv');
+const { handleError } = require('./src/lib/PxpError');
+const CM = require("./src/lib/ControlMiddle");
+dotenv.config();
 const app = express();
 
 app.use(bodyParser.json());
@@ -36,6 +38,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-app.listen(3000, () => {
-  console.log("El servidor está inicializado en el puerto 3000");
+app.listen(process.env.PORT, () => {
+  console.log(`Your port is ${process.env.PORT}`);
 });

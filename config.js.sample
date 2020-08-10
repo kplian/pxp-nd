@@ -28,4 +28,4 @@ const config = {
     idleTimeoutMillis: 30000
   },
 }
-module.exports = config;s
+module.exports = config;

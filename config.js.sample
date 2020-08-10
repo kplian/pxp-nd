@@ -1,0 +1,31 @@
+const config = {
+  database: 'postgres', //postgres, mysql, sqlserver, oracle
+  pgPoolConfig: {
+    user: PG_USER, // name of the user account
+    database: PG_DATABASE, // name of the database
+    host: PG_HOST,
+    password: PG_PASSWORD,
+    port: PG_PORT,
+    max: PG_MAX_CLIENTS, // max number of clients in the pool
+    idleTimeoutMillis: 30000
+  },
+  myPoolConfig: {
+    user: MY_USER, // name of the user account
+    database: MY_DATABASE, // name of the database
+    max: MY_MAX_CLIENTS, // max number of clients in the pool
+    idleTimeoutMillis: 30000
+  },
+  msPoolConfig: {
+    user: MS_USER, // name of the user account
+    database: MS_DATABASE, // name of the database
+    max: MS_MAX_CLIENTS, // max number of clients in the pool
+    idleTimeoutMillis: 30000
+  },
+  orPoolConfig: {
+    user: OR_USER, // name of the user account
+    database: OR_DATABASE, // name of the database
+    max: OR_MAX_CLIENTS, // max number of clients in the pool
+    idleTimeoutMillis: 30000
+  },
+}
+module.exports = config;

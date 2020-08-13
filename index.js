@@ -25,8 +25,9 @@ app.post('/api/*', async function (req, res, next) {
   cm = new CM('POST', req, res, next);
   await cm.processRequest();
 });
-app.get('/api/*', function (req, res, next) {
+app.get('/api/*', async function (req, res, next) {
   cm = new CM('GET', req, res, next);
+  await cm.processRequest();
 });
 app.put('/api/*', function (req, res, next) {
   cm = new CM('PUT', req, res, next);

@@ -19,11 +19,11 @@ class User extends BaseController {
     super(method, res, next);
   }
 
-  async addUser() {
+  async add() {
     this.setMethod('POST');
-    this.setTransaction('SEGU_ADDUSER');
+    this.setTransaction('SEGU_ADDUSER_INS');
     //this.setStoreProcedure('pxp.ft_user');
-    this.setModel('pxp/User', 'addUser');
+    this.setModel('pxp/User', 'add');
     //this.setAsync(true);
     const schema = Joi.object({
       userName: Joi.string().required(),
@@ -38,6 +38,22 @@ class User extends BaseController {
     //call to Model
     const a = await __(this.execModel(params));
     // anything you send here will go inside data object
+    this.response(a);
+  }
+
+  async list() {
+    this.setMethod('GET');
+    this.setTransaction('SEGU_ADDUSER_SEL');    
+    this.setModel('pxp/User', 'list');
+    
+    const schema = Joi.object({
+      start: Joi.number().required(),
+      limit: Joi.number().required(),     
+    });
+
+    const params = await __(this.validateSchema(schema)); 
+    
+    const a = await __(this.execModel(params));    
     this.response(a);
   }
 

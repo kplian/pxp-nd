@@ -88,6 +88,7 @@ class BaseController {
     if (!this.methodValidated) {
       throw new PxpError(500, 'Method was not validated in controller');
     }
+      
     //split subsystem and model
     const subMod = split(this.model, '/');
     if (subMod.length === 1) {
@@ -100,17 +101,20 @@ class BaseController {
       throw new PxpError(500, 'Not found Model');
     }
 
-    const auxPath = __dirname + '/../modules/' + subMod[0] + '/models/' + config.database + '/' + subMod[1] + '.js'
+    const auxPath = __dirname + '/../modules/' + subMod[0] + '/models/' + config.dbms + '/' + subMod[1] + '.js'    
     // if db != postgres check if db model exists and save path
-    if (config.dbms !== 'postgres' && fs.existsSync()) {
+    if (config.dbms !== 'postgres' && fs.existsSync(auxPath)) {      
       modelPath = auxPath;
     }
-
+    console.log(modelPath);
     const Model = require(modelPath);
+    
     const m = new Model();
+    
     if (typeof m[this.modelFunction] !== 'function') {
       throw new PxpError(500, 'Not found model function');
     }
+    
     const res = await __(m.exec(this.transaction, this.modelFunction, params, this.checkPermissions));
     return res;
   }

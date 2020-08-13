@@ -29,6 +29,9 @@ class ControlMiddle {
       this.params = { ...this.req.query, ...this.req.body };
 
       try {
+        if (myPathArr.length < 5) {
+          throw new PxpError(404, 'Wrong URL');
+        }
         // check session or token
         this.validateCredentials();
         const myPath = __dirname + '/../modules/' + myPathArr[2] + '/controllers/' + myPathArr[3];

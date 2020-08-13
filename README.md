@@ -29,6 +29,16 @@ We have to options to start the backend, one as a developer mode ant the other a
 ## File structure
 
 ![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend1.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend2.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend3.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend4.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend5.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend6.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend7.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend8.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend9.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend10.PNG)
+![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend11.PNG)
 
 
 

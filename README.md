@@ -1,5 +1,6 @@
 ![KPLIAN](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/kplian.jpg)
 ## pxp-nd New pxp backend implemented in Node Js!
+#### (last update august 16, 2020)
 
 This backend it was designed for faster development, applying new standards and the best practices 
 
@@ -35,13 +36,14 @@ We have to options to start the backend, one as a developer mode ant the other a
 
 Initial files:
 
-- .env.sample
-- .env.dev.sample
-- .gitignore
-- config.js.sample
-- LICENSE
-- package.json
-- README.md
+- .env.sample: sample file with all the variables for a production environment
+- .env.dev.sample: sample file with all the variables for a development environment. 
+(It could be more files .env for other enviroments)
+- .gitignore:  contains a long list of files that will not be managed by git.
+- config.js.sample: this file contains list-value for variables are using in global app
+- LICENSE: details for the kind of license
+- package.json: all de external packages needed for the pxp backend
+- README.md: introduction of how to use the pxp backend
 
 ![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend2.PNG)
 
@@ -62,12 +64,12 @@ Initial files:
 
 ![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend5.PNG)
 
-- ux:
-- BaseController.js:
-- BaseModel.js:
-- ControlMiddle.js
-- PgPool.js
-- PxpError.js:
+- ux: directory for user's libraries
+- BaseController.js: File with the base logic for the Control layer
+- BaseModel.js: File with the base logic for the Model layer
+- ControlMiddle.js: This file connect all user's petitions with the model, maybe in database or in the same NodeJs
+- PgPool.js: Class to manage the communication with postgresql database
+- PxpError.js: Class to manage all errors generated in the backend
 
 ![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend6.PNG)
 
@@ -90,4 +92,5 @@ Initial files:
 ![Main](https://github.com/kplian/pxp-nd/blob/master/api/public/readme.md/backend11.PNG)
 
 
+For more details, I invite you to visit our github wiki.
 

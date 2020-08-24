@@ -9,7 +9,8 @@
  * @since  10.06.2020
  */
 const pg = require('pg');
-const config = require('../../config');
-var pool = new pg.Pool(config.pgPoolConfig);
+const config = require('../config');
+
+const pool = new pg.Pool(config.pgPoolConfig);
 
 module.exports = pool;

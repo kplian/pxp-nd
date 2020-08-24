@@ -25,7 +25,7 @@ class User extends BaseModel {
   }
 
   async add(client, params) {
-    const res = await __(client.query(this.insertSql, [params.userName, params.email, params.password]));
+    const res = await __(client.query(this.insertSql, [params.userName, params.email]));
     return res.rows;
   }
 

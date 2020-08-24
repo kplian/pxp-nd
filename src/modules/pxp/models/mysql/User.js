@@ -15,10 +15,10 @@ class User extends BaseUser {
   insertSql = `INSERT INTO 
                 user1(username, email, password) 
                 VALUES(?, ?, ?);`;
-                
+
   listSql = ` SELECT * 
               FROM user1
-              LIMIT ? OFFSET ?
+              LIMIT ? OFFSET ? 
               `; 
   async list(client, params) {    
     const res = await __(client.query(this.listSql, [params.limit, params.start]));

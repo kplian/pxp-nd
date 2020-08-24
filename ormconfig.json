@@ -1,0 +1,24 @@
+{
+  "type": "postgres",
+  "host": "dbkplian.csq7ej40dpou.us-east-2.rds.amazonaws.com",
+  "port": 5432,
+  "username": "postgres",
+  "password": "Mund0libre",
+  "database": "dbkplian",
+  "synchronize": true,
+  "logging": false,
+  "entities": [
+    "src/modules/**/entity/*.ts"
+  ],
+  "migrations": [
+    "src/migration/**/*.ts"
+  ],
+  "subscribers": [
+    "src/subscriber/**/*.ts"
+  ],
+  "cli": {
+    "entitiesDir": "src/entity",
+    "migrationsDir": "src/migration",
+    "subscribersDir": "src/subscriber"
+  }
+}

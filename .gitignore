@@ -1,12 +1,13 @@
 # Dependency directories
 node_modules/
+dist/
 
 # dotenv environment variables file
 .env
 .env.test
 
 # Config file
-config.js
+src/config.js
 
 # Optional npm cache directory
 .npm

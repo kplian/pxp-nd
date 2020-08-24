@@ -8,11 +8,18 @@
  * @author Jaime Rivera (Kplian).
  * @since  10.06.2020
  */
-const fs = require('fs');
-const { PxpError } = require('./PxpError');
-class ControlMiddle {
+import fs from 'fs';
+import express from 'express';
+import { PxpError } from './PxpError';
 
-  constructor(method, req, res, next) {
+class ControlMiddle {
+  method: string;
+  req: express.Request;
+  res: express.Response;
+  next: express.NextFunction;
+  params: Record<string, unknown>;
+
+  constructor(method: string, req: express.Request, res: express.Response, next: express.NextFunction) {
     this.method = method;
     this.req = req;
     this.res = res;
@@ -20,9 +27,9 @@ class ControlMiddle {
     this.params = {};
   }
 
-  async processRequest() {
+  async processRequest(): Promise<void> {
     if (this.method === 'OPTIONS') {
-      this.processRequestOptions();
+      // this.processRequestOptions();
     } else {
       const myPathArr = this.req.path.split('/');
       // merge all params
@@ -33,43 +40,31 @@ class ControlMiddle {
           throw new PxpError(404, 'Wrong URL');
         }
         // check session or token
-        this.validateCredentials();
-        const myPath = __dirname + '/../modules/' + myPathArr[2] + '/controllers/' + myPathArr[3];
+        // this.validateCredentials();
+        const myPath = `${__dirname}/../modules/${myPathArr[2]}/controllers/${myPathArr[3]}`;
 
         // check if controller exists
-        if (!fs.existsSync(myPath + '.js')) {
+        if (!fs.existsSync(`${myPath}.js`)) {
           throw new PxpError(404, 'Not found Controller');
         }
-        //check if api token or session is sent
+        // check if api token or session is sent
         // init controller
-        const Controller = require(myPath);
-        const c = new Controller(this.method, this.res, this.next);
-        //check if method exists
+        // eslint-disable-next-line global-require
+        const ControllerClass = await import(myPath);
+        const c = new ControllerClass(this.method, this.res, this.next);
+        // check if method exists
         if (typeof c[myPathArr[4]] !== 'function') {
           throw new PxpError(404, 'Not found Method');
         }
-        c.setParams(this.params);
+        await c.setParams(this.params);
         // call to corresponding method
-        await eval('c.' + myPathArr[4] + '()');
-
+        c[myPathArr[4]]();
       } catch (ex) {
         this.next(ex);
       }
 
       //
     }
-
   }
-
-  processRequestOptions() {
-
-  }
-  validateCredentials() {
-    //validate sesion
-    //validate token
-    //or is call to auten
-  }
-
 }
-
-module.exports = ControlMiddle;
+export default ControlMiddle;

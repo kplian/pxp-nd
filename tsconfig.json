@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "module": "commonjs",
+    "target": "es2017",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true, /* Enable all strict type-checking options. */
+    "skipLibCheck": true, /* Skip type checking of declaration files. */
+    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
+    "strictPropertyInitialization": false
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

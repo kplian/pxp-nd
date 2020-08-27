@@ -1,21 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-
-@Entity({ schema: 'pxp', name: 'tuser' })
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+@Entity({ schema: 'pxp', name: 'user' })
 export class User {
-
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  firstName: string;
+  // @Column()
+  // firstName: string;
+
+  // @Column()
+  // lastName: string;
+
+  // @Column()
+  // isActive: boolean;
 
   @Column()
-  lastName: string;
+  username: string;
 
   @Column()
-  isActive: boolean;
-
+  hash: string;
   @Column()
-  nombre = ''
-
+  salt: string;
 }

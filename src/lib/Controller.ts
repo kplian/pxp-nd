@@ -14,7 +14,7 @@ import { Router, Request, Response } from 'express';
 import { __ } from './PxpError';
 import { RouteDefinition } from './RouteDefinition';
 import ControllerInterface from './ControllerInterface';
-
+import { isAuthenticated } from '../auth/config/passport-local';
 
 class Controller implements ControllerInterface {
   public schemaValidated: boolean;
@@ -30,22 +30,33 @@ class Controller implements ControllerInterface {
   }
 
   private initializeRoutes() {
-    const routes = Reflect.getMetadata('routes', this.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', this.constructor) as Array<
+      RouteDefinition
+    >;
     this.path = '/' + this.constructor.name;
     if (Reflect.hasMetadata('controller_path', this.constructor)) {
       this.path = Reflect.getMetadata('controller_path', this.constructor);
     }
-    routes.forEach(route => {
+    routes.forEach((route) => {
+      console.log('[route]', '/' + this.module + this.path + route.path);
 
-      this.router[route.requestMethod]('/' + this.module + this.path + route.path, async (req: Request, res: Response) => {
-        // Execute our method for this path and pass our express request and response object.
-        await this.methodWrapper(req, res, route.methodName);
-
-      });
+      this.router[route.requestMethod](
+        '/' + this.module + this.path + route.path,
+        //MIDLEWARES AREA
+        isAuthenticated,
+        async (req: Request, res: Response) => {
+          // Execute our method for this path and pass our express request and response object.
+          await this.methodWrapper(req, res, route.methodName);
+        }
+      );
     });
   }
 
-  async methodWrapper(req: Request, res: Response, methodName: string): Promise<void> {
+  async methodWrapper(
+    req: Request,
+    res: Response,
+    methodName: string
+  ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);
     console.log('after function');
@@ -55,14 +66,14 @@ class Controller implements ControllerInterface {
     this.params = params;
   }
   async validateSchema(schema: Joi.Schema): Promise<unknown> {
-    const value = await __(schema.validateAsync(this.params, { abortEarly: false }), true);
+    const value = await __(
+      schema.validateAsync(this.params, { abortEarly: false }),
+      true
+    );
     this.schemaValidated = true;
     return value;
   }
 }
-
-
-
 
 const Get = (path = '') => {
   return (target: any, propertyKey: string): void => {
@@ -71,11 +82,13 @@ const Get = (path = '') => {
     if (!Reflect.hasMetadata('routes', target.constructor)) {
       Reflect.defineMetadata('routes', [], target.constructor);
     }
-    console.log('get', target);
-    console.log('get', target.constructor);
+    // console.log('get', target);
+    // console.log('get', target.constructor);
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'get',
@@ -95,7 +108,9 @@ const Post = (path = '') => {
     }
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'post',

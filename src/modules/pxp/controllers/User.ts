@@ -30,9 +30,10 @@ class User extends Controller {
     user.hash = hash;
     user.salt = salt;
     user.username = 'gato';
-    // user.firstName = 'Timber';
-    // user.lastName = 'Saw';
-    // user.isActive = true;
+    user.login = 'juan.perez';
+    user.password = 'Juan123';
+    user.token = 'ABCD123';
+
     await __(getManager().save(user));
     response.json(user);
   }

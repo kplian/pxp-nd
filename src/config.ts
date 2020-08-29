@@ -1,5 +1,6 @@
 export default {
   dbms: 'postgres', // postgres, mysql, sqlserver, oracle
+  defaultDbSettings: 'Orm',
   // connections for direct query models
   pgPoolConfig: {
     user: process.env.PG_USER, // name of the user account

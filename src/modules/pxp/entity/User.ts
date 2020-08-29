@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity({ schema: 'pxp', name: 'tuser' })
-export class User {
+export default class User {
 
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,8 +14,4 @@ export class User {
 
   @Column()
   isActive: boolean;
-
-  @Column()
-  nombre = ''
-
 }

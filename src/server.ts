@@ -2,11 +2,14 @@ import 'dotenv/config';
 import App from './App';
 
 const app = new App();
-app.loadControllers()
+app
+  .loadControllers()
   .then(() => {
     console.log('controllers loaded');
+    app.initializeErrorHandling();
+    //app.initializeAuthentication();
+    app.listen();
   })
-  .catch(err => {
+  .catch((err) => {
     console.log(err);
   });
-app.listen();

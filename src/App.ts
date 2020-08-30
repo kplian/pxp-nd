@@ -9,28 +9,34 @@
  * @since  10.06.2020
  */
 
-
 import 'reflect-metadata';
 import { createConnections } from 'typeorm';
 import * as bodyParser from 'body-parser';
 import express from 'express';
 import Controller from './lib/ControllerInterface';
-import loadControllers from './lib/loadControllers'
+import loadControllers from './lib/loadControllers';
 import { errorMiddleware } from './lib/PxpError';
-
+import passport from 'passport';
+import { authRouter } from './auth/auth-routes';
+import { configPassport } from './auth/config/passport-local';
+import session from 'express-session';
+import { getConnection } from 'typeorm';
+import { Session } from './modules/pxp/entity/Session';
+import { TypeormStore } from 'typeorm-store';
 class App {
   public app: express.Application;
   public controllers: Controller[];
 
   constructor() {
     this.app = express();
-    this.connectToTheDatabase();
     this.initializeMiddlewares();
     this.controllers = [];
-    this.initializeErrorHandling();
+
   }
   public async loadControllers(): Promise<void> {
     this.controllers = await loadControllers();
+    await this.connectToTheDatabase();
+    this.initializeAuthentication();
     this.initializeRoutes();
   }
   public listen(): void {
@@ -45,42 +51,63 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: false }));
   }
 
-  private initializeErrorHandling() {
+  initializeAuthentication(): void {
+    this.initializeSession();
+    this.initializePassport();
+  }
+
+  initializeErrorHandling(): void {
     this.app.use(errorMiddleware);
   }
 
-  private initializeRoutes() {
-    console.log('load routes', this.controllers);
-    this.controllers.forEach((controller) => {
+  private initializePassport() {
+    configPassport();
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
+    this.app.use((req, res, next) => {
+      next();
+    });
+    this.app.use(authRouter);
+  }
 
-      this.app.use('/', controller.router);
+  private initializeSession() {
+
+    const repository = getConnection().getRepository(Session);
+    this.app.use(
+      session({
+        secret: String(process.env.SECRET),
+        resave: false,
+        saveUninitialized: true,
+        store: new TypeormStore({ repository }),
+        cookie: {
+          maxAge: 1000 * 60 * 60 * 24 // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
+        }
+      })
+    );
+  }
+
+  private initializeRoutes() {
+    this.controllers.forEach((controller) => {
+      this.app.use(controller.router);
     });
   }
 
-  private connectToTheDatabase() {
-    console.log('create connections');
-    createConnections([{
-      name: String('default'),
-      type: 'postgres',
-      host: String(process.env.PG_HOST),
-      port: Number(process.env.PG_PORT),
-      username: String(process.env.PG_USER),
-      password: String(process.env.PG_PASSWORD),
-      database: String(process.env.PG_DATABASE),
-      entities: [
-        __dirname + "/modules/**/entity/*.js"
-      ],
-    }, {
-      name: String('log'),
-      type: 'postgres',
-      host: String(process.env.PG_HOST),
-      port: Number(process.env.PG_PORT),
-      username: String(process.env.PG_USER),
-      password: String(process.env.PG_PASSWORD),
-      database: String(process.env.PG_DATABASE),
-    }]);
+  private async connectToTheDatabase(): Promise<void> {
+    await createConnections([
+      {
+        name: String('default'),
+        type: 'postgres',
+        host: String(process.env.PG_HOST),
+        port: Number(process.env.PG_PORT),
+        username: String(process.env.PG_USER),
+        password: String(process.env.PG_PASSWORD),
+        database: String(process.env.PG_DATABASE),
+        entities: [__dirname + '/modules/**/entity/*.js']
+      }
+    ]);
   }
 }
 

@@ -13,10 +13,16 @@ export default async (): Promise<Controller[]> => {
     modules = await readdir(modulesPath);
     for (let i = 0; i < modules.length; i++) {
       const files = await readdir(modulesPath + '/' + modules[i] + '/controllers');
-      auxFiles = files.map(j => ({
-        url: modulesPath + '/' + modules[i] + '/controllers/' + j,
-        module: modules[i]
-      }));
+      //this adds javascript files not ts
+      auxFiles = files.reduce((result: Record<string, string>[], j) => {
+        if (!j.includes('.map')) {
+          result.push({
+            url: modulesPath + '/' + modules[i] + '/controllers/' + j,
+            module: modules[i]
+          });
+        }
+        return result;
+      }, []);
       controllerFiles = [...controllerFiles, ...auxFiles];
     }
 

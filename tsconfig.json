@@ -11,10 +11,13 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": true, /* Enable all strict type-checking options. */
-    "skipLibCheck": true, /* Skip type checking of declaration files. */
-    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
-    "strictPropertyInitialization": false
+    /* Enable all strict type-checking options. */
+    "strict": true,
+    /* Skip type checking of declaration files. */
+    "skipLibCheck": true,
+    /* Disallow inconsistently-cased references to the same file. */
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
   },
   "include": [
     "src/**/*.ts"

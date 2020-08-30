@@ -17,6 +17,7 @@ import { PxpError } from './PxpError';
 import ControllerInterface from './ControllerInterface';
 import config from '../config';
 
+import { isAuthenticated } from '../auth/config/passport-local';
 
 class Controller implements ControllerInterface {
   public schemaValidated: boolean;
@@ -42,7 +43,9 @@ class Controller implements ControllerInterface {
   }
 
   private initializeRoutes() {
-    const routes = Reflect.getMetadata('routes', this.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', this.constructor) as Array<
+      RouteDefinition
+    >;
     this.path = '/' + this.constructor.name;
     //get controller path
     if (Reflect.hasMetadata('controller_path', this.constructor)) {
@@ -72,11 +75,14 @@ class Controller implements ControllerInterface {
         });
       } else {
         //call with middleware
-        this.router[route.requestMethod]('/' + this.module + this.path + route.path, async (req: Request, res: Response, next: NextFunction) => {
-          // Execute our method for this path and pass our express request and response object.
-          const params = { ...req.query, ...req.body, ...req.params };
-          await this.genericMethodWrapper(params, next, res, route.methodName, methodDbSettings, readonly[route.methodName], permission[route.methodName], log[route.methodName]);
-        });
+        this.router[route.requestMethod]('/' + this.module + this.path + route.path,
+          //MIDDLEWARES AREA
+          isAuthenticated,
+          async (req: Request, res: Response, next: NextFunction) => {
+            // Execute our method for this path and pass our express request and response object.
+            const params = { ...req.query, ...req.body, ...req.params };
+            await this.genericMethodWrapper(params, next, res, route.methodName, methodDbSettings, readonly[route.methodName], permission[route.methodName], log[route.methodName]);
+          });
       }
 
     });
@@ -128,7 +134,10 @@ class Controller implements ControllerInterface {
 
 
   async validateSchema(schema: Joi.Schema): Promise<unknown> {
-    const value = await __(schema.validateAsync(this.params, { abortEarly: false }), true);
+    const value = await __(
+      schema.validateAsync(this.params, { abortEarly: false }),
+      true
+    );
     this.schemaValidated = true;
     return value;
   }
@@ -144,11 +153,13 @@ const Get = (path = '') => {
     if (!Reflect.hasMetadata('routes', target.constructor)) {
       Reflect.defineMetadata('routes', [], target.constructor);
     }
-    console.log('get', target);
-    console.log('get', target.constructor);
+    // console.log('get', target);
+    // console.log('get', target.constructor);
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'get',
@@ -168,11 +179,13 @@ const Post = (path = '') => {
     }
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'post',
-      path: path === '' ? propertyKey : path,
+      path: path === '' ? '/' + propertyKey : path,
       methodName: propertyKey
     });
     Reflect.defineMetadata('routes', routes, target.constructor);
@@ -192,7 +205,7 @@ const Put = (path = '') => {
 
     routes.push({
       requestMethod: 'put',
-      path: path === '' ? propertyKey : path,
+      path: path === '' ? '/' + propertyKey : path,
       methodName: propertyKey
     });
     Reflect.defineMetadata('routes', routes, target.constructor);
@@ -212,7 +225,7 @@ const Delete = (path = '') => {
 
     routes.push({
       requestMethod: 'delete',
-      path: path === '' ? propertyKey : path,
+      path: path === '' ? '/' + propertyKey : path,
       methodName: propertyKey
     });
     Reflect.defineMetadata('routes', routes, target.constructor);
@@ -232,7 +245,7 @@ const Patch = (path = '') => {
 
     routes.push({
       requestMethod: 'patch',
-      path: path === '' ? propertyKey : path,
+      path: path === '' ? '/' + propertyKey : path,
       methodName: propertyKey
     });
     Reflect.defineMetadata('routes', routes, target.constructor);

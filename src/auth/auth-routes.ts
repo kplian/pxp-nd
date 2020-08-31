@@ -7,7 +7,7 @@ import { isAuthenticated } from './config/passport-local';
 const authRouter = Router();
 
 authRouter.post(
-  '/api/login',
+  '/auth/login',
   (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('local', (err, user, info) => {
       console.log(err, user, info);
@@ -31,16 +31,50 @@ authRouter.post(
   }
 );
 
-authRouter.get('/api/guard', isAuthenticated, (req, res, next) => {
+authRouter.get('/auth/guard', isAuthenticated, (req, res, next) => {
   res.status(200).send({
     message: 'RUOTE GUARD'
   });
 });
 
-authRouter.get('/api/logout', (req, res, next) => {
+authRouter.get('/auth/logout', (req, res, next) => {
   req.logout();
   res.status(200).send({
     message: 'Logout correct'
   });
 });
+
+//** GOOGLE */
+authRouter.get(
+  '/auth/google',
+  passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/plus.login']
+  })
+);
+
+authRouter.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/auth/login' }),
+  function (req, res) {
+    console.log('res');
+
+    res.redirect('/');
+  }
+);
+
+/** FACEBOOK */
+authRouter.get(
+  '/auth/facebook',
+  passport.authenticate('facebook', { scope: 'read_stream' })
+);
+
+authRouter.get(
+  '/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/auth/login' }),
+  function (req, res) {
+    console.log('res facebook');
+
+    res.redirect('/');
+  }
+);
 export { authRouter };

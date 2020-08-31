@@ -18,7 +18,7 @@ import loadControllers from './lib/loadControllers';
 import { errorMiddleware } from './lib/PxpError';
 import passport from 'passport';
 import { authRouter } from './auth/auth-routes';
-import { configPassport } from './auth/config/passport-local';
+import { configPassport } from './auth/config';
 import session from 'express-session';
 import { getConnection } from 'typeorm';
 import { Session } from './modules/pxp/entity/Session';

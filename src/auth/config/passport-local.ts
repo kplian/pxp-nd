@@ -43,7 +43,7 @@ export const verifyCallback = (
     });
 };
 
-function configPassport() {
+function configPassportLocal() {
   const strategy = new LocalStrategy(customFields, verifyCallback);
   passport.use(strategy);
   // This method is used to store the user identifier locally.
@@ -85,4 +85,4 @@ export const isAuthenticated = (
   res.status(401).send({ message: 'Not Authorized' });
 };
 
-export { configPassport };
+export { configPassportLocal };

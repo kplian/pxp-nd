@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, } from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
 
 
 @Entity({schema: 'pxp', name: "tpar_global_data"})

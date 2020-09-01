@@ -4,53 +4,53 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 @Entity({ schema: 'pxp', name: 'tsec_person' })
 export default class Person {
 
-  @PrimaryGeneratedColumn()
-  person_id: number;
+  @PrimaryGeneratedColumn({name:'person_id'})
+  personId: number;
 
-  @Column({ type: 'varchar', length: 150, nullable: false })
+  @Column({name:'name', type: 'varchar', length: 150, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  last_name_first: string;
+  @Column({ name:'last_name_first', type: 'varchar', length: 100, nullable: true })
+  lastNameFirst: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  last_name_second: string;
+  @Column({ name:'last_name_second', type: 'varchar', length: 100, nullable: true })
+  lastNameSecond: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: false })
+  @Column({ name:'dni', type: 'varchar', length: 20, nullable: false })
   dni: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: false })
-  dni_number: string;
+  @Column({ name:'dni_number', type: 'varchar', length: 20, nullable: false })
+  dniNumber: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ name:'mail', type: 'varchar', length: 50, nullable: true })
   mail: string;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
+  @Column({ name:'address', type: 'varchar', length: 250, nullable: true })
   address: string;
 
-  @Column({ type: 'varchar', length: 15, nullable: false, default: 'M' })
+  @Column({ name:'gender', type: 'varchar', length: 15, nullable: false, default: 'M' })
   gender: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ name:'birthday', type: 'date', nullable: true })
   birthday: Date;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ name:'phone', type: 'varchar', length: 20, nullable: true })
   phone: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ name:'cellphone', type: 'varchar', length: 20, nullable: true })
   cellphone: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false, default: 'Bolivian' })
+  @Column({ name:'nationality', type: 'varchar', length: 100, nullable: false, default: 'Bolivian' })
   nationality: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
+  createdAt: Date;
 
   @Column({ name: 'is_active', default: true })
-  is_active: boolean;
+  isActive: boolean;
 
-  @Column({ type: 'varchar', length: 80, nullable: true, default: 'local' })
-  user_reg: string;
+  @Column({ name:'user_reg', type: 'varchar', length: 80, nullable: true, default: 'local' })
+  userReg: string;
 
 
 

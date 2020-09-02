@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
+import Translate from "./Translate";
 
 
 @Entity({schema: 'pxp', name: "tpar_language"})
@@ -23,4 +24,6 @@ export default class Language {
     isActive: boolean;
 
     
+    @OneToMany( type=> Translate, translate => translate.language,{eager:true,cascade:true})
+    translates:Translate[];
 }

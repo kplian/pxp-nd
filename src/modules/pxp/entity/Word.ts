@@ -1,5 +1,6 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany} from "typeorm";
 import LanguageGroup from "./LanguageGroup";
+import Translate from "./Translate";
 
 @Entity({schema: 'pxp', name: "tpar_word"})
 export default class Word {
@@ -22,4 +23,8 @@ export default class Word {
     @ManyToOne(type=> LanguageGroup, languageGroup=> languageGroup.words)
     @JoinColumn({name:"language_group_id"})
     languageGroup:LanguageGroup;
+
+    @OneToMany( type=> Translate, translate => translate.word,{eager:true,cascade:true})
+    translatesW:Translate[];
+
 }

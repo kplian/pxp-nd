@@ -1,7 +1,7 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany } from 'typeorm';
 import Transaction from './Transaction';
 import Role from './Role';
-//import { Tsec_ui_tree } from './tsec_ui_tree';
+import UiTransaction from './UiTransaction';
 
 @Entity({ name: 'tsec_ui' })
 
@@ -32,15 +32,28 @@ export default class Ui extends BaseEntity {
   icon: string;
 
   @ManyToMany(type => Role)
-  @JoinTable()
+  @JoinTable({
+    schema: 'pxp',
+    name: 'tsec_ui_role',
+    joinColumn: {
+      name: 'ui_id',
+      referencedColumnName: 'uiId'
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    }
+  })
   roles: Role[];
 
-  @ManyToMany(type => Transaction)
+  @OneToMany(type => UiTransaction, uiTransaction => uiTransaction.ui)
   @JoinTable()
-  transactions: Transaction[];
+  transactions: UiTransaction[];
 
-  //@OneToMany(type => Tsec_ui_tree, tsec_ui_tree => tsec_ui_tree.tsec_ui)
-  //tsec_ui_trees: Tsec_ui_tree[];
+  @ManyToOne(type => Ui, ui => ui.children)
+  parent: Ui;
 
+  @OneToMany(type => Ui, ui => ui.parent)
+  children: Ui[];
 
 }

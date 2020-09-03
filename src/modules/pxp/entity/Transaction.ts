@@ -1,6 +1,6 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable } from 'typeorm';
 import Procedure from './Procedure';
-import Ui from './Ui';
+import UiTransaction from './UiTransaction';
 
 @Entity()
 
@@ -19,8 +19,8 @@ export default class Transaction extends BaseEntity {
   @JoinColumn({ name: 'fk_procedure_id' })
   procedure: Procedure;
 
-  @ManyToMany(type => Ui)
+  @OneToMany(type => UiTransaction, uiTransaction => uiTransaction.transaction)
   @JoinTable()
-  uis: Ui[];
+  uis: UiTransaction[];
 
 }

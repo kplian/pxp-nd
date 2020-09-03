@@ -62,6 +62,17 @@ export default class User extends BaseEntity {
   person: Person;
 
   @ManyToMany(type => Role)
-  @JoinTable()
+  @JoinTable({
+    schema: 'pxp',
+    name: 'tsec_user_role',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'userId'
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    }
+  })
   roles: Role[];
 }

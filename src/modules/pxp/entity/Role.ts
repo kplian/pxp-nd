@@ -17,7 +17,18 @@ export default class Role {
   description: string;
 
   @ManyToMany(type => User)
-  @JoinTable()
+  @JoinTable({
+    schema: 'pxp',
+    name: 'tsec_user_role',
+    joinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'userId'
+    }
+  })
   users: User[];
 
   @ManyToOne(type => Subsystem, subsystem => subsystem.roles)
@@ -25,7 +36,18 @@ export default class Role {
   subsystem: Subsystem;
 
   @ManyToMany(type => Ui)
-  @JoinTable()
+  @JoinTable({
+    schema: 'pxp',
+    name: 'tsec_ui_role',
+    joinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    },
+    inverseJoinColumn: {
+      name: 'ui_id',
+      referencedColumnName: 'uiId'
+    }
+  })
   uis: Ui[];
 
 }

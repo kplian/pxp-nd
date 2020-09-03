@@ -1,28 +1,28 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
-import Word from "./Word";
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import Word from './Word';
 
 
-@Entity({schema: 'pxp', name: "tpar_language_group"})
-export default class LanguageGroup {
+@Entity({ schema: 'pxp', name: 'tpar_language_group' })
+export default class LanguageGroup extends BaseEntity {
 
-    @PrimaryGeneratedColumn({name:'language_group_id'})
-    languageGroupId: number;
+  @PrimaryGeneratedColumn({ name: 'language_group_id' })
+  languageGroupId: number;
 
-    @Column({name:'code', type:'varchar', length: 50, nullable: false })
-    code: string;
+  @Column({ name: 'code', type: 'varchar', length: 50, nullable: false })
+  code: string;
 
-    @Column({name:'name', type:'varchar', length: 50, nullable: true })
-    name: string; 
+  @Column({ name: 'name', type: 'varchar', length: 50, nullable: true })
+  name: string;
 
-    @Column({name:'type', type:'varchar', length: 50, nullable: true})
-    type: string; 
+  @Column({ name: 'type', type: 'varchar', length: 50, nullable: true })
+  type: string;
 
-    @CreateDateColumn ({ name: 'created_at'})
-    createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-	@Column({name:'is_active', default:true})
-    isActive: boolean;
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
 
-    @OneToMany( type=> Word, word => word.languageGroup,{eager:true,cascade:true})
-    words:Word[];
+  @OneToMany(type => Word, word => word.languageGroup, { eager: true, cascade: true })
+  words: Word[];
 }

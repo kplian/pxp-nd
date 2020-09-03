@@ -1,25 +1,25 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany} from "typeorm";
-import  Subtype from "./Subtype";
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import Subtype from './Subtype';
 
-@Entity({schema: 'pxp', name: "tpar_type"})
-export default class Type  {
+@Entity({ schema: 'pxp', name: 'tpar_type' })
+export default class Type extends BaseEntity {
 
-    @PrimaryGeneratedColumn({name:'type_id'})
-    typeId: number;
+  @PrimaryGeneratedColumn({ name: 'type_id' })
+  typeId: number;
 
-    @Column({name:'name', type:'varchar', length: 100, nullable: true })
-    name: string;
+  @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
+  name: string;
 
-    @Column({name:'table', type:'varchar', length: 100, nullable: true })
-    table: string; 
+  @Column({ name: 'table', type: 'varchar', length: 100, nullable: true })
+  table: string;
 
-    @CreateDateColumn ({ name: 'created_at'})
-    createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-	@Column({name:'is_active', default:true})
-    isActive: boolean;
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
 
-    @OneToMany ( type=> Subtype, subtype => subtype.ttype,{eager:true,cascade:true})
-    subtypes:Subtype[];
+  @OneToMany(type => Subtype, subtype => subtype.ttype, { eager: true, cascade: true })
+  subtypes: Subtype[];
 
 }

@@ -2,7 +2,7 @@ import passport from 'passport';
 import { OAuth2Strategy, Profile } from 'passport-google-oauth';
 import { UserRepository } from '../../modules/pxp/repository/User';
 import { getCustomRepository } from 'typeorm';
-import { User } from 'modules/pxp/entity/User';
+import User from 'modules/pxp/entity/User';
 
 const googleStrategy = new OAuth2Strategy(
   {
@@ -20,8 +20,8 @@ const googleStrategy = new OAuth2Strategy(
       },
       {
         username: profile.emails ? profile.emails[0].value : profile.id,
-        autentification_id: profile.id,
-        autentification_type: 'google'
+        authenticationId: profile.id,
+        authenticationType: 'google'
       }
     )
       .then((user: User) => {

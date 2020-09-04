@@ -1,7 +1,7 @@
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
 import { validPassword } from '../utils/password';
-import { User } from 'modules/pxp/entity/User';
+import User from 'modules/pxp/entity/User';
 import { getCustomRepository } from 'typeorm';
 import { UserRepository } from '../../modules/pxp/repository/User';
 import { NextFunction, Response, Request } from 'express';

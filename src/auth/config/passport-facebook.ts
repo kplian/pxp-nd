@@ -2,7 +2,7 @@ import passport from 'passport';
 import { Strategy, Profile, VerifyFunction } from 'passport-facebook';
 import { UserRepository } from '../../modules/pxp/repository/User';
 import { getCustomRepository } from 'typeorm';
-import { User } from 'modules/pxp/entity/User';
+import User from 'modules/pxp/entity/User';
 
 const facebookStrategy = new Strategy(
   {
@@ -15,13 +15,13 @@ const facebookStrategy = new Strategy(
     const UserRepo = getCustomRepository(UserRepository);
     UserRepo.findOrCreateSocial(
       {
-        autentification_id: profile.id,
-        autentification_type: 'google'
+        authenticationId: profile.id,
+        authenticationType: 'google'
       },
       {
-        username: profile.emails ? profile.emails[0].value : profile.id,
-        autentification_id: profile.id,
-        autentification_type: 'google'
+        username: profile.emails ? profile.emails[0].value : String(profile.id),
+        authenticationId: String(profile.id),
+        authenticationType: 'facebook'
       }
     )
       .then((user: User) => {

@@ -2,7 +2,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import passport from 'passport';
 import { UserRepository } from '../../modules/pxp/repository/User';
 import { getCustomRepository } from 'typeorm';
-import { User } from 'modules/pxp/entity/User';
+import User from 'modules/pxp/entity/User';
 // import * as jwt from 'jsonwebtoken';
 import { sign, verify } from 'jsonwebtoken';
 const options = {
@@ -39,7 +39,7 @@ export const configPassportJwtStrategy = () => {
  * @param {*} user - The user object.  We need this to set the JWT `sub` payload property to the User ID
  */
 export function issueJWT(user: User) {
-  const id = user.user_id;
+  const id = user.userId;
 
   const expiresIn = '1d';
   const secret = String(process.env.SECRET);

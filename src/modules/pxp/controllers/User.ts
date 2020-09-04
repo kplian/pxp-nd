@@ -9,7 +9,7 @@ import Controller, {
   ReadOnly,
   Model
 } from '../../../lib/Controller';
-import { User as UserModel } from '../entity/User';
+import UserModel from '../entity/User';
 import { genPassword } from '../../../auth/utils/password';
 
 @Route('/user')

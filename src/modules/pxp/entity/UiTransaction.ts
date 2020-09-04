@@ -10,7 +10,7 @@ export default class UiTransaction extends PxpEntity {
   @PrimaryGeneratedColumn({ name: 'ui_transaction_id' })
   uiTransactionId: number;
 
-  @Column({ name: 'button', type: 'boolean', length: 200, nullable: true })
+  @Column({ name: 'button', type: 'boolean', nullable: false, default: false })
   button: string
 
   @Column({ name: 'description', type: 'text', nullable: true })

@@ -11,10 +11,10 @@ export default class Role extends PxpEntity {
   @PrimaryGeneratedColumn({ name: 'role_id' })
   roleId: number;
 
-  @Column({ name: 'role', type: 'varchar', length: 80, nullable: false })
+  @Column({ name: 'role', type: 'varchar', length: 100, nullable: false })
   role: string;
 
-  @Column({ name: 'description', type: 'text', length: 100, nullable: false })
+  @Column({ name: 'description', type: 'text', nullable: false })
   description: string;
 
   @ManyToMany(() => User)

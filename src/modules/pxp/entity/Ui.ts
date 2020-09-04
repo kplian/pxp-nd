@@ -4,7 +4,6 @@ import UiTransaction from './UiTransaction';
 import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tsec_ui' })
-
 export default class Ui extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_id' })

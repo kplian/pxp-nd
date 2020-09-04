@@ -1,7 +1,5 @@
-import { Entity, BaseEntity, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-
-@Entity({ name: 'tpar_chat', schema: 'pxp' })
 export default class PxpEntity extends BaseEntity {
 
   @Column({ name: 'created_by' })

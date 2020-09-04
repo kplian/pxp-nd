@@ -23,6 +23,7 @@ import session from 'express-session';
 import { getConnection } from 'typeorm';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
+import cors from 'cors';
 class App {
   public app: express.Application;
   public controllers: Controller[];
@@ -31,21 +32,11 @@ class App {
     this.app = express();
     this.initializeMiddlewares();
     this.controllers = [];
-    // this.loadControllers()
-    //   .then(() => {
-    //     return this.connectToTheDatabase();
-    //   })
-    this.connectToTheDatabase()
-      .then((resp) => {
-        this.initializeSession();
-        this.initializePassport();
-        // this.initializeErrorHandling();
-        console.log('depandencias loaded');
-      })
-      .catch((err) => console.log(err));
   }
   public async loadControllers(): Promise<void> {
     this.controllers = await loadControllers();
+    await this.connectToTheDatabase();
+    this.initializeAuthentication();
     this.initializeRoutes();
   }
   public listen(): void {
@@ -61,9 +52,15 @@ class App {
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.configCors();
   }
 
-  initializeErrorHandling() {
+  initializeAuthentication(): void {
+    // this.initializeSession();
+    this.initializePassport();
+  }
+
+  initializeErrorHandling(): void {
     this.app.use(errorMiddleware);
   }
 
@@ -71,17 +68,27 @@ class App {
     configPassport();
     this.app.use(passport.initialize());
     this.app.use(passport.session());
-
     this.app.use((req, res, next) => {
-      console.log(req.session);
-      console.log(req.user);
       next();
     });
-    console.log('[AUTH]', authRouter);
-
     this.app.use(authRouter);
   }
 
+  private configCors() {
+    const whitelist = ['http://localhost:3100'];
+
+    // const corsOptions = {
+    //   origin: function (origin, callback) {
+    //     if (whitelist.indexOf(origin) !== -1 || !origin) {
+    //       callback(null, true);
+    //     } else {
+    //       callback(new Error('Not allowed by CORS'));
+    //     }
+    //   }
+    // };
+    this.app.use(cors());
+    this.app.options('*', cors());
+  }
   private initializeSession() {
     const repository = getConnection().getRepository(Session);
     this.app.use(
@@ -98,17 +105,13 @@ class App {
   }
 
   private initializeRoutes() {
-    // console.log('load routes', this.controllers);
     this.controllers.forEach((controller) => {
-      console.log(controller.router);
-
       this.app.use(controller.router);
     });
   }
 
-  private connectToTheDatabase() {
-    console.log('create connections');
-    return createConnections([
+  private async connectToTheDatabase(): Promise<void> {
+    await createConnections([
       {
         name: String('default'),
         type: 'postgres',
@@ -118,15 +121,6 @@ class App {
         password: String(process.env.PG_PASSWORD),
         database: String(process.env.PG_DATABASE),
         entities: [__dirname + '/modules/**/entity/*.js']
-      },
-      {
-        name: String('log'),
-        type: 'postgres',
-        host: String(process.env.PG_HOST),
-        port: Number(process.env.PG_PORT),
-        username: String(process.env.PG_USER),
-        password: String(process.env.PG_PASSWORD),
-        database: String(process.env.PG_DATABASE)
       }
     ]);
   }

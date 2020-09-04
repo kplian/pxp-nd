@@ -1,11 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
-import { UserRepository } from '../modules/pxp/repository/User';
+import { isAuthenticated, verifyCallback } from './config/passport-local';
 import { getCustomRepository } from 'typeorm';
-import { isAuthenticated } from './config/passport-local';
+import { UserRepository } from '../modules/pxp/repository/User';
+import { validPassword } from './utils/password';
+import { issueJWT } from './config/passport-jwt';
 
 const authRouter = Router();
-
 authRouter.post(
   '/auth/login',
   (req: Request, res: Response, next: NextFunction) => {
@@ -31,6 +32,49 @@ authRouter.post(
   }
 );
 
+authRouter.post('/auth/login/token', (req, res, next) => {
+  const userRepo = getCustomRepository(UserRepository);
+  userRepo
+    .findOne({
+      where: {
+        username: req.body.username
+      }
+    })
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(400)
+          .send({ message: 'Invalid username or password' });
+      }
+      const isValid = validPassword(
+        req.body.password,
+        String(user.hash),
+        String(user.salt)
+      );
+
+      console.log('user', isValid);
+      if (isValid) {
+        console.log('token', user);
+        const tokenObject = issueJWT(user);
+
+        return res.status(200).send({
+          success: true,
+          token: tokenObject.token,
+          expiresIn: tokenObject.expires
+        });
+      } else {
+        console.log('user error', isValid);
+
+        return res
+          .status(400)
+          .send({ message: 'Invalid username or password' });
+      }
+    })
+    .catch((err) => {
+      return res.status(400).send(err);
+    });
+});
+
 authRouter.get('/auth/guard', isAuthenticated, (req, res, next) => {
   res.status(200).send({
     message: 'RUOTE GUARD'
@@ -48,7 +92,11 @@ authRouter.get('/auth/logout', (req, res, next) => {
 authRouter.get(
   '/auth/google',
   passport.authenticate('google', {
-    scope: ['https://www.googleapis.com/auth/plus.login']
+    scope: [
+      'https://www.googleapis.com/auth/plus.login',
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile'
+    ]
   })
 );
 
@@ -56,16 +104,14 @@ authRouter.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/auth/login' }),
   function (req, res) {
-    console.log('res');
-
-    res.redirect('/');
+    res.status(200).send(req.user);
   }
 );
 
 /** FACEBOOK */
 authRouter.get(
   '/auth/facebook',
-  passport.authenticate('facebook', { scope: 'read_stream' })
+  passport.authenticate('facebook', { scope: ['read_stream', 'email'] })
 );
 
 authRouter.get(

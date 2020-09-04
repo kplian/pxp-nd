@@ -1,23 +1,30 @@
 import express from 'express';
 import { getManager } from 'typeorm';
-import { __ } from '../../../lib/PxpError';
-import Controller, { Get, Route, Post } from '../../../lib/Controller';
+import Controller, {
+  Get,
+  Route,
+  Post,
+  StoredProcedure,
+  DbSettings,
+  ReadOnly,
+  Model
+} from '../../../lib/Controller';
 import { User as UserModel } from '../entity/User';
 import { genPassword } from '../../../auth/utils/password';
 
 @Route('/user')
-//@StoredProcedure('')
+@StoredProcedure('pxp.ftusuario')
+@Model('pxp/User')
 class User extends Controller {
   @Get()
-  async getAll(
-    request: express.Request,
-    response: express.Response
-  ): Promise<void> {
-    const users = await __(getManager().find(UserModel));
-    response.send(users);
+  @DbSettings('Orm')
+  @ReadOnly(true)
+  async getAll(params: Record<string, unknown>): Promise<UserModel[]> {
+    const users = await getManager().find(UserModel);
+    return users;
   }
 
-  @Post()
+  /*@Post()
   async add(
     request: express.Request,
     response: express.Response
@@ -34,9 +41,19 @@ class User extends Controller {
     // user.password = 'Juan123';
     // user.token = 'ABCD123';
 
-    await __(getManager().save(user));
+    await getManager().save(user);
     response.json(user);
-  }
+  }*/
+  /*
+    @Post()
+    async add(request: express.Request, response: express.Response): Promise<void> {
+      const user = new UserModel();
+      user.firstName = "Timber";
+      user.lastName = "Saw";
+      user.isActive = true;
+      await __(getManager().save(user));
+      response.json(user);
+    }*/
 }
 
 export default User;

@@ -7,7 +7,7 @@ export class UserRepository extends Repository<User> {
   async findOrCreateSocial(options: any, data: User): Promise<User> {
     const row = await this.findOne({
       where: {
-        [options.socialName]: options.socialId
+        ...options
       }
     });
     if (row) {

@@ -6,13 +6,13 @@ import {
   OneToOne,
   JoinColumn
 } from 'typeorm';
-import { Person } from './Person';
+import Person from './Person';
 
 // @Entity({ schema: 'public', name: 'tsec_user' })
 @Entity({ schema: 'public', name: 'user' })
 export class User {
-  // @PrimaryGeneratedColumn()
-  // user_id: number;
+  @PrimaryGeneratedColumn()
+  user_id?: number;
 
   // @Column({ type: 'varchar', length: 80, unique: true })
   // login: string;
@@ -26,8 +26,11 @@ export class User {
   // @Column({ type: 'date', nullable: true })
   // expiration: Date;
 
-  // @Column({ type: 'varchar', length: 80, nullable: false, default: 'local' })
-  // autentification_type: string;
+  @Column({ type: 'varchar', length: 80, nullable: false, default: 'local' })
+  autentification_type?: string;
+
+  @Column({ type: 'varchar', length: 80, unique: true, nullable: true })
+  autentification_id?: string;
 
   // @Column({ type: 'varchar', length: 80, unique: true, nullable: true })
   // token: string;
@@ -41,22 +44,18 @@ export class User {
   // @Column({ type: 'varchar', length: 80, nullable: true, default: 'local' })
   // user_reg: string;
 
-  @PrimaryGeneratedColumn()
-  id?: number;
+  // @PrimaryGeneratedColumn()
+  // id?: number;
 
   @Column()
   username: string;
 
   @Column()
-  hash: string;
+  hash?: string;
+
   @Column()
-  salt: string;
+  salt?: string;
 
-  // @Column({ name: 'google_id' })
-  // googleId?: string;
-
-  // @Column({ name: 'facebook_id' })
-  // facebookId?: string;
   // @OneToOne((type) => Person, {
   //   eager: true,
   //   cascade: true

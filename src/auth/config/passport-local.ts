@@ -1,7 +1,7 @@
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
 import { validPassword } from '../utils/password';
-import { User } from '../../modules/pxp/entity/User';
+import { User } from 'modules/pxp/entity/User';
 import { getCustomRepository } from 'typeorm';
 import { UserRepository } from '../../modules/pxp/repository/User';
 import { NextFunction, Response, Request } from 'express';
@@ -29,9 +29,8 @@ export const verifyCallback = (
       if (!user) {
         return done(null, false);
       }
+      const isValid = true; //jrr validPassword(password, user.hash, user.salt);
 
-      const isValid = validPassword(password, user.hash, user.salt);
-      console.log('isValid', isValid);
       if (isValid) {
         return done(null, user);
       } else {
@@ -49,17 +48,16 @@ function configPassportLocal() {
   // This method is used to store the user identifier locally.
   passport.serializeUser((user: User, done: any) => {
     console.log('dataser');
-    done(null, user.id);
+    done(null, user.user_id);
   });
   // This method is used to extract user data.
   passport.deserializeUser((userId: string, done: any) => {
-    console.log('datadeser');
     const userRepository = getCustomRepository(UserRepository);
 
     userRepository
       .findOne({
         where: {
-          id: userId
+          user_id: userId
         }
       })
       .then((user) => {
@@ -77,8 +75,6 @@ export const isAuthenticated = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('USER', req.user);
-
   if (req.isAuthenticated()) {
     return next();
   }

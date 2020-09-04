@@ -7,6 +7,7 @@ app
   .then(() => {
     console.log('controllers loaded');
     app.initializeErrorHandling();
+    //app.initializeAuthentication();
     app.listen();
   })
   .catch((err) => {

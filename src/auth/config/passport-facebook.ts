@@ -15,13 +15,13 @@ const facebookStrategy = new Strategy(
     const UserRepo = getCustomRepository(UserRepository);
     UserRepo.findOrCreateSocial(
       {
-        socialId: profile.id,
-        socialName: 'googleId'
+        autentification_id: profile.id,
+        autentification_type: 'google'
       },
       {
-        username: 'new',
-        hash: 'goolge',
-        salt: 'google'
+        username: profile.emails ? profile.emails[0].value : profile.id,
+        autentification_id: profile.id,
+        autentification_type: 'google'
       }
     )
       .then((user: User) => {

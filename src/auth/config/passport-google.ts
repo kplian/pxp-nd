@@ -13,21 +13,27 @@ const googleStrategy = new OAuth2Strategy(
   (accessToken: string, refreshToken: string, profile: Profile, done) => {
     console.log('PROFILE', profile);
     const UserRepo = getCustomRepository(UserRepository);
-    // UserRepo.findOrCreateSocial(
-    //   {
-    //     socialId: profile.id,
-    //     socialName: 'googleId'
-    //   },
-    //   {
-    //     username: 'new',
-    //     hash: 'goolge',
-    //     salt: 'google'
-    //   }
-    // )
-    //   .then((user: User) => {
-    //     return done(null, user);
-    //   })
-    //   .catch((err) => done(err));
+    UserRepo.findOrCreateSocial(
+      {
+        autentification_id: profile.id,
+        autentification_type: 'google'
+      },
+      {
+        username: profile.emails ? profile.emails[0].value : profile.id,
+        autentification_id: profile.id,
+        autentification_type: 'google'
+      }
+    )
+      .then((user: User) => {
+        console.log('[USER]', user);
+
+        return done(null, user);
+      })
+      .catch((err) => {
+        console.log('[ERROR]', err);
+
+        done(err);
+      });
   }
 );
 

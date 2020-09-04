@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import Subsystem from './Subsystem';
 import Transaction from './Transaction';
 
 @Entity()
-export default class Procedure {
+export default class Procedure extends BaseEntity {
 
   @PrimaryGeneratedColumn({ name: 'procedure_id' })
   procedureId: number;

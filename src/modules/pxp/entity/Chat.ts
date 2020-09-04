@@ -22,13 +22,13 @@ export default class Chat extends BaseEntity {
   isActive: boolean;
 
 
-  @ManyToOne(type => ChatType, chatType => chatType.chats)
+  @ManyToOne(() => ChatType, chatType => chatType.chats)
   @JoinColumn({ name: 'chat_type_id' })
   chatType: ChatType;
 
-  @OneToMany(type => Message, message => message.chat)
+  @OneToMany(() => Message, message => message.chat)
   messages: Message[];
 
-  @OneToMany(type => ChatUser, chatUser => chatUser.chatU)
+  @OneToMany(() => ChatUser, chatUser => chatUser.chatU)
   chatUser: ChatUser[];
 }

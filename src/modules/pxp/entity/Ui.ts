@@ -1,5 +1,4 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany } from 'typeorm';
-import Transaction from './Transaction';
 import Role from './Role';
 import UiTransaction from './UiTransaction';
 
@@ -31,7 +30,7 @@ export default class Ui extends BaseEntity {
   @Column({ name: 'icon', type: 'varchar', length: 80, nullable: true })
   icon: string;
 
-  @ManyToMany(type => Role)
+  @ManyToMany(() => Role)
   @JoinTable({
     schema: 'pxp',
     name: 'tsec_ui_role',
@@ -46,14 +45,14 @@ export default class Ui extends BaseEntity {
   })
   roles: Role[];
 
-  @OneToMany(type => UiTransaction, uiTransaction => uiTransaction.ui)
+  @OneToMany(() => UiTransaction, uiTransaction => uiTransaction.ui)
   @JoinTable()
   transactions: UiTransaction[];
 
-  @ManyToOne(type => Ui, ui => ui.children)
+  @ManyToOne(() => Ui, ui => ui.children)
   parent: Ui;
 
-  @OneToMany(type => Ui, ui => ui.parent)
+  @OneToMany(() => Ui, ui => ui.parent)
   children: Ui[];
 
 }

@@ -47,8 +47,7 @@ function configPassportLocal() {
   passport.use(strategy);
   // This method is used to store the user identifier locally.
   passport.serializeUser((user: User, done: any) => {
-    console.log('dataser');
-    done(null, user.user_id);
+    done(null, user.userId);
   });
   // This method is used to extract user data.
   passport.deserializeUser((userId: string, done: any) => {

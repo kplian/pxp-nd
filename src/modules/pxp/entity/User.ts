@@ -2,64 +2,75 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
   OneToOne,
-  JoinColumn
+  JoinColumn,
+  ManyToMany,
+  JoinTable
 } from 'typeorm';
 import Person from './Person';
+import Role from './Role';
+import PxpEntity from './PxpEntity';
 
-// @Entity({ schema: 'public', name: 'tsec_user' })
-@Entity({ schema: 'public', name: 'user' })
-export class User {
-  @PrimaryGeneratedColumn()
-  user_id?: number;
+@Entity({ schema: 'pxp', name: 'tsec_user' })
+export default class User extends PxpEntity {
+  @PrimaryGeneratedColumn({ name: 'user_id' })
+  userId: number;
 
-  // @Column({ type: 'varchar', length: 80, unique: true })
-  // login: string;
-
-  // @Column({ type: 'varchar', length: 80 })
-  // password: string;
-
-  // @Column({ type: 'varchar', length: 80, nullable: true })
-  // style: string;
-
-  // @Column({ type: 'date', nullable: true })
-  // expiration: Date;
-
-  @Column({ type: 'varchar', length: 80, nullable: false, default: 'local' })
-  autentification_type?: string;
-
-  @Column({ type: 'varchar', length: 80, unique: true, nullable: true })
-  autentification_id?: string;
-
-  // @Column({ type: 'varchar', length: 80, unique: true, nullable: true })
-  // token: string;
-
-  // @CreateDateColumn({ name: 'created_at' })
-  // created_at: Date;
-
-  // @Column({ name: 'is_active', default: true })
-  // is_active: boolean;
-
-  // @Column({ type: 'varchar', length: 80, nullable: true, default: 'local' })
-  // user_reg: string;
-
-  // @PrimaryGeneratedColumn()
-  // id?: number;
-
-  @Column()
+  @Column({ name: 'username', type: 'varchar', length: 500 })
   username: string;
 
-  @Column()
-  hash?: string;
+  @Column({ name: 'password', type: 'varchar', length: 200, nullable: true })
+  password: string;
 
-  @Column()
-  salt?: string;
+  @Column({ name: 'style', type: 'varchar', length: 80, nullable: true })
+  style: string;
 
-  // @OneToOne((type) => Person, {
-  //   eager: true,
-  //   cascade: true
-  // })
-  // @JoinColumn({ name: 'person_id', referencedColumnName: 'person_id' })
-  // person: Person;
+  @Column({ name: 'expiration', nullable: true })
+  expiration: Date;
+
+  @Column({
+    name: 'authentication_type',
+    type: 'varchar',
+    length: 80,
+    nullable: false,
+    default: 'local'
+  })
+  authenticationType: string;
+
+  @Column({
+    name: 'token',
+    type: 'varchar',
+    length: 80,
+    unique: true,
+    nullable: true
+  })
+  token: string;
+
+  @Column({ name: 'hash', type: 'varchar', length: 500 })
+  hash: string;
+
+  @Column({ name: 'salt', type: 'varchar', length: 500 })
+  salt: string;
+
+  @OneToOne(() => Person, {
+    eager: true,
+    cascade: true
+  })
+  @JoinColumn({ name: 'person_id' })
+  person: Person;
+
+  @ManyToMany(() => Role)
+  @JoinTable({
+    schema: 'pxp',
+    name: 'tsec_user_role',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'userId'
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    }
+  })
+  roles: Role[];
 }

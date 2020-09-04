@@ -19,9 +19,9 @@ class Person extends Controller {
   async add(params: Record<string, unknown>): Promise<PersonModel> {
     const person = new PersonModel();
     person.name = <string>params['name'];
-    person.last_name_first = <string>params['last_name_first'];
+    person.lastNameFirst = <string>params['last_name_first'];
     person.dni = <string>params['dni'];
-    person.dni_number = <string>params['dni_number'];
+    person.dniNumber = <string>params['dni_number'];
     await getManager().save(person);
     return person;
   }

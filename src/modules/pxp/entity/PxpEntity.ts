@@ -2,7 +2,7 @@ import { Entity, BaseEntity, Column, CreateDateColumn } from 'typeorm';
 
 
 @Entity({ name: 'tpar_chat', schema: 'pxp' })
-export default class Chat extends BaseEntity {
+export default class PxpEntity extends BaseEntity {
 
   @Column({ name: 'created_by' })
   createdBy: number;

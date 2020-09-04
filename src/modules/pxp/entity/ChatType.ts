@@ -1,8 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Chat from './Chat';
+import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tpar_chat_type' })
-export default class ChatType extends BaseEntity {
+export default class ChatType extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'chat_type_id' })
   chatTypeId: number;
@@ -28,12 +29,6 @@ export default class ChatType extends BaseEntity {
   @Column({ name: 'url', type: 'varchar', length: 200, nullable: true })
   url: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-  @OneToMany(type => Chat, chat => chat.chatType)
+  @OneToMany(() => Chat, chat => chat.type)
   chats: Chat[];
 }

@@ -1,10 +1,11 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import Transaction from './Transaction';
 import Ui from './Ui';
 import Role from './Role';
+import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tsec_ui_transaction', schema: 'pxp' })
-export default class UiTransaction extends BaseEntity {
+export default class UiTransaction extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_transaction_id' })
   uiTransactionId: number;
@@ -15,15 +16,15 @@ export default class UiTransaction extends BaseEntity {
   @Column({ name: 'description', type: 'text', nullable: true })
   buttonName: string
 
-  @ManyToOne(type => Ui, ui => ui.transactions)
-  @JoinColumn({ name: 'fk_ui_id' })
+  @ManyToOne(() => Ui, ui => ui.transactions)
+  @JoinColumn({ name: 'ui_id' })
   ui: Ui;
 
-  @ManyToOne(type => Transaction, transaction => transaction.uis)
-  @JoinColumn({ name: 'fk_transaction_id' })
+  @ManyToOne(() => Transaction, transaction => transaction.uis)
+  @JoinColumn({ name: 'transaction_id' })
   transaction: Transaction;
 
-  @ManyToMany(type => Role)
+  @ManyToMany(() => Role)
   @JoinTable({
     schema: 'pxp',
     name: 'tsec_ui_transaction_role',

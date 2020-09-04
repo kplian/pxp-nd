@@ -1,8 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Subtype from './Subtype';
+import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tpar_type' })
-export default class Type extends BaseEntity {
+export default class Type extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'type_id' })
   typeId: number;
@@ -13,13 +14,6 @@ export default class Type extends BaseEntity {
   @Column({ name: 'table', type: 'varchar', length: 100, nullable: true })
   table: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-  @OneToMany(type => Subtype, subtype => subtype.ttype, { eager: true, cascade: true })
+  @OneToMany(() => Subtype, subtype => subtype.type, { eager: true, cascade: true })
   subtypes: Subtype[];
-
 }

@@ -1,8 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Type from './Type';
+import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tpar_subtype' })
-export default class Subtype extends BaseEntity {
+export default class Subtype extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'subtype_id' })
   subtypeId: number;
@@ -16,13 +17,7 @@ export default class Subtype extends BaseEntity {
   @Column({ name: 'order', type: 'int' })
   order: number
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-  @ManyToOne(type => Type, ttype => ttype.subtypes)
+  @ManyToOne(() => Type, type => type.subtypes)
   @JoinColumn({ name: 'type_id' })
-  ttype: Subtype;
+  type: Type;
 }

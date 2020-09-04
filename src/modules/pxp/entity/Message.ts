@@ -1,8 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Chat from './Chat';
+import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tpar_message', schema: 'pxp' })
-export default class Message extends BaseEntity {
+export default class Message extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'message_id' })
   messageId: number;
@@ -16,14 +17,7 @@ export default class Message extends BaseEntity {
   @Column({ name: 'message', type: 'varchar', nullable: true })
   message: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-
-  @ManyToOne(type => Chat, chat => chat.messages)
+  @ManyToOne(() => Chat, chat => chat.messages)
   @JoinColumn({ name: 'chat_id' })
   chat: Chat;
 }

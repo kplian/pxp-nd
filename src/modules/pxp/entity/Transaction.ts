@@ -1,10 +1,11 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable } from 'typeorm';
 import Procedure from './Procedure';
 import UiTransaction from './UiTransaction';
+import PxpEntity from './PxpEntity';
 
 @Entity()
 
-export default class Transaction extends BaseEntity {
+export default class Transaction extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'transaction_id' })
   transactionId: number;
@@ -15,11 +16,11 @@ export default class Transaction extends BaseEntity {
   @Column({ name: 'description', type: 'text' })
   description: string
 
-  @ManyToOne(type => Procedure, procedure => procedure.transactions)
-  @JoinColumn({ name: 'fk_procedure_id' })
+  @ManyToOne(() => Procedure, procedure => procedure.transactions)
+  @JoinColumn({ name: 'procedure_id' })
   procedure: Procedure;
 
-  @OneToMany(type => UiTransaction, uiTransaction => uiTransaction.transaction)
+  @OneToMany(() => UiTransaction, uiTransaction => uiTransaction.transaction)
   @JoinTable()
   uis: UiTransaction[];
 

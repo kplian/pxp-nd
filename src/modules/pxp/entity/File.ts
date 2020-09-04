@@ -1,9 +1,10 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import FileType from './FileType';
 import HistoryFile from './HistoryFile';
+import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tpar_file', schema: 'pxp' })
-export default class File extends BaseEntity {
+export default class File extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'file_id' })
   fileId: number;
@@ -20,19 +21,10 @@ export default class File extends BaseEntity {
   @Column({ name: 'folder', type: 'varchar', length: 500, nullable: true })
   folder: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-
-  @ManyToOne(type => FileType, fileType => fileType.files)
+  @ManyToOne(() => FileType, fileType => fileType.files)
   @JoinColumn({ name: 'file_type_id' })
-  fileType: FileType;
+  type: FileType;
 
-  @OneToMany(type => HistoryFile, HistoryFile => HistoryFile.file)
+  @OneToMany(() => HistoryFile, HistoryFile => HistoryFile.file)
   historyFiles: HistoryFile[];
-
-
 }

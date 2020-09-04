@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, BaseEntity, Entity, PrimaryColumn } from 'typeorm';
 import { SessionEntity } from 'typeorm-store';
 
 @Entity({ schema: 'pxp', name: 'tsec_session' })

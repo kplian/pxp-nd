@@ -1,10 +1,11 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import Role from './Role';
 import UiTransaction from './UiTransaction';
+import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tsec_ui' })
 
-export default class Ui extends BaseEntity {
+export default class Ui extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_id' })
   uiId: number;
@@ -50,6 +51,7 @@ export default class Ui extends BaseEntity {
   transactions: UiTransaction[];
 
   @ManyToOne(() => Ui, ui => ui.children)
+  @JoinColumn({ name: 'parent_ui_id' })
   parent: Ui;
 
   @OneToMany(() => Ui, ui => ui.parent)

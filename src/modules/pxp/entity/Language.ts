@@ -1,9 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Translate from './Translate';
-
+import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tpar_language' })
-export default class Language extends BaseEntity {
+export default class Language extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'language_id' })
   languageId: number;
@@ -17,13 +17,6 @@ export default class Language extends BaseEntity {
   @Column({ name: 'id_default', default: false })
   isDefault: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-
-  @OneToMany(type => Translate, translate => translate.language, { eager: true, cascade: true })
+  @OneToMany(() => Translate, translate => translate.language, { eager: true, cascade: true })
   translates: Translate[];
 }

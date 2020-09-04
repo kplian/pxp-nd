@@ -1,9 +1,10 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Language from './Language';
 import Word from './Word';
+import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tpar_translate' })
-export default class Translate extends BaseEntity {
+export default class Translate extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'translate_id' })
   translateId: number;
@@ -11,17 +12,11 @@ export default class Translate extends BaseEntity {
   @Column({ name: 'text', type: 'varchar', length: 30, nullable: false })
   text: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-  @ManyToOne(type => Language, language => language.translates)
+  @ManyToOne(() => Language, language => language.translates)
   @JoinColumn({ name: 'language_id' })
   language: Language;
 
-  @ManyToOne(type => Word, word => word.translatesW)
+  @ManyToOne(() => Word, word => word.translates)
   @JoinColumn({ name: 'word_id' })
   word: Word;
 }

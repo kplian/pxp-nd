@@ -1,9 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Word from './Word';
-
+import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tpar_language_group' })
-export default class LanguageGroup extends BaseEntity {
+export default class LanguageGroup extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'language_group_id' })
   languageGroupId: number;
@@ -17,12 +17,6 @@ export default class LanguageGroup extends BaseEntity {
   @Column({ name: 'type', type: 'varchar', length: 50, nullable: true })
   type: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-  @OneToMany(type => Word, word => word.languageGroup, { eager: true, cascade: true })
+  @OneToMany(() => Word, word => word.languageGroup, { eager: true, cascade: true })
   words: Word[];
 }

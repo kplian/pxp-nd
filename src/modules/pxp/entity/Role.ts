@@ -1,11 +1,12 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 
 import User from './User';
 import Subsystem from './Subsystem';
 import Ui from './Ui';
+import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tsec_role' })
-export default class Role extends BaseEntity {
+export default class Role extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'role_id' })
   roleId: number;
@@ -16,7 +17,7 @@ export default class Role extends BaseEntity {
   @Column({ name: 'description', type: 'text', length: 100, nullable: false })
   description: string;
 
-  @ManyToMany(type => User)
+  @ManyToMany(() => User)
   @JoinTable({
     schema: 'pxp',
     name: 'tsec_user_role',
@@ -31,11 +32,11 @@ export default class Role extends BaseEntity {
   })
   users: User[];
 
-  @ManyToOne(type => Subsystem, subsystem => subsystem.roles)
-  @JoinColumn({ name: 'fk_subsystem_id' })
+  @ManyToOne(() => Subsystem, subsystem => subsystem.roles)
+  @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
 
-  @ManyToMany(type => Ui)
+  @ManyToMany(() => Ui)
   @JoinTable({
     schema: 'pxp',
     name: 'tsec_ui_role',

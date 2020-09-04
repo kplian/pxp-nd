@@ -1,8 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import File from './File';
-//, OneToOne, JoinColumn
+import PxpEntity from './PxpEntity';
+
 @Entity({ schema: 'pxp', name: 'tpar_file_type' })
-export default class FileType extends BaseEntity {
+export default class FileType extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'file_type_id' })
   fileTypeId: number;
@@ -28,12 +29,6 @@ export default class FileType extends BaseEntity {
   @Column({ name: 'multiple', type: 'varchar', length: 100, nullable: true })
   multiple: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-  @OneToMany(type => File, file => file.fileType)
+  @OneToMany(() => File, file => file.type)
   files: File[];
 }

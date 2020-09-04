@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, Column, CreateDateColumn } from 'typeorm';
+import { Entity, BaseEntity, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 
 @Entity({ name: 'tpar_chat', schema: 'pxp' })
@@ -19,7 +19,7 @@ export default class PxpEntity extends BaseEntity {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Column({ name: 'modified_at', nullable: true })
+  @UpdateDateColumn({ name: 'modified_at', nullable: true })
   modifiedAt: Date;
 
   @Column({ name: 'is_active', default: true })

@@ -1,10 +1,11 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import ChatType from './ChatType';
 import Message from './Message';
 import ChatUser from './ChatUser';
+import PxpEntity from './PxpEntity';
 
 @Entity({ name: 'tpar_chat', schema: 'pxp' })
-export default class Chat extends BaseEntity {
+export default class Chat extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'chat_id' })
   chatId: number;
@@ -15,20 +16,13 @@ export default class Chat extends BaseEntity {
   @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
   description: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
-
-
   @ManyToOne(() => ChatType, chatType => chatType.chats)
   @JoinColumn({ name: 'chat_type_id' })
-  chatType: ChatType;
+  type: ChatType;
 
   @OneToMany(() => Message, message => message.chat)
   messages: Message[];
 
-  @OneToMany(() => ChatUser, chatUser => chatUser.chatU)
-  chatUser: ChatUser[];
+  @OneToMany(() => ChatUser, chatUser => chatUser.chat)
+  users: ChatUser[];
 }

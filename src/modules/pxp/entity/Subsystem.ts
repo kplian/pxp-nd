@@ -3,8 +3,7 @@ import Role from './Role';
 import Procedure from './Procedure';
 import PxpEntity from './PxpEntity';
 
-@Entity({ name: 'tsec_subsystem' })
-
+@Entity({ schema: 'pxp', name: 'tsec_subsystem' })
 export default class Subsystem extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'subsystem_id' })

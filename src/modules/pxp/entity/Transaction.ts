@@ -3,8 +3,7 @@ import Procedure from './Procedure';
 import UiTransaction from './UiTransaction';
 import PxpEntity from './PxpEntity';
 
-@Entity()
-
+@Entity({ schema: 'pxp', name: 'tsec_transaction' })
 export default class Transaction extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'transaction_id' })

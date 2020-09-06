@@ -18,11 +18,12 @@ import loadControllers from './lib/loadControllers';
 import { errorMiddleware } from './lib/PxpError';
 import passport from 'passport';
 import { authRouter } from './auth/auth-routes';
-import { configPassport } from './auth/config/passport-local';
+import { configPassport } from './auth/config';
 import session from 'express-session';
 import { getConnection } from 'typeorm';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
+import cors from 'cors';
 class App {
   public app: express.Application;
   public controllers: Controller[];
@@ -31,7 +32,6 @@ class App {
     this.app = express();
     this.initializeMiddlewares();
     this.controllers = [];
-
   }
   public async loadControllers(): Promise<void> {
     this.controllers = await loadControllers();
@@ -52,10 +52,11 @@ class App {
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.configCors();
   }
 
   initializeAuthentication(): void {
-    this.initializeSession();
+    // this.initializeSession();
     this.initializePassport();
   }
 
@@ -73,8 +74,22 @@ class App {
     this.app.use(authRouter);
   }
 
-  private initializeSession() {
+  private configCors() {
+    const whitelist = ['http://localhost:3100'];
 
+    // const corsOptions = {
+    //   origin: function (origin, callback) {
+    //     if (whitelist.indexOf(origin) !== -1 || !origin) {
+    //       callback(null, true);
+    //     } else {
+    //       callback(new Error('Not allowed by CORS'));
+    //     }
+    //   }
+    // };
+    this.app.use(cors());
+    this.app.options('*', cors());
+  }
+  private initializeSession() {
     const repository = getConnection().getRepository(Session);
     this.app.use(
       session({

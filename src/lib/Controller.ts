@@ -34,9 +34,14 @@ class Controller implements ControllerInterface {
       this.model = Reflect.getMetadata('model', this.constructor);
       const modelArray = this.model.split('/');
       try {
-        const defaultModel = import(`../modules/${modelArray[0]}/entity/${modelArray[1]}`);
+        const defaultModel = import(
+          `../modules/${modelArray[0]}/entity/${modelArray[1]}`
+        );
       } catch {
-        throw new PxpError(500, 'Model defined in  ' + this.constructor.name + ' not found.');
+        throw new PxpError(
+          500,
+          'Model defined in  ' + this.constructor.name + ' not found.'
+        );
       }
     }
     this.initializeRoutes();
@@ -52,54 +57,144 @@ class Controller implements ControllerInterface {
       this.path = Reflect.getMetadata('controller_path', this.constructor);
     }
     //get read only
-    const readonly = Reflect.getMetadata('readonly', this.constructor) as { [id: string]: boolean; } || {};
+    const readonly =
+      (Reflect.getMetadata('readonly', this.constructor) as {
+        [id: string]: boolean;
+      }) || {};
     //get authentication
-    const authentication = Reflect.getMetadata('authentication', this.constructor) as { [id: string]: boolean; } || {};
+    const authentication =
+      (Reflect.getMetadata('authentication', this.constructor) as {
+        [id: string]: boolean;
+      }) || {};
     //get permission
-    const permission = Reflect.getMetadata('permission', this.constructor) as { [id: string]: boolean; } || {};
+    const permission =
+      (Reflect.getMetadata('permission', this.constructor) as {
+        [id: string]: boolean;
+      }) || {};
     //get log
-    const log = Reflect.getMetadata('permission', this.constructor) as { [id: string]: boolean; } || {};
+    const log =
+      (Reflect.getMetadata('permission', this.constructor) as {
+        [id: string]: boolean;
+      }) || {};
     //get dbsettings
-    const dbsettings = Reflect.getMetadata('dbsettings', this.constructor) as { [id: string]: 'Procedure' | 'Orm' | 'Query'; } || {};
+    const dbsettings =
+      (Reflect.getMetadata('dbsettings', this.constructor) as {
+        [id: string]: 'Procedure' | 'Orm' | 'Query';
+      }) || {};
 
-    routes.forEach(route => {
-      const methodDbSettings = dbsettings[route.methodName] || config.defaultDbSettings;
+    routes.forEach((route) => {
+      const methodDbSettings =
+        dbsettings[route.methodName] || config.defaultDbSettings;
       if (!(route.methodName in readonly)) {
-        throw new PxpError(500, 'ReadOnly decorator was not defined for ' + route.methodName + ' in ' + this.constructor.name + ' controller.');
+        throw new PxpError(
+          500,
+          'ReadOnly decorator was not defined for ' +
+            route.methodName +
+            ' in ' +
+            this.constructor.name +
+            ' controller.'
+        );
       }
-      if (route.methodName in authentication && authentication[route.methodName] === false) {
-        this.router[route.requestMethod]('/' + this.module + this.path + route.path, async (req: Request, res: Response, next: NextFunction) => {
-          // Execute our method for this path and pass our express request and response object.
-          const params = { ...req.query, ...req.body, ...req.params };
-          await this.genericMethodWrapper(params, next, res, route.methodName, methodDbSettings, readonly[route.methodName], permission[route.methodName], log[route.methodName]);
-        });
-      } else {
-        //call with middleware
-        this.router[route.requestMethod]('/' + this.module + this.path + route.path,
-          //MIDDLEWARES AREA
-          isAuthenticated,
+      if (
+        route.methodName in authentication &&
+        authentication[route.methodName] === false
+      ) {
+        this.router[route.requestMethod](
+          '/' + this.module + this.path + route.path,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-            await this.genericMethodWrapper(params, next, res, route.methodName, methodDbSettings, readonly[route.methodName], permission[route.methodName], log[route.methodName]);
-          });
-      }
+            await this.genericMethodWrapper(
+              params,
+              next,
+              res,
+              route.methodName,
+              methodDbSettings,
+              readonly[route.methodName],
+              permission[route.methodName],
+              log[route.methodName]
+            );
+          }
+        );
+      } else {
+        //call with middleware
+        console.log('route', '/' + this.module + this.path + route.path);
 
+        this.router[route.requestMethod](
+          '/' + this.module + this.path + route.path,
+          //MIDDLEWARES AREA
+          // isAuthenticated,
+          async (req: Request, res: Response, next: NextFunction) => {
+            // Execute our method for this path and pass our express request and response object.
+            const params = { ...req.query, ...req.body, ...req.params };
+            await this.genericMethodWrapper(
+              params,
+              next,
+              res,
+              route.methodName,
+              methodDbSettings,
+              readonly[route.methodName],
+              permission[route.methodName],
+              log[route.methodName]
+            );
+          }
+        );
+      }
     });
   }
 
-  async genericMethodWrapper(params: Record<string, unknown>, next: NextFunction, res: Response, methodName: string, dbsettings: string, readonly: boolean, permission = true, log = true): Promise<void> {
+  async genericMethodWrapper(
+    params: Record<string, unknown>,
+    next: NextFunction,
+    res: Response,
+    methodName: string,
+    dbsettings: string,
+    readonly: boolean,
+    permission = true,
+    log = true
+  ): Promise<void> {
     if (dbsettings === 'Orm') {
-      await this.ormMethodWrapper(params, next, res, methodName, readonly, permission, log);
+      await this.ormMethodWrapper(
+        params,
+        next,
+        res,
+        methodName,
+        readonly,
+        permission,
+        log
+      );
     } else if (dbsettings === 'Procedure') {
-      await this.procedureMethodWrapper(params, next, res, methodName, readonly, permission, log);
+      await this.procedureMethodWrapper(
+        params,
+        next,
+        res,
+        methodName,
+        readonly,
+        permission,
+        log
+      );
     } else {
-      await this.sqlMethodWrapper(params, next, res, methodName, readonly, permission, log);
+      await this.sqlMethodWrapper(
+        params,
+        next,
+        res,
+        methodName,
+        readonly,
+        permission,
+        log
+      );
     }
   }
 
-  async ormMethodWrapper(params: Record<string, unknown>, next: NextFunction, res: Response, methodName: string, readonly: boolean, permission = true, log = true): Promise<void> {
-
+  async ormMethodWrapper(
+    params: Record<string, unknown>,
+    next: NextFunction,
+    res: Response,
+    methodName: string,
+    readonly: boolean,
+    permission = true,
+    log = true
+  ): Promise<void> {
     try {
       let metResponse = {};
       if (permission) {
@@ -116,22 +211,35 @@ class Controller implements ControllerInterface {
     } catch (ex) {
       next(ex);
     }
-
-
   }
 
-  async procedureMethodWrapper(params: Record<string, unknown>, next: NextFunction, res: Response, methodName: string, readonly: boolean, permission = true, log = true): Promise<void> {
+  async procedureMethodWrapper(
+    params: Record<string, unknown>,
+    next: NextFunction,
+    res: Response,
+    methodName: string,
+    readonly: boolean,
+    permission = true,
+    log = true
+  ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);
     console.log('after function');
   }
 
-  async sqlMethodWrapper(params: Record<string, unknown>, next: NextFunction, res: Response, methodName: string, readonly: boolean, permission = true, log = true): Promise<void> {
+  async sqlMethodWrapper(
+    params: Record<string, unknown>,
+    next: NextFunction,
+    res: Response,
+    methodName: string,
+    readonly: boolean,
+    permission = true,
+    log = true
+  ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);
     console.log('after function');
   }
-
 
   async validateSchema(schema: Joi.Schema): Promise<unknown> {
     const value = await __(
@@ -144,7 +252,6 @@ class Controller implements ControllerInterface {
 }
 
 /*************************DECORATORS***********************************/
-
 
 const Get = (path = '') => {
   return (target: any, propertyKey: string): void => {
@@ -201,7 +308,9 @@ const Put = (path = '') => {
     }
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'put',
@@ -221,7 +330,9 @@ const Delete = (path = '') => {
     }
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'delete',
@@ -241,7 +352,9 @@ const Patch = (path = '') => {
     }
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<RouteDefinition>;
+    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
+      RouteDefinition
+    >;
 
     routes.push({
       requestMethod: 'patch',
@@ -280,7 +393,9 @@ const Authentication = (authentication = true) => {
     if (!Reflect.hasMetadata('authentication', target.constructor)) {
       Reflect.defineMetadata('authentication', {}, target.constructor);
     }
-    const aut = Reflect.getMetadata('authentication', target.constructor) as { [id: string]: boolean; };
+    const aut = Reflect.getMetadata('authentication', target.constructor) as {
+      [id: string]: boolean;
+    };
     aut[propertyKey] = authentication;
 
     Reflect.defineMetadata('authentication', aut, target.constructor);
@@ -292,7 +407,9 @@ const Log = (log = true) => {
     if (!Reflect.hasMetadata('log', target.constructor)) {
       Reflect.defineMetadata('log', [], target.constructor);
     }
-    const logVar = Reflect.getMetadata('log', target.constructor) as { [id: string]: boolean; };
+    const logVar = Reflect.getMetadata('log', target.constructor) as {
+      [id: string]: boolean;
+    };
     logVar[propertyKey] = log;
     Reflect.defineMetadata('log', logVar, target.constructor);
   };
@@ -303,7 +420,9 @@ const Permission = (permission = true) => {
     if (!Reflect.hasMetadata('permission', target.constructor)) {
       Reflect.defineMetadata('permission', [], target.constructor);
     }
-    const perVar = Reflect.getMetadata('permission', target.constructor) as { [id: string]: boolean; };
+    const perVar = Reflect.getMetadata('permission', target.constructor) as {
+      [id: string]: boolean;
+    };
     perVar[propertyKey] = permission;
     Reflect.defineMetadata('permission', perVar, target.constructor);
   };
@@ -314,7 +433,9 @@ const ReadOnly = (ronly = true) => {
     if (!Reflect.hasMetadata('readonly', target.constructor)) {
       Reflect.defineMetadata('readonly', [], target.constructor);
     }
-    const rOnlyVar = Reflect.getMetadata('readonly', target.constructor) as { [id: string]: boolean; };
+    const rOnlyVar = Reflect.getMetadata('readonly', target.constructor) as {
+      [id: string]: boolean;
+    };
     rOnlyVar[propertyKey] = ronly;
     Reflect.defineMetadata('readonly', rOnlyVar, target.constructor);
   };
@@ -325,14 +446,28 @@ const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') => {
     if (!Reflect.hasMetadata('dbsettings', target.constructor)) {
       Reflect.defineMetadata('dbsettings', [], target.constructor);
     }
-    const dbvar = Reflect.getMetadata('readonly', target.constructor) as { [id: string]: 'Procedure' | 'Orm' | 'Query'; };
+    const dbvar = Reflect.getMetadata('readonly', target.constructor) as {
+      [id: string]: 'Procedure' | 'Orm' | 'Query';
+    };
     dbvar[propertyKey] = modelType;
 
     Reflect.defineMetadata('dbsettings', dbvar, target.constructor);
   };
 };
 
-
-
 export default Controller;
-export { Get, Post, Put, Delete, Patch, Route, Authentication, Log, Permission, DbSettings, ReadOnly, Model, StoredProcedure };
+export {
+  Get,
+  Post,
+  Put,
+  Delete,
+  Patch,
+  Route,
+  Authentication,
+  Log,
+  Permission,
+  DbSettings,
+  ReadOnly,
+  Model,
+  StoredProcedure
+};

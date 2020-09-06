@@ -1,6 +1,14 @@
 import express from 'express';
 import { getManager } from 'typeorm';
-import Controller, { Get, Route, Post, StoredProcedure, DbSettings, ReadOnly, Model } from '../../../lib/Controller';
+import Controller, {
+  Get,
+  Route,
+  Post,
+  StoredProcedure,
+  DbSettings,
+  ReadOnly,
+  Model
+} from '../../../lib/Controller';
 import UserModel from '../entity/User';
 import { genPassword } from '../../../auth/utils/password';
 
@@ -29,9 +37,9 @@ class User extends Controller {
     user.hash = hash;
     user.salt = salt;
     user.username = 'gato';
-    user.login = 'juan.perez';
-    user.password = 'Juan123';
-    user.token = 'ABCD123';
+    // user.login = 'juan.perez';
+    // user.password = 'Juan123';
+    // user.token = 'ABCD123';
 
     await getManager().save(user);
     response.json(user);

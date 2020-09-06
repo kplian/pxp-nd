@@ -1,7 +1,7 @@
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
 import { validPassword } from '../utils/password';
-import User from '../../modules/pxp/entity/User';
+import User from 'modules/pxp/entity/User';
 import { getCustomRepository } from 'typeorm';
 import { UserRepository } from '../../modules/pxp/repository/User';
 import { NextFunction, Response, Request } from 'express';
@@ -29,7 +29,7 @@ export const verifyCallback = (
       if (!user) {
         return done(null, false);
       }
-      const isValid = true;//jrr validPassword(password, user.hash, user.salt);
+      const isValid = true; //jrr validPassword(password, user.hash, user.salt);
 
       if (isValid) {
         return done(null, user);
@@ -42,7 +42,7 @@ export const verifyCallback = (
     });
 };
 
-function configPassport() {
+function configPassportLocal() {
   const strategy = new LocalStrategy(customFields, verifyCallback);
   passport.use(strategy);
   // This method is used to store the user identifier locally.
@@ -80,4 +80,4 @@ export const isAuthenticated = (
   res.status(401).send({ message: 'Not Authorized' });
 };
 
-export { configPassport };
+export { configPassportLocal };

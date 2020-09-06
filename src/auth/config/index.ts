@@ -1,3 +1,3 @@
-import * as configPassportLocal from './passport-local';
+import { configPassport } from './passport-config';
 
-export { configPassportLocal };
+export { configPassport };

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Role from './Role';
 import Procedure from './Procedure';
+import Ui from './Ui';
 import PxpEntity from './PxpEntity';
 
 @Entity({ schema: 'pxp', name: 'tsec_subsystem' })
@@ -26,5 +27,8 @@ export default class Subsystem extends PxpEntity {
 
   @OneToMany(() => Role, role => role.subsystem)
   roles: Role[];
+
+  @OneToMany(() => Ui, ui => ui.subsystem)
+  uis: Ui[];
 
 } 

@@ -89,10 +89,10 @@ class Controller implements ControllerInterface {
         throw new PxpError(
           500,
           'ReadOnly decorator was not defined for ' +
-            route.methodName +
-            ' in ' +
-            this.constructor.name +
-            ' controller.'
+          route.methodName +
+          ' in ' +
+          this.constructor.name +
+          ' controller.'
         );
       }
       if (
@@ -100,7 +100,7 @@ class Controller implements ControllerInterface {
         authentication[route.methodName] === false
       ) {
         this.router[route.requestMethod](
-          '/' + this.module + this.path + route.path,
+          config.apiPrefix + '/' + this.module + this.path + route.path,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
@@ -121,9 +121,9 @@ class Controller implements ControllerInterface {
         console.log('route', '/' + this.module + this.path + route.path);
 
         this.router[route.requestMethod](
-          '/' + this.module + this.path + route.path,
+          config.apiPrefix + '/' + this.module + this.path + route.path,
           //MIDDLEWARES AREA
-          // isAuthenticated,
+          isAuthenticated,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };

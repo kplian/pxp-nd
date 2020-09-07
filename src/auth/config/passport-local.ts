@@ -16,25 +16,42 @@ export const verifyCallback = (
   username: string,
   password: string,
   done: any
-) => {
+): void => {
   const userRepository = getCustomRepository(UserRepository);
-
+  /*
+  {
+        select: ['username', 'userId', 'person', 'authenticationType', 'style', 'hash', 'salt'],
+        where: {
+          username
+        }
+      }*/
   userRepository
-    .findOne({
-      where: {
-        username
-      }
-    })
+    .createQueryBuilder('user')
+    .innerJoin('user.person', 'person')
+    .select([
+      'user.userId',
+      'user.username',
+      'user.authenticationType',
+      'user.style',
+      'user.hash',
+      'user.salt',
+      'person.name',
+      'person.lastName',
+      'person.lastName2',
+      'person.mail',
+    ])
+    .getOne()
     .then((user) => {
       if (!user) {
-        return done(null, false);
+        return done(null, false, 'Invalid username');
       }
-      const isValid = true; //jrr validPassword(password, user.hash, user.salt);
-
+      const isValid = validPassword(password, <string>user.hash, <string>user.salt);
+      delete user.hash;
+      delete user.salt;
       if (isValid) {
         return done(null, user);
       } else {
-        return done(null, false);
+        return done(null, false, 'Invalid password');
       }
     })
     .catch((err) => {
@@ -42,7 +59,7 @@ export const verifyCallback = (
     });
 };
 
-function configPassportLocal() {
+function configPassportLocal(): void {
   const strategy = new LocalStrategy(customFields, verifyCallback);
   passport.use(strategy);
   // This method is used to store the user identifier locally.
@@ -56,7 +73,7 @@ function configPassportLocal() {
     userRepository
       .findOne({
         where: {
-          user_id: userId
+          userId: userId
         }
       })
       .then((user) => {
@@ -73,7 +90,7 @@ export const isAuthenticated = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   if (req.isAuthenticated()) {
     return next();
   }

@@ -1,27 +1,31 @@
 import { getManager } from 'typeorm';
-import Controller, { Get, Post, DbSettings, ReadOnly, Authentication } from '../../../lib/Controller';
+import Controller, { Get, Post, DbSettings, ReadOnly, Authentication, Log, Model } from '../../../lib/Controller';
 import PersonModel from '../entity/Person';
 
-
+@Model('pxp/Person')
 class Person extends Controller {
-  @Get()
+  /*@Get()
   @DbSettings('Orm')
   @ReadOnly(true)
-  @Authentication(false)
-  async getAll(params: Record<string, unknown>): Promise<PersonModel[]> {
-    const users = await PersonModel.find();
-    return users;
-  }
+  async list(params: Record<string, unknown>): Promise<PersonModel[]> {
+    const persons = await PersonModel.find();
+    console.log('hijo');
+    return persons;
+  }*/
 
   @Post()
   @DbSettings('Orm')
   @ReadOnly(false)
+  @Authentication(false)
+  @Log(false)
   async add(params: Record<string, unknown>): Promise<PersonModel> {
+    console.log('llega');
     const person = new PersonModel();
     person.name = <string>params['name'];
-    person.lastNameFirst = <string>params['last_name_first'];
+    person.lastName = <string>params['last_name_first'];
     person.dni = <string>params['dni'];
     person.dniNumber = <string>params['dni_number'];
+    person.createdBy = <number>this.user.userId;
     await person.save();
     return person;
   }

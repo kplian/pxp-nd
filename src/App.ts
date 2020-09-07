@@ -56,7 +56,7 @@ class App {
   }
 
   initializeAuthentication(): void {
-    // this.initializeSession();
+    this.initializeSession();
     this.initializePassport();
   }
 

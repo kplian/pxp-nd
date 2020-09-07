@@ -10,13 +10,14 @@
  */
 
 import Joi from '@hapi/joi';
+import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
 import { __ } from './PxpError';
 import { RouteDefinition } from './RouteDefinition';
 import { PxpError } from './PxpError';
 import ControllerInterface from './ControllerInterface';
 import config from '../config';
-
+import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
 
 class Controller implements ControllerInterface {
@@ -25,18 +26,35 @@ class Controller implements ControllerInterface {
   public router = Router();
   public path = '';
   public module = '';
-  public model = '';
+  public modelString = '';
+  public user: User;
+  public model: any;
+  private basicRoutes: RouteDefinition[] = [
+    { requestMethod: 'post', path: '/add', methodName: 'add' },
+    { requestMethod: 'delete', path: '/delete', methodName: 'delete' },
+    { requestMethod: 'put', path: '/edit', methodName: 'edit' },
+    { requestMethod: 'get', path: '/list', methodName: 'list' }
+  ];
+  private basicReadOnly = {
+    add: false,
+    edit: false,
+    list: true,
+    delete: false
+  };
 
   constructor(module: string) {
     this.schemaValidated = false;
     this.module = module;
+    //import 
     if (Reflect.hasMetadata('model', this.constructor)) {
-      this.model = Reflect.getMetadata('model', this.constructor);
-      const modelArray = this.model.split('/');
+      this.modelString = Reflect.getMetadata('model', this.constructor);
+      const modelArray = this.modelString.split('/');
       try {
-        const defaultModel = import(
+        import(
           `../modules/${modelArray[0]}/entity/${modelArray[1]}`
-        );
+        ).then(model => {
+          this.model = model;
+        });
       } catch {
         throw new PxpError(
           500,
@@ -48,7 +66,7 @@ class Controller implements ControllerInterface {
   }
 
   private initializeRoutes() {
-    const routes = Reflect.getMetadata('routes', this.constructor) as Array<
+    let routes = Reflect.getMetadata('routes', this.constructor) as Array<
       RouteDefinition
     >;
     this.path = '/' + this.constructor.name;
@@ -57,7 +75,7 @@ class Controller implements ControllerInterface {
       this.path = Reflect.getMetadata('controller_path', this.constructor);
     }
     //get read only
-    const readonly =
+    let readonly =
       (Reflect.getMetadata('readonly', this.constructor) as {
         [id: string]: boolean;
       }) || {};
@@ -73,7 +91,7 @@ class Controller implements ControllerInterface {
       }) || {};
     //get log
     const log =
-      (Reflect.getMetadata('permission', this.constructor) as {
+      (Reflect.getMetadata('log', this.constructor) as {
         [id: string]: boolean;
       }) || {};
     //get dbsettings
@@ -81,6 +99,12 @@ class Controller implements ControllerInterface {
       (Reflect.getMetadata('dbsettings', this.constructor) as {
         [id: string]: 'Procedure' | 'Orm' | 'Query';
       }) || {};
+
+    //define basic routes
+    if (this.modelString != '') {
+      routes = _.union(this.basicRoutes, routes);
+      readonly = { ...this.basicReadOnly, ...readonly }
+    }
 
     routes.forEach((route) => {
       const methodDbSettings =
@@ -117,8 +141,6 @@ class Controller implements ControllerInterface {
           }
         );
       } else {
-        //call with middleware
-        console.log('route', '/' + this.module + this.path + route.path);
 
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
@@ -127,6 +149,11 @@ class Controller implements ControllerInterface {
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
+
+            if (req.user) {
+              this.user = <User>req.user;
+            }
+
             await this.genericMethodWrapper(
               params,
               next,
@@ -199,18 +226,30 @@ class Controller implements ControllerInterface {
       let metResponse = {};
       if (permission) {
         console.log('validate permission');
+        //this.user es instancia de entity user
+        this.user.userId;
       }
-      if (permission) {
+      if (readonly) {
         console.log('get readonly connection');
+      } else {
+        console.log('get modification connection');
       }
+
       metResponse = await eval(`this.${methodName}(params)`);
-      if (permission) {
+      if (log) {
         console.log('insert into log');
       }
       res.json(metResponse);
     } catch (ex) {
       next(ex);
     }
+  }
+
+  async list(params: Record<string, unknown>): Promise<any[]> {
+    console.log(this.model.default);
+    const persons = await this.model.default.find();
+    console.log('padre');
+    return persons;
   }
 
   async procedureMethodWrapper(
@@ -446,7 +485,7 @@ const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') => {
     if (!Reflect.hasMetadata('dbsettings', target.constructor)) {
       Reflect.defineMetadata('dbsettings', [], target.constructor);
     }
-    const dbvar = Reflect.getMetadata('readonly', target.constructor) as {
+    const dbvar = Reflect.getMetadata('dbsettings', target.constructor) as {
       [id: string]: 'Procedure' | 'Orm' | 'Query';
     };
     dbvar[propertyKey] = modelType;

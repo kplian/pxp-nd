@@ -8,7 +8,7 @@
  * @author Jaime Rivera (Kplian).
  * @since  10.06.2020
  */
-
+import { Like } from 'typeorm';
 import Joi from '@hapi/joi';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
@@ -16,6 +16,7 @@ import { __ } from './PxpError';
 import { RouteDefinition } from './RouteDefinition';
 import { PxpError } from './PxpError';
 import ControllerInterface from './ControllerInterface';
+import ListParam from './ListParamInterface';
 import config from '../config';
 import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
@@ -53,7 +54,7 @@ class Controller implements ControllerInterface {
         import(
           `../modules/${modelArray[0]}/entity/${modelArray[1]}`
         ).then(model => {
-          this.model = model;
+          this.model = model.default;
         });
       } catch {
         throw new PxpError(
@@ -126,6 +127,7 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           async (req: Request, res: Response, next: NextFunction) => {
+            console.log('not authenticated');
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
             await this.genericMethodWrapper(
@@ -149,7 +151,7 @@ class Controller implements ControllerInterface {
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-
+            console.log('authenticated');
             if (req.user) {
               this.user = <User>req.user;
             }
@@ -227,7 +229,7 @@ class Controller implements ControllerInterface {
       if (permission) {
         console.log('validate permission');
         //this.user es instancia de entity user
-        this.user.userId;
+        //this.user.userId;
       }
       if (readonly) {
         console.log('get readonly connection');
@@ -246,10 +248,33 @@ class Controller implements ControllerInterface {
   }
 
   async list(params: Record<string, unknown>): Promise<any[]> {
-    console.log(this.model.default);
-    const persons = await this.model.default.find();
-    console.log('padre');
+    const listParam = this.getListParams(params);
+    console.log(listParam);
+    const persons = await this.model.find(listParam);
     return persons;
+  }
+
+  getListParams(params: Record<string, unknown>): ListParam {
+    const res: ListParam = {
+      where: [],
+      skip: <number>params.start,
+      take: <number>params.limit,
+      order: {
+        [<string>params.sort]: <string>params.dir
+      }
+    };
+    if (params.genericFilterFields) {
+      const genericFilterFields = <string>params.genericFilterFields;
+      const filterFieldsArray = genericFilterFields.split('#');
+      filterFieldsArray.forEach((field) => {
+        if (res.where) {
+          res.where.push({
+            [field]: Like('%' + <string>params.genericFilterValue + '%')
+          })
+        }
+      });
+    }
+    return res;
   }
 
   async procedureMethodWrapper(

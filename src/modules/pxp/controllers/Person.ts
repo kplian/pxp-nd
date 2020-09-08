@@ -4,14 +4,15 @@ import PersonModel from '../entity/Person';
 
 @Model('pxp/Person')
 class Person extends Controller {
-  /*@Get()
+  @Get()
   @DbSettings('Orm')
+  @Authentication(true)
   @ReadOnly(true)
   async list(params: Record<string, unknown>): Promise<PersonModel[]> {
-    const persons = await PersonModel.find();
-    console.log('hijo');
+    const listParam = this.getListParams(params);
+    const persons = await PersonModel.find(listParam);
     return persons;
-  }*/
+  }
 
   @Post()
   @DbSettings('Orm')

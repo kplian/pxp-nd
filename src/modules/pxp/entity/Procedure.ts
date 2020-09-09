@@ -3,7 +3,7 @@ import Subsystem from './Subsystem';
 import Transaction from './Transaction';
 import PxpEntity from './PxpEntity';
 
-@Entity()
+@Entity({ schema: 'pxp', name: 'tsec_procedure' })
 export default class Procedure extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'procedure_id' })

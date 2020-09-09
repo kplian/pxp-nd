@@ -5,26 +5,25 @@ import { getCustomRepository } from 'typeorm';
 import { UserRepository } from '../modules/pxp/repository/User';
 import { validPassword } from './utils/password';
 import { issueJWT } from './config/passport-jwt';
+import config from '../config';
 
 const authRouter = Router();
 authRouter.post(
-  '/auth/login',
+  config.apiPrefix + '/auth/login',
   (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('local', (err, user, info) => {
-      console.log(err, user, info);
       if (err) {
         return next(err);
       }
       if (!user) {
         return res
           .status(400)
-          .send({ message: 'Invalid username or password' });
+          .send({ message: info });
       }
       req.logIn(user, function (err) {
         if (err) {
           return next(err);
         }
-
         // const tokenObject = issueJWT(user);
         return res.status(200).send(user);
       });
@@ -32,7 +31,7 @@ authRouter.post(
   }
 );
 
-authRouter.post('/auth/login/token', (req, res, next) => {
+authRouter.post(config.apiPrefix + '/auth/login/token', (req, res, next) => {
   const userRepo = getCustomRepository(UserRepository);
   userRepo
     .findOne({
@@ -75,13 +74,13 @@ authRouter.post('/auth/login/token', (req, res, next) => {
     });
 });
 
-authRouter.get('/auth/guard', isAuthenticated, (req, res, next) => {
+authRouter.get(config.apiPrefix + '/auth/guard', isAuthenticated, (req, res, next) => {
   res.status(200).send({
     message: 'RUOTE GUARD'
   });
 });
 
-authRouter.get('/auth/logout', (req, res, next) => {
+authRouter.get(config.apiPrefix + '/auth/logout', (req, res, next) => {
   req.logout();
   res.status(200).send({
     message: 'Logout correct'
@@ -90,7 +89,7 @@ authRouter.get('/auth/logout', (req, res, next) => {
 
 //** GOOGLE */
 authRouter.get(
-  '/auth/google',
+  config.apiPrefix + '/auth/google',
   passport.authenticate('google', {
     scope: [
       'https://www.googleapis.com/auth/plus.login',
@@ -101,7 +100,7 @@ authRouter.get(
 );
 
 authRouter.get(
-  '/auth/google/callback',
+  config.apiPrefix + '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/auth/login' }),
   function (req, res) {
     res.status(200).send(req.user);
@@ -110,12 +109,12 @@ authRouter.get(
 
 /** FACEBOOK */
 authRouter.get(
-  '/auth/facebook',
+  config.apiPrefix + '/auth/facebook',
   passport.authenticate('facebook', { scope: ['read_stream', 'email'] })
 );
 
 authRouter.get(
-  '/auth/facebook/callback',
+  config.apiPrefix + '/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/auth/login' }),
   function (req, res) {
     console.log('res facebook');

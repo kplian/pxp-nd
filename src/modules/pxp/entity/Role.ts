@@ -5,7 +5,7 @@ import Subsystem from './Subsystem';
 import Ui from './Ui';
 import PxpEntity from './PxpEntity';
 
-@Entity({ schema: 'pxp', name: 'tsec_role' })
+@Entity({ name: 'tsec_role' })
 export default class Role extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'role_id' })

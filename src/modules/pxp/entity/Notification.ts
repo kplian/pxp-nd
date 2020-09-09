@@ -1,25 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import PxpEntity from './PxpEntity';
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, } from "typeorm";
 
-@Entity({ schema: 'pxp', name: 'tpar_notification' })
-export default class Notification extends PxpEntity {
 
-  @PrimaryGeneratedColumn({ name: 'notification_id' })
-  notificationId: number;
+@Entity({schema: 'pxp', name: "tpar_notification"})
+export default class Notification {
 
-  @Column({ name: 'type', type: 'varchar', length: 50, nullable: false })
-  type: string;
+    @PrimaryGeneratedColumn({name:'notification_id'})
+    notificationId: number;
 
-  @Column({ name: 'tittle', type: 'varchar', length: 50, nullable: false })
-  tittle: string;
+    @Column({name:'type', type:'varchar', length: 50, nullable: true })
+    type: string;
 
-  @Column({ name: 'status', type: 'varchar', length: 50, nullable: false })
-  status: string;
+    @Column({name:'tittle', type:'varchar', length: 50, nullable: true })
+    tittle: string; 
 
-  @Column({ name: 'description', type: 'text', nullable: false })
-  description: string;
+    @Column({name:'description', type:'varchar', length: 500, nullable: true })
+    description: string; 
 
-  @Column({ name: 'url', type: 'varchar', length: 50, nullable: true })
-  url: string;
+    @Column({name:'url', type:'varchar', length: 50, nullable: true })
+    url: string; 
 
+    @CreateDateColumn ({ name: 'created_at'})
+    createdAt: Date;
+
+	@Column({name:'is_active', default:true})
+    isActive: boolean;
+
+    
 }

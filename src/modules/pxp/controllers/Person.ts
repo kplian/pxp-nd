@@ -20,7 +20,6 @@ class Person extends Controller {
   @Authentication(false)
   @Log(false)
   async add(params: Record<string, unknown>): Promise<PersonModel> {
-    console.log('llega');
     const person = new PersonModel();
     person.name = <string>params['name'];
     person.lastName = <string>params['last_name_first'];

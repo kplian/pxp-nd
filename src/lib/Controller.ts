@@ -156,6 +156,8 @@ class Controller implements ControllerInterface {
               this.user = <User>req.user;
             }
 
+            //this.transaction = (this.module + this.path + route.path).replace('/', '.');
+
             await this.genericMethodWrapper(
               params,
               next,
@@ -241,7 +243,7 @@ class Controller implements ControllerInterface {
       if (log) {
         console.log('insert into log');
       }
-      res.json(metResponse);
+      res.json({ data: metResponse });
     } catch (ex) {
       next(ex);
     }
@@ -251,6 +253,7 @@ class Controller implements ControllerInterface {
     const listParam = this.getListParams(params);
     console.log(listParam);
     const persons = await this.model.find(listParam);
+    const count = await this.model
     return persons;
   }
 

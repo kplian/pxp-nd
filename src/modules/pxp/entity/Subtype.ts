@@ -1,28 +1,23 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn} from "typeorm";
-import Type  from "./Type";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import Type from './Type';
+import PxpEntity from './PxpEntity';
 
-@Entity({schema: 'pxp', name: "tpar_subtype"})
-export default class Subtype {
+@Entity({ schema: 'pxp', name: 'tpar_subtype' })
+export default class Subtype extends PxpEntity {
 
-    @PrimaryGeneratedColumn({name:'subtype_id'})
-    subtypeId: number;
+  @PrimaryGeneratedColumn({ name: 'subtype_id' })
+  subtypeId: number;
 
-    @Column({name:'code', type:'varchar', length: 30, nullable: false })
-    code: string;
+  @Column({ name: 'code', type: 'varchar', length: 30, nullable: false })
+  code: string;
 
-    @Column({name:'description', type:'varchar', length: 500, nullable: true })
-    description: string; 
+  @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
+  description: string;
 
-    @Column({name:'order', type:'int'})
-    order: number
+  @Column({ name: 'order', type: 'int' })
+  order: number
 
-    @CreateDateColumn ({ name: 'created_at'})
-    createdAt: Date;
-
-	@Column({name:'is_active', default:true})
-    isActive: boolean;
-
-    @ManyToOne(type=> Type, ttype=> ttype.subtypes)
-    @JoinColumn({name:"type_id"})
-    ttype:Subtype;
+  @ManyToOne(() => Type, type => type.subtypes)
+  @JoinColumn({ name: 'type_id' })
+  type: Type;
 }

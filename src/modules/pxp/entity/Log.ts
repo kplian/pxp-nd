@@ -1,59 +1,49 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn } from 'typeorm';
 
 
 @Entity({ schema: 'pxp', name: 'tsec_log' })
 export default class Log extends BaseEntity {
 
-  @PrimaryGeneratedColumn({name:'log_id'})
+  @PrimaryGeneratedColumn({ name: 'log_id' })
   logId: number;
 
-  @Column({name:'username', type: 'varchar', length: 150, nullable: false })
+  @Column({ name: 'username', type: 'varchar', length: 150, nullable: false })
   username: string;
 
-  @Column({ name:'macaddress', type: 'varchar', length: 150, nullable: true })
+  @Column({ name: 'macaddress', type: 'varchar', length: 150, nullable: true })
   macaddres: string;
 
-  @Column({ name:'ip', type: 'varchar', length: 100, nullable: true })
+  @Column({ name: 'ip', type: 'varchar', length: 100, nullable: true })
   ip: string;
 
-  @Column({ name:'type_log', type: 'varchar', length: 50, nullable: false })
-  typeLog: string;
+  @Column({ name: 'logType', type: 'varchar', length: 50, nullable: false })
+  logType: string;
 
-  @Column({ name:'description', type: 'varchar', nullable: true })
+  @Column({ name: 'description', type: 'varchar', nullable: true })
   description: string;
 
-  @Column({ name:'procedure', type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'procedure', type: 'varchar', length: 250, nullable: true })
   procedure: string;
 
-  @Column({ name:'transaction', type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'transaction', type: 'varchar', length: 250, nullable: true })
   transaction: string;
 
-  @Column({ name:'query', type: 'varchar',  nullable: true})
+  @Column({ name: 'query', type: 'text', nullable: true })
   query: string;
 
-  @Column({ name:'date_log', type: 'date', nullable: true })
-  dateLog: Date;
+  @Column({ name: 'request', type: 'text', nullable: true })
+  request: string;
 
-  @Column({ name:'time_exec', type: 'varchar', length: 20, nullable: true })
-  timeExec: string;
+  @Column({ name: 'response', type: 'text', nullable: true })
+  response: string;
 
-  @Column({ name:'user_db', type: 'varchar', length: 100, nullable: true })
-  userDb: string;
+  @CreateDateColumn({ name: 'log_date' })
+  logDate: Date;
 
-  @Column({ name:'code_error', type: 'varchar', length: 100, nullable: true})
-  codeError: string;
+  @Column({ name: 'exec_time', nullable: true })
+  execTime: number;
 
-  @Column({ name:'pid_db', type: 'varchar', length: 100, nullable: true })
-  pidDB: string;
-
-  @Column({ name:'pid_web', type: 'varchar', length: 100, nullable: true})
-  pidWeb: string;
-
-  @Column({ name:'sid_web', type: 'varchar', length: 150, nullable: true })
-  sidWeb: string;
-
-  @Column({ name:'code_subsystem', type: 'varchar', length: 150, nullable: true })
-  codeSubsystem: string;
-
+  @Column({ name: 'errorCode', type: 'varchar', length: 100, nullable: true })
+  errorCode: string;
 
 }

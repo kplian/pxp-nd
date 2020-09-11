@@ -78,7 +78,7 @@ function configPassportLocal(): void {
         where: {
           userId: userId
         },
-        cache: 3600000
+        //cache: 3600000
       })
       .then((user) => {
         console.timeEnd('Time this');

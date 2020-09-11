@@ -43,7 +43,6 @@ const __ = (promise: Promise<unknown>, myShowError = false): Promise<unknown> =>
 
 // error handler middleware
 const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response, next: express.NextFunction): void => {
-  console.log('error happened', res);
   const {
     statusCode, message, stack, tecMessage,
   } = err;

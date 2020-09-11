@@ -16,7 +16,7 @@ export default class Transaction extends PxpEntity {
   description: string
 
   @ManyToOne(() => Subsystem, subsystem => subsystem.transactions)
-  @JoinColumn({ name: 'procedure_id' })
+  @JoinColumn({ name: 'transaction_id' })
   subsystem: Subsystem;
 
   @OneToMany(() => UiTransaction, uiTransaction => uiTransaction.transaction)

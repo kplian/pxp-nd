@@ -10,6 +10,9 @@ VALUES(1, 'admin', '201a971991b7e67d0706a829ba5fc77cf4633a57f21b27bb3fd61e3126e3
 INSERT INTO pxp.tsec_role (created_by, role, description)
 VALUES (1, 'admin', 'Pxp Administrator (equals to root)');
 
+INSERT INTO pxp.tsec_user_role (user_id, role_id)
+VALUES (1, 1);
+
 INSERT INTO pxp.tsec_subsystem (created_by, code, name, folder_name, prefix)
 VALUES (1, 'PXP', 'PXP', 'PXP', 'PXP');
 

@@ -20,7 +20,7 @@ import ListParam from './ListParamInterface';
 import config from '../config';
 import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
-import  {userHasPermission} from './utils/Permissions'
+import { userHasPermission } from './utils/Permissions'
 class Controller implements ControllerInterface {
   public schemaValidated: boolean;
   public params: Record<string, unknown>[];
@@ -232,11 +232,13 @@ class Controller implements ControllerInterface {
         console.log('validate permission');
         //this.user es instancia de entity user
         //this.user.userId;
-        const hasPermission= await userHasPermission(this.user.userId, 'pxp.person.funListar');
-        if (hasPermission)
-        console.log('tiene permisos');
-        else
-        console.log('NO tiene permisos');
+        const hasPermission = await userHasPermission(<number>this.user.userId, 'pxp.person.funListar');
+        //console.log(hasPermission);
+        if (hasPermission) {
+          console.log('tiene permisos');
+        } else {
+          console.log('NO tiene permisos');
+        }
 
       }
       if (readonly) {

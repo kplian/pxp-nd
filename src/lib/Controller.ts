@@ -20,7 +20,7 @@ import ListParam from './ListParamInterface';
 import config from '../config';
 import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
-import { userHasPermission } from './utils/Permissions'
+import { userHasPermission } from './utils/Security'
 class Controller implements ControllerInterface {
   public schemaValidated: boolean;
   public params: Record<string, unknown>[];
@@ -28,6 +28,7 @@ class Controller implements ControllerInterface {
   public path = '';
   public module = '';
   public modelString = '';
+  public transactionCode = '';
   public user: User;
   public model: any;
   private basicRoutes: RouteDefinition[] = [
@@ -155,8 +156,7 @@ class Controller implements ControllerInterface {
             if (req.user) {
               this.user = <User>req.user;
             }
-
-            //this.transaction = (this.module + this.path + route.path).replace('/', '.');
+            this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
 
             await this.genericMethodWrapper(
               params,
@@ -229,15 +229,13 @@ class Controller implements ControllerInterface {
     try {
       let metResponse = {};
       if (permission) {
-        console.log('validate permission');
-        //this.user es instancia de entity user
-        //this.user.userId;
-        const hasPermission = await userHasPermission(<number>this.user.userId, 'pxp.person.funListar');
-        //console.log(hasPermission);
-        if (hasPermission) {
-          console.log('tiene permisos');
-        } else {
-          console.log('NO tiene permisos');
+        //doesn't have admin role
+        console.log(this.transactionCode);
+        if (this.user.roles.length === 0) {
+          const hasPermission = await userHasPermission(<number>this.user.userId, this.transactionCode);
+          if (!hasPermission) {
+            throw new PxpError(403, 'Access denied to execute this method');
+          }
         }
 
       }

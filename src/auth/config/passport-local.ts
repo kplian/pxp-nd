@@ -73,15 +73,14 @@ function configPassportLocal(): void {
     const userRepository = getCustomRepository(UserRepository);
     console.time('Time this');
 
-    userRepository
-      .findOne({
-        where: {
-          userId: userId
-        },
-        //cache: 3600000
-      })
+    userRepository.createQueryBuilder('user')
+      //.leftJoinAndSelect('role.uis', 'ui')
+      .leftJoinAndSelect('user.roles', 'role', 'role.roleId = 1')
+      .where('"user".user_id = :id', { id: userId })
+      .getOne()
       .then((user) => {
         console.timeEnd('Time this');
+        console.log(user);
         done(null, user);
       })
       .catch((err) => done(err));

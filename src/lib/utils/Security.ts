@@ -7,7 +7,6 @@ const userHasPermission = async (userId: number, transaction: string): Promise<b
   const user = await getManager()
     .createQueryBuilder(Role, 'role')
     .innerJoinAndSelect('role.uis', 'ui')
-    .printSql()
     .innerJoin('role.users', 'user')
     .innerJoin('ui.transactions', 'uiTran')
     .innerJoin('uiTran.transaction', 'transac')

@@ -1,4 +1,3 @@
-import { getManager } from 'typeorm';
 import Controller, { Get, Post, DbSettings, ReadOnly, Authentication, Log, Model } from '../../../lib/Controller';
 import PersonModel from '../entity/Person';
 

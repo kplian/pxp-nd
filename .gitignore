@@ -6,8 +6,10 @@ dist/
 .env
 .env.test
 
+ormconfig.json
+
 # Config file
-src/config.js
+src/config.ts
 
 # Optional npm cache directory
 .npm

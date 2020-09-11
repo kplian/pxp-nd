@@ -1,6 +1,6 @@
 /********************************************I-DAT-JRR-SEGU-0-06/09/2019********************************************/
 INSERT INTO pxp.tsec_person
-(created_by, name, last_name_first)
+(created_by, name, last_name)
 VALUES(1, 'admin', 'admin' );
 
 INSERT INTO pxp.tsec_user

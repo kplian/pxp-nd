@@ -64,19 +64,24 @@ function configPassportLocal(): void {
   passport.use(strategy);
   // This method is used to store the user identifier locally.
   passport.serializeUser((user: User, done: any) => {
+    console.log('serialize');
     done(null, user.userId);
   });
   // This method is used to extract user data.
   passport.deserializeUser((userId: string, done: any) => {
+    console.log('deserialize');
     const userRepository = getCustomRepository(UserRepository);
+    console.time('Time this');
 
     userRepository
       .findOne({
         where: {
           userId: userId
-        }
+        },
+        //cache: 3600000
       })
       .then((user) => {
+        console.timeEnd('Time this');
         done(null, user);
       })
       .catch((err) => done(err));

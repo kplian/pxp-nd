@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Transaction } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Role from './Role';
-import transaction from './Transaction';
+import Transaction from './Transaction';
+import Ui from './Ui';
+import PxpEntity from './PxpEntity';
 
-@Entity({ name: 'tsec_subsystem' })
-
-export default class Subsystem  {
+@Entity({ schema: 'pxp', name: 'tsec_subsystem' })
+export default class Subsystem extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'subsystem_id' })
   subsystemId: number;
@@ -21,10 +22,13 @@ export default class Subsystem  {
   @Column({ name: 'prefix', type: 'varchar', length: 10, nullable: true })
   prefix: string;
 
-  @OneToMany(() => transaction, transaction => transaction.subsystem  )
-  transactions: transaction[];
+  @OneToMany(() => Transaction, transaction => transaction.subsystem)
+  transactions: Transaction[];
 
   @OneToMany(() => Role, role => role.subsystem)
   roles: Role[];
+
+  @OneToMany(() => Ui, ui => ui.subsystem)
+  uis: Ui[];
 
 } 

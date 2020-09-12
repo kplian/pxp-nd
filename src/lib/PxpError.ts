@@ -42,11 +42,12 @@ const __ = (promise: Promise<unknown>, myShowError = false): Promise<unknown> =>
 );
 
 // error handler middleware
-const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response, next: express.NextFunction): void => {
+const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response): void => {
   const {
     statusCode, message, stack, tecMessage,
   } = err;
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
+  //console.log('error:', err);
   // @todo if production not show tecMessage and stack
   res.status(500).json(
     {

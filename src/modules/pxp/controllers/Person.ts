@@ -1,5 +1,7 @@
+import { EntityManager } from 'typeorm';
 import Controller, { Get, Post, DbSettings, ReadOnly, Authentication, Log, Model } from '../../../lib/Controller';
 import PersonModel from '../entity/Person';
+import { PxpError } from '../../../lib/PxpError';
 
 @Model('pxp/Person')
 class Person extends Controller {
@@ -16,16 +18,15 @@ class Person extends Controller {
   @Post()
   @DbSettings('Orm')
   @ReadOnly(false)
-  @Authentication(false)
-  @Log(false)
-  async add(params: Record<string, unknown>): Promise<PersonModel> {
+  @Log(true)
+  async add(params: Record<string, unknown>, entityManager: EntityManager): Promise<PersonModel> {
     const person = new PersonModel();
     person.name = <string>params['name'];
-    person.lastName = <string>params['last_name_first'];
+    person.lastName = <string>params['lastName'];
     person.dni = <string>params['dni'];
-    person.dniNumber = <string>params['dni_number'];
+    person.dniNumber = <string>params['dniNumber'];
     person.createdBy = <number>this.user.userId;
-    await person.save();
+    await entityManager.save(person);
     return person;
   }
 }

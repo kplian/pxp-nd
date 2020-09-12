@@ -8,7 +8,7 @@
  * @author Jaime Rivera (Kplian).
  * @since  10.06.2020
  */
-import { Like } from 'typeorm';
+import { Like, getConnection, EntityManager } from 'typeorm';
 import Joi from '@hapi/joi';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
@@ -240,26 +240,39 @@ class Controller implements ControllerInterface {
 
       }
       if (readonly) {
-        console.log('get readonly connection');
+        metResponse = await eval(`this.${methodName}(params, entityManager)`);
       } else {
-        console.log('get modification connection');
-      }
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
 
-      metResponse = await eval(`this.${methodName}(params)`);
+        // establish real database connection using our new query runner
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+          metResponse = await eval(`this.${methodName}(params, queryRunner.manager)`);
+          await queryRunner.commitTransaction();
+
+        } catch (err) {
+          await queryRunner.rollbackTransaction();
+          throw err;
+        } finally {
+          await queryRunner.release();
+        }
+      }
       if (log) {
         console.log('insert into log');
       }
       res.json({ data: metResponse });
     } catch (ex) {
+      console.log('llega');
       next(ex);
     }
   }
 
   async list(params: Record<string, unknown>): Promise<any[]> {
     const listParam = this.getListParams(params);
-    console.log(listParam);
     const persons = await this.model.find(listParam);
-    const count = await this.model
+    //const count = await this.model
     return persons;
   }
 

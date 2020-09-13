@@ -47,7 +47,7 @@ class Controller implements ControllerInterface {
   constructor(module: string) {
     this.schemaValidated = false;
     this.module = module;
-    //import 
+    //import
     if (Reflect.hasMetadata('model', this.constructor)) {
       this.modelString = Reflect.getMetadata('model', this.constructor);
       const modelArray = this.modelString.split('/');
@@ -249,7 +249,9 @@ class Controller implements ControllerInterface {
       if (log) {
         console.log('insert into log');
       }
-      res.json({ data: metResponse });
+      //res.json({ data: metResponse });
+      res.json(metResponse);
+
     } catch (ex) {
       next(ex);
     }

@@ -18,12 +18,13 @@ class PxpError extends Error {
   statusCode: number;
   message: string;
   tecMessage: string;
-  constructor(statusCode: number, message: string, stack = undefined) {
+  constructor(statusCode: number, message: string, stack?: undefined) {
     super();
     this.statusCode = statusCode;
     this.message = statusCode === 500 ? genericMessage : message;
     this.tecMessage = message;
     this.stack = stack || this.stack;
+    console.log('constructor', this);
   }
 }
 
@@ -47,7 +48,7 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
     statusCode, message, stack, tecMessage,
   } = err;
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
-  //console.log('error:', err);
+  console.log('error middleware:', err);
   // @todo if production not show tecMessage and stack
   res.status(500).json(
     {

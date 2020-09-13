@@ -49,3 +49,7 @@ package-lock.json
 build/Release
 
 /.idea
+
+# Ingore all modules but pxp
+/src/modules/*/
+!/src/modules/pxp

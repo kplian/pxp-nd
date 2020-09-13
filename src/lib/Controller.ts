@@ -12,9 +12,8 @@ import { Like, getConnection, EntityManager } from 'typeorm';
 import Joi from '@hapi/joi';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
-import { __ } from './PxpError';
 import { RouteDefinition } from './RouteDefinition';
-import { PxpError } from './PxpError';
+import { PxpError, __, errorMiddleware } from './PxpError';
 import ControllerInterface from './ControllerInterface';
 import ListParam from './ListParamInterface';
 import config from '../config';
@@ -47,7 +46,7 @@ class Controller implements ControllerInterface {
   constructor(module: string) {
     this.schemaValidated = false;
     this.module = module;
-    //import 
+    // import 
     if (Reflect.hasMetadata('model', this.constructor)) {
       this.modelString = Reflect.getMetadata('model', this.constructor);
       const modelArray = this.modelString.split('/');
@@ -68,42 +67,40 @@ class Controller implements ControllerInterface {
   }
 
   private initializeRoutes() {
-    let routes = Reflect.getMetadata('routes', this.constructor) as Array<
-      RouteDefinition
-    >;
+    let routes = Reflect.getMetadata('routes', this.constructor) as RouteDefinition[];
     this.path = '/' + this.constructor.name;
-    //get controller path
+    // get controller path
     if (Reflect.hasMetadata('controller_path', this.constructor)) {
       this.path = Reflect.getMetadata('controller_path', this.constructor);
     }
-    //get read only
+    // get read only
     let readonly =
       (Reflect.getMetadata('readonly', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get authentication
+    // get authentication
     const authentication =
       (Reflect.getMetadata('authentication', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get permission
+    // get permission
     const permission =
       (Reflect.getMetadata('permission', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get log
+    // get log
     const log =
       (Reflect.getMetadata('log', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get dbsettings
+    // get dbsettings
     const dbsettings =
       (Reflect.getMetadata('dbsettings', this.constructor) as {
         [id: string]: 'Procedure' | 'Orm' | 'Query';
       }) || {};
 
-    //define basic routes
-    if (this.modelString != '') {
+    // define basic routes
+    if (this.modelString !== '') {
       routes = _.union(this.basicRoutes, routes);
       readonly = { ...this.basicReadOnly, ...readonly }
     }
@@ -154,20 +151,25 @@ class Controller implements ControllerInterface {
             const params = { ...req.query, ...req.body, ...req.params };
             console.log('authenticated');
             if (req.user) {
-              this.user = <User>req.user;
+              this.user = (req.user as User);
             }
             this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
+            try {
+              await this.genericMethodWrapper(
+                params,
+                next,
+                res,
+                route.methodName,
+                methodDbSettings,
+                readonly[route.methodName],
+                permission[route.methodName],
+                log[route.methodName]
+              );
+              console.log('after');
+            } catch (ex) {
+              errorMiddleware(ex, req, res);
+            }
 
-            await this.genericMethodWrapper(
-              params,
-              next,
-              res,
-              route.methodName,
-              methodDbSettings,
-              readonly[route.methodName],
-              permission[route.methodName],
-              log[route.methodName]
-            );
           }
         );
       }
@@ -185,7 +187,8 @@ class Controller implements ControllerInterface {
     log = true
   ): Promise<void> {
     if (dbsettings === 'Orm') {
-      await this.ormMethodWrapper(
+
+      await __(this.ormMethodWrapper(
         params,
         next,
         res,
@@ -193,9 +196,10 @@ class Controller implements ControllerInterface {
         readonly,
         permission,
         log
-      );
+      ));
+
     } else if (dbsettings === 'Procedure') {
-      await this.procedureMethodWrapper(
+      await __(this.procedureMethodWrapper(
         params,
         next,
         res,
@@ -203,7 +207,7 @@ class Controller implements ControllerInterface {
         readonly,
         permission,
         log
-      );
+      ));
     } else {
       await this.sqlMethodWrapper(
         params,
@@ -226,72 +230,64 @@ class Controller implements ControllerInterface {
     permission = true,
     log = true
   ): Promise<void> {
-    try {
-      let metResponse = {};
-      if (permission) {
-        //doesn't have admin role
-        console.log(this.transactionCode);
-        if (this.user.roles.length === 0) {
-          const hasPermission = await userHasPermission(<number>this.user.userId, this.transactionCode);
-          if (!hasPermission) {
-            throw new PxpError(403, 'Access denied to execute this method');
-          }
-        }
-
-      }
-      if (readonly) {
-        metResponse = await eval(`this.${methodName}(params, entityManager)`);
-      } else {
-        const connection = getConnection();
-        const queryRunner = connection.createQueryRunner();
-
-        // establish real database connection using our new query runner
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-        try {
-          metResponse = await eval(`this.${methodName}(params, queryRunner.manager)`);
-          await queryRunner.commitTransaction();
-
-        } catch (err) {
-          await queryRunner.rollbackTransaction();
-          throw err;
-        } finally {
-          await queryRunner.release();
+    let metResponse: unknown;
+    if (permission) {
+      if (this.user.roles.length === 0) {
+        const hasPermission = await __(userHasPermission(this.user.userId as number, this.transactionCode));
+        if (!hasPermission) {
+          throw new PxpError(403, 'Access denied to execute this method');
         }
       }
-      if (log) {
-        console.log('insert into log');
-      }
-      res.json({ data: metResponse });
-    } catch (ex) {
-      console.log('llega');
-      next(ex);
     }
+    if (readonly) {
+      metResponse = await __(eval(`this.${methodName}(params)`));
+    } else {
+      const connection = getConnection();
+      const queryRunner = connection.createQueryRunner();
+
+      // establish real database connection using our new query runner
+      await __(queryRunner.connect());
+      await __(queryRunner.startTransaction());
+      try {
+        metResponse = await eval(`this.${methodName}(params, queryRunner.manager)`) as Record<string, unknown>;
+        await queryRunner.commitTransaction();
+
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await __(queryRunner.release());
+      }
+    }
+    if (log) {
+      console.log('insert into log');
+    }
+    res.json({ data: metResponse });
+
   }
 
-  async list(params: Record<string, unknown>): Promise<any[]> {
+  async list(params: Record<string, unknown>): Promise<unknown[]> {
     const listParam = this.getListParams(params);
-    const persons = await this.model.find(listParam);
-    //const count = await this.model
-    return persons;
+    const rows = await __(this.model.find(listParam));
+    return rows as unknown[];
   }
 
   getListParams(params: Record<string, unknown>): ListParam {
     const res: ListParam = {
       where: [],
-      skip: <number>params.start,
-      take: <number>params.limit,
+      skip: params.start as number,
+      take: params.limit as number,
       order: {
-        [<string>params.sort]: <string>params.dir
+        [params.sort as string]: params.dir as string
       }
     };
     if (params.genericFilterFields) {
-      const genericFilterFields = <string>params.genericFilterFields;
+      const genericFilterFields = params.genericFilterFields as string;
       const filterFieldsArray = genericFilterFields.split('#');
       filterFieldsArray.forEach((field) => {
         if (res.where) {
           res.where.push({
-            [field]: Like('%' + <string>params.genericFilterValue + '%')
+            [field]: Like('%' + (params.genericFilterValue as string) + '%')
           })
         }
       });

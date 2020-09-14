@@ -9,6 +9,7 @@
  * @since  10.06.2020
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
+import { validate } from 'class-validator';
 import Joi from '@hapi/joi';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
@@ -21,7 +22,7 @@ import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
 import { userHasPermission } from './utils/Security'
 class Controller implements ControllerInterface {
-  public schemaValidated: boolean;
+  public validated: boolean;
   public params: Record<string, unknown>[];
   public router = Router();
   public path = '';
@@ -32,8 +33,8 @@ class Controller implements ControllerInterface {
   public model: any;
   private basicRoutes: RouteDefinition[] = [
     { requestMethod: 'post', path: '/add', methodName: 'add' },
-    { requestMethod: 'delete', path: '/delete', methodName: 'delete' },
-    { requestMethod: 'put', path: '/edit', methodName: 'edit' },
+    { requestMethod: 'delete', path: '/delete/:id', methodName: 'delete' },
+    { requestMethod: 'patch', path: '/edit/:id', methodName: 'edit' },
     { requestMethod: 'get', path: '/list', methodName: 'list' }
   ];
   private basicReadOnly = {
@@ -44,9 +45,9 @@ class Controller implements ControllerInterface {
   };
 
   constructor(module: string) {
-    this.schemaValidated = false;
+    this.validated = false;
     this.module = module;
-    // import 
+
     if (Reflect.hasMetadata('model', this.constructor)) {
       this.modelString = Reflect.getMetadata('model', this.constructor);
       const modelArray = this.modelString.split('/');
@@ -135,7 +136,7 @@ class Controller implements ControllerInterface {
               route.methodName,
               methodDbSettings,
               readonly[route.methodName],
-              permission[route.methodName],
+              false,
               log[route.methodName]
             );
           }
@@ -144,7 +145,7 @@ class Controller implements ControllerInterface {
 
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
-          //MIDDLEWARES AREA
+          // MIDDLEWARES AREA
           isAuthenticated,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
@@ -259,17 +260,50 @@ class Controller implements ControllerInterface {
         await __(queryRunner.release());
       }
     }
+
     if (log) {
       console.log('insert into log');
     }
-    res.json({ data: metResponse });
+    res.json(metResponse);
 
   }
 
-  async list(params: Record<string, unknown>): Promise<unknown[]> {
+  async list(params: Record<string, unknown>): Promise<unknown> {
     const listParam = this.getListParams(params);
-    const rows = await __(this.model.find(listParam));
-    return rows as unknown[];
+    const [rows, count] = await __(this.model.findAndCount(listParam)) as unknown[];
+    return { data: rows, count };
+  }
+
+  async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    const modelInstance = new this.model();
+    Object.assign(modelInstance, params);
+    modelInstance.createdBy = (this.user.username as string);
+    await __(this.classValidate(modelInstance));
+    await manager.save(modelInstance);
+    return modelInstance;
+  }
+
+  async edit(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    const modelInstance = await __(this.model.findOne(params.id)) as any;
+    if (!modelInstance) {
+      throw new PxpError(406, 'Record not found');
+    }
+    const editParams = params;
+    Object.assign(modelInstance, editParams);
+    delete editParams.id;
+    modelInstance.modifiedBy = (this.user.username as string);
+    await __(this.classValidate(modelInstance));
+    await manager.save(modelInstance);
+    return modelInstance;
+  }
+
+  async delete(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    const modelInstance = await __(this.model.findOne(params.id)) as any;
+    if (!modelInstance) {
+      throw new PxpError(406, 'Record not found');
+    }
+    await manager.remove(modelInstance);
+    return modelInstance;
   }
 
   getListParams(params: Record<string, unknown>): ListParam {
@@ -323,13 +357,12 @@ class Controller implements ControllerInterface {
     console.log('after function');
   }
 
-  async validateSchema(schema: Joi.Schema): Promise<unknown> {
-    const value = await __(
-      schema.validateAsync(this.params, { abortEarly: false }),
-      true
-    );
-    this.schemaValidated = true;
-    return value;
+  async classValidate(model: any): Promise<void> {
+    const errors = await __(validate(model)) as unknown[];
+    if (errors.length > 0) {
+      throw new PxpError(406, 'Validation failed!', errors as unknown as undefined);
+    }
+
   }
 }
 

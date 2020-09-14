@@ -32,6 +32,7 @@
     "@types/passport": "^1.0.4",
     "@types/passport-local": "^1.0.33",
     "body-parser": "^1.19.0",
+    "class-validator": "^0.12.2",
     "connect-pg-simple": "^6.2.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable } from 'typeorm';
-import Procedure from './Procedure';
+import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
 import PxpEntity from './PxpEntity';
 
@@ -15,9 +15,9 @@ export default class Transaction extends PxpEntity {
   @Column({ name: 'description', type: 'text' })
   description: string
 
-  @ManyToOne(() => Procedure, procedure => procedure.transactions)
-  @JoinColumn({ name: 'procedure_id' })
-  procedure: Procedure;
+  @ManyToOne(() => Subsystem, subsystem => subsystem.transactions)
+  @JoinColumn({ name: 'transaction_id' })
+  subsystem: Subsystem;
 
   @OneToMany(() => UiTransaction, uiTransaction => uiTransaction.transaction)
   @JoinTable()

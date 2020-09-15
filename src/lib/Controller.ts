@@ -8,32 +8,33 @@
  * @author Jaime Rivera (Kplian).
  * @since  10.06.2020
  */
-import { Like } from 'typeorm';
+import { Like, getConnection, EntityManager } from 'typeorm';
+import { validate } from 'class-validator';
 import Joi from '@hapi/joi';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
-import { __ } from './PxpError';
 import { RouteDefinition } from './RouteDefinition';
-import { PxpError } from './PxpError';
+import { PxpError, __, errorMiddleware } from './PxpError';
 import ControllerInterface from './ControllerInterface';
 import ListParam from './ListParamInterface';
 import config from '../config';
 import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
-
+import { userHasPermission } from './utils/Security'
 class Controller implements ControllerInterface {
-  public schemaValidated: boolean;
+  public validated: boolean;
   public params: Record<string, unknown>[];
   public router = Router();
   public path = '';
   public module = '';
   public modelString = '';
+  public transactionCode = '';
   public user: User;
   public model: any;
   private basicRoutes: RouteDefinition[] = [
     { requestMethod: 'post', path: '/add', methodName: 'add' },
-    { requestMethod: 'delete', path: '/delete', methodName: 'delete' },
-    { requestMethod: 'put', path: '/edit', methodName: 'edit' },
+    { requestMethod: 'delete', path: '/delete/:id', methodName: 'delete' },
+    { requestMethod: 'patch', path: '/edit/:id', methodName: 'edit' },
     { requestMethod: 'get', path: '/list', methodName: 'list' }
   ];
   private basicReadOnly = {
@@ -44,9 +45,9 @@ class Controller implements ControllerInterface {
   };
 
   constructor(module: string) {
-    this.schemaValidated = false;
+    this.validated = false;
     this.module = module;
-    //import 
+
     if (Reflect.hasMetadata('model', this.constructor)) {
       this.modelString = Reflect.getMetadata('model', this.constructor);
       const modelArray = this.modelString.split('/');
@@ -67,42 +68,40 @@ class Controller implements ControllerInterface {
   }
 
   private initializeRoutes() {
-    let routes = Reflect.getMetadata('routes', this.constructor) as Array<
-      RouteDefinition
-    >;
+    let routes = Reflect.getMetadata('routes', this.constructor) as RouteDefinition[];
     this.path = '/' + this.constructor.name;
-    //get controller path
+    // get controller path
     if (Reflect.hasMetadata('controller_path', this.constructor)) {
       this.path = Reflect.getMetadata('controller_path', this.constructor);
     }
-    //get read only
+    // get read only
     let readonly =
       (Reflect.getMetadata('readonly', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get authentication
+    // get authentication
     const authentication =
       (Reflect.getMetadata('authentication', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get permission
+    // get permission
     const permission =
       (Reflect.getMetadata('permission', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get log
+    // get log
     const log =
       (Reflect.getMetadata('log', this.constructor) as {
         [id: string]: boolean;
       }) || {};
-    //get dbsettings
+    // get dbsettings
     const dbsettings =
       (Reflect.getMetadata('dbsettings', this.constructor) as {
         [id: string]: 'Procedure' | 'Orm' | 'Query';
       }) || {};
 
-    //define basic routes
-    if (this.modelString != '') {
+    // define basic routes
+    if (this.modelString !== '') {
       routes = _.union(this.basicRoutes, routes);
       readonly = { ...this.basicReadOnly, ...readonly }
     }
@@ -137,7 +136,7 @@ class Controller implements ControllerInterface {
               route.methodName,
               methodDbSettings,
               readonly[route.methodName],
-              permission[route.methodName],
+              false,
               log[route.methodName]
             );
           }
@@ -146,26 +145,32 @@ class Controller implements ControllerInterface {
 
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
-          //MIDDLEWARES AREA
+          // MIDDLEWARES AREA
           isAuthenticated,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
             console.log('authenticated');
             if (req.user) {
-              this.user = <User>req.user;
+              this.user = (req.user as User);
+            }
+            this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
+            try {
+              await this.genericMethodWrapper(
+                params,
+                next,
+                res,
+                route.methodName,
+                methodDbSettings,
+                readonly[route.methodName],
+                permission[route.methodName],
+                log[route.methodName]
+              );
+              console.log('after');
+            } catch (ex) {
+              errorMiddleware(ex, req, res);
             }
 
-            await this.genericMethodWrapper(
-              params,
-              next,
-              res,
-              route.methodName,
-              methodDbSettings,
-              readonly[route.methodName],
-              permission[route.methodName],
-              log[route.methodName]
-            );
           }
         );
       }
@@ -183,7 +188,8 @@ class Controller implements ControllerInterface {
     log = true
   ): Promise<void> {
     if (dbsettings === 'Orm') {
-      await this.ormMethodWrapper(
+
+      await __(this.ormMethodWrapper(
         params,
         next,
         res,
@@ -191,9 +197,10 @@ class Controller implements ControllerInterface {
         readonly,
         permission,
         log
-      );
+      ));
+
     } else if (dbsettings === 'Procedure') {
-      await this.procedureMethodWrapper(
+      await __(this.procedureMethodWrapper(
         params,
         next,
         res,
@@ -201,7 +208,7 @@ class Controller implements ControllerInterface {
         readonly,
         permission,
         log
-      );
+      ));
     } else {
       await this.sqlMethodWrapper(
         params,
@@ -224,52 +231,97 @@ class Controller implements ControllerInterface {
     permission = true,
     log = true
   ): Promise<void> {
-    try {
-      let metResponse = {};
-      if (permission) {
-        console.log('validate permission');
-        //this.user es instancia de entity user
-        //this.user.userId;
+    let metResponse: unknown;
+    if (permission) {
+      if (this.user.roles.length === 0) {
+        const hasPermission = await __(userHasPermission(this.user.userId as number, this.transactionCode));
+        if (!hasPermission) {
+          throw new PxpError(403, 'Access denied to execute this method');
+        }
       }
-      if (readonly) {
-        console.log('get readonly connection');
-      } else {
-        console.log('get modification connection');
-      }
-
-      metResponse = await eval(`this.${methodName}(params)`);
-      if (log) {
-        console.log('insert into log');
-      }
-      res.json(metResponse);
-    } catch (ex) {
-      next(ex);
     }
+    if (readonly) {
+      metResponse = await __(eval(`this.${methodName}(params)`));
+    } else {
+      const connection = getConnection();
+      const queryRunner = connection.createQueryRunner();
+
+      // establish real database connection using our new query runner
+      await __(queryRunner.connect());
+      await __(queryRunner.startTransaction());
+      try {
+        metResponse = await eval(`this.${methodName}(params, queryRunner.manager)`) as Record<string, unknown>;
+        await queryRunner.commitTransaction();
+
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await __(queryRunner.release());
+      }
+    }
+
+    if (log) {
+      console.log('insert into log');
+    }
+    res.json(metResponse);
+
   }
 
-  async list(params: Record<string, unknown>): Promise<any[]> {
+  async list(params: Record<string, unknown>): Promise<unknown> {
     const listParam = this.getListParams(params);
-    console.log(listParam);
-    const persons = await this.model.find(listParam);
-    return persons;
+    const [rows, count] = await __(this.model.findAndCount(listParam)) as unknown[];
+    return { data: rows, count };
+  }
+
+  async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    const modelInstance = new this.model();
+    Object.assign(modelInstance, params);
+    modelInstance.createdBy = (this.user.username as string);
+    await __(this.classValidate(modelInstance));
+    await manager.save(modelInstance);
+    return modelInstance;
+  }
+
+  async edit(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    const modelInstance = await __(this.model.findOne(params.id)) as any;
+    if (!modelInstance) {
+      throw new PxpError(406, 'Record not found');
+    }
+    const editParams = params;
+    Object.assign(modelInstance, editParams);
+    delete editParams.id;
+    modelInstance.modifiedBy = (this.user.username as string);
+    await __(this.classValidate(modelInstance));
+    await manager.save(modelInstance);
+    return modelInstance;
+  }
+
+  async delete(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    const modelInstance = await __(this.model.findOne(params.id)) as any;
+    if (!modelInstance) {
+      throw new PxpError(406, 'Record not found');
+    }
+    await manager.remove(modelInstance);
+    return modelInstance;
   }
 
   getListParams(params: Record<string, unknown>): ListParam {
     const res: ListParam = {
       where: [],
-      skip: <number>params.start,
-      take: <number>params.limit,
+      skip: params.start as number,
+      take: params.limit as number,
       order: {
-        [<string>params.sort]: <string>params.dir
+        [params.sort as string]: params.dir as string
       }
     };
     if (params.genericFilterFields) {
-      const genericFilterFields = <string>params.genericFilterFields;
+      const genericFilterFields = params.genericFilterFields as string;
       const filterFieldsArray = genericFilterFields.split('#');
       filterFieldsArray.forEach((field) => {
         if (res.where) {
           res.where.push({
-            [field]: Like('%' + <string>params.genericFilterValue + '%')
+            [field]: Like('%' + (params.genericFilterValue as string) + '%')
           })
         }
       });
@@ -305,13 +357,12 @@ class Controller implements ControllerInterface {
     console.log('after function');
   }
 
-  async validateSchema(schema: Joi.Schema): Promise<unknown> {
-    const value = await __(
-      schema.validateAsync(this.params, { abortEarly: false }),
-      true
-    );
-    this.schemaValidated = true;
-    return value;
+  async classValidate(model: any): Promise<void> {
+    const errors = await __(validate(model)) as unknown[];
+    if (errors.length > 0) {
+      throw new PxpError(406, 'Validation failed!', errors as unknown as undefined);
+    }
+
   }
 }
 

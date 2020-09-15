@@ -1,4 +1,3 @@
-import express from 'express';
 import { getManager } from 'typeorm';
 import Controller, {
   Get,

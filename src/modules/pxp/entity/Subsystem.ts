@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Role from './Role';
-import Procedure from './Procedure';
+import Transaction from './Transaction';
 import Ui from './Ui';
 import PxpEntity from './PxpEntity';
 
@@ -22,8 +22,8 @@ export default class Subsystem extends PxpEntity {
   @Column({ name: 'prefix', type: 'varchar', length: 10, nullable: true })
   prefix: string;
 
-  @OneToMany(() => Procedure, procedure => procedure.subsystem)
-  procedures: Procedure[];
+  @OneToMany(() => Transaction, transaction => transaction.subsystem)
+  transactions: Transaction[];
 
   @OneToMany(() => Role, role => role.subsystem)
   roles: Role[];

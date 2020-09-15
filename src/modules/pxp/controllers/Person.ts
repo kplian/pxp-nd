@@ -1,33 +1,30 @@
-import { getManager } from 'typeorm';
-import Controller, { Get, Post, DbSettings, ReadOnly, Authentication, Log, Model } from '../../../lib/Controller';
+import { EntityManager } from 'typeorm';
+import { validate } from 'class-validator';
+import Controller, { Get, Post, DbSettings, ReadOnly, Log, Model } from '../../../lib/Controller';
 import PersonModel from '../entity/Person';
+import { PxpError, __ } from '../../../lib/PxpError';
 
 @Model('pxp/Person')
 class Person extends Controller {
   @Get()
   @DbSettings('Orm')
-  @Authentication(true)
   @ReadOnly(true)
-  async list(params: Record<string, unknown>): Promise<PersonModel[]> {
+  async list(params: Record<string, unknown>): Promise<unknown> {
     const listParam = this.getListParams(params);
-    const persons = await PersonModel.find(listParam);
-    return persons;
+    const [persons, count] = await __(PersonModel.findAndCount(listParam)) as unknown[];
+    return { data: persons, count };
   }
 
   @Post()
   @DbSettings('Orm')
   @ReadOnly(false)
-  @Authentication(false)
-  @Log(false)
-  async add(params: Record<string, unknown>): Promise<PersonModel> {
-    console.log('llega');
+  @Log(true)
+  async add(params: Record<string, unknown>, manager: EntityManager): Promise<PersonModel> {
     const person = new PersonModel();
-    person.name = <string>params['name'];
-    person.lastName = <string>params['last_name_first'];
-    person.dni = <string>params['dni'];
-    person.dniNumber = <string>params['dni_number'];
-    person.createdBy = <number>this.user.userId;
-    await person.save();
+    Object.assign(person, params);
+    person.createdBy = (this.user.username as string);
+    await __(this.classValidate(person));
+    await manager.save(person);
     return person;
   }
 }

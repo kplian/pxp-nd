@@ -1,6 +1,7 @@
 export default {
   dbms: 'postgres', // postgres, mysql, sqlserver, oracle
   defaultDbSettings: 'Orm', // Orm, Procedure, Query
+  apiPrefix: '/api',
   // connections for direct query models
   pgPoolConfig: {
     user: process.env.PG_USER, // name of the user account

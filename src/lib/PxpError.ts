@@ -18,12 +18,15 @@ class PxpError extends Error {
   statusCode: number;
   message: string;
   tecMessage: string;
-  constructor(statusCode: number, message: string, stack = undefined) {
+  errorObject: undefined;
+  constructor(statusCode: number, message: string, errorObject?: undefined, stack?: undefined) {
     super();
     this.statusCode = statusCode;
     this.message = statusCode === 500 ? genericMessage : message;
+    this.errorObject = errorObject;
     this.tecMessage = message;
     this.stack = stack || this.stack;
+    console.log('constructor', this);
   }
 }
 
@@ -36,18 +39,18 @@ const __ = (promise: Promise<unknown>, myShowError = false): Promise<unknown> =>
       if (error instanceof PxpError) {
         throw error;
       } else {
-        throw new PxpError(showError ? 406 : 500, error.message, error.stack);
+        throw new PxpError(showError ? 406 : 500, error.message, undefined, error.stack);
       }
     })
 );
 
 // error handler middleware
-const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response, next: express.NextFunction): void => {
-  console.log('error happened', res);
+const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response): void => {
   const {
-    statusCode, message, stack, tecMessage,
+    statusCode, message, stack, tecMessage, errorObject
   } = err;
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
+  console.log('error middleware:', err);
   // @todo if production not show tecMessage and stack
   res.status(500).json(
     {
@@ -55,6 +58,7 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
         ...{
           code: statusCode,
           message,
+          errorObject,
         },
         ...extraObj,
       },

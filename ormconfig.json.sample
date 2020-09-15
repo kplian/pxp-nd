@@ -1,9 +1,9 @@
 {
   "type": "postgres",
-  "host": "dbkplian.csq7ej40dpou.us-east-2.rds.amazonaws.com",
+  "host": "dbkplian.gfdgfsdgfsdg.us-east-2.rds.amazonaws.com",
   "port": 5432,
-  "username": "postgres",
-  "password": "Mund0libre",
+  "username": "kplian",
+  "password": "zzzzz",
   "database": "dbkplian",
   "synchronize": true,
   "logging": false,

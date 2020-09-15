@@ -38,6 +38,7 @@ class App {
     await this.connectToTheDatabase();
     this.initializeAuthentication();
     this.initializeRoutes();
+    this.initializeErrorHandling();
   }
   public listen(): void {
     this.app.listen(process.env.PORT, () => {
@@ -49,7 +50,31 @@ class App {
     return this.app;
   }
 
+  private getDurationInMilliseconds = (start: [number, number]) => {
+    const NS_PER_SEC = 1e9
+    const NS_TO_MS = 1e6
+    const diff = process.hrtime(start)
+
+    return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS
+  }
+
   private initializeMiddlewares() {
+    this.app.use((req, res, next) => {
+      console.log(`${req.method} ${req.originalUrl} [STARTED]`)
+      const start = process.hrtime()
+
+      res.on('finish', () => {
+        const durationInMilliseconds = this.getDurationInMilliseconds(start)
+        console.log(`${req.method} ${req.originalUrl} [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`)
+      })
+
+      res.on('close', () => {
+        const durationInMilliseconds = this.getDurationInMilliseconds(start)
+        console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
+      })
+
+      next()
+    });
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.configCors();
@@ -101,7 +126,7 @@ class App {
           maxAge: 1000 * 60 * 60 * 24 // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
         }
       })
-    );
+    )
   }
 
   private initializeRoutes() {
@@ -120,7 +145,8 @@ class App {
         username: String(process.env.PG_USER),
         password: String(process.env.PG_PASSWORD),
         database: String(process.env.PG_DATABASE),
-        entities: [__dirname + '/modules/**/entity/*.js']
+        entities: [__dirname + '/modules/**/entity/*.js'],
+        cache: true
       }
     ]);
   }

@@ -24,6 +24,7 @@ import { getConnection } from 'typeorm';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
 import cors from 'cors';
+import config from './config';
 class App {
   public app: express.Application;
   public controllers: Controller[];
@@ -61,18 +62,20 @@ class App {
   private initializeMiddlewares() {
     this.app.use((req, res, next) => {
       req.start = new Date();
-      console.log(`${req.method} ${req.originalUrl} [STARTED]`)
-      const start = process.hrtime()
+      if (config.logDuration) {
+        console.log(`${req.method} ${req.originalUrl} [STARTED]`);
+        const start = process.hrtime();
 
-      res.on('finish', () => {
-        const durationInMilliseconds = this.getDurationInMilliseconds(start)
-        console.log(`${req.method} ${req.originalUrl} [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`)
-      })
+        res.on('finish', () => {
+          const durationInMilliseconds = this.getDurationInMilliseconds(start);
+          console.log(`${req.method} ${req.originalUrl} [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`);
+        })
 
-      res.on('close', () => {
-        const durationInMilliseconds = this.getDurationInMilliseconds(start)
-        console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
-      })
+        res.on('close', () => {
+          const durationInMilliseconds = this.getDurationInMilliseconds(start);
+          console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`);
+        })
+      }
 
       next()
     });

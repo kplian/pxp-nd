@@ -60,6 +60,7 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use((req, res, next) => {
+      req.start = new Date();
       console.log(`${req.method} ${req.originalUrl} [STARTED]`)
       const start = process.hrtime()
 

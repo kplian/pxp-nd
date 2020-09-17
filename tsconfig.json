@@ -20,6 +20,7 @@
     "strictPropertyInitialization": false,
   },
   "include": [
+    "custom.d.ts",
     "src/**/*.ts"
   ],
   "exclude": [

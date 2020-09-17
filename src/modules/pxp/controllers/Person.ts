@@ -1,6 +1,6 @@
 import { EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
-import Controller, { Get, Post, DbSettings, ReadOnly, Log, Model } from '../../../lib/Controller';
+import Controller, { Get, Post, DbSettings, ReadOnly, Log, Model, Authentication } from '../../../lib/Controller';
 import PersonModel from '../entity/Person';
 import { PxpError, __ } from '../../../lib/PxpError';
 

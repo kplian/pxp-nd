@@ -1,6 +1,19 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-17 18:57:27
+ */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Word from './Word';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
 @Entity({ schema: 'pxp', name: 'tpar_language_group' })
 export default class LanguageGroup extends PxpEntity {

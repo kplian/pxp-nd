@@ -1,6 +1,19 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-17 18:58:20
+ */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Chat from './Chat';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
 @Entity({ name: 'tpar_message', schema: 'pxp' })
 export default class Message extends PxpEntity {

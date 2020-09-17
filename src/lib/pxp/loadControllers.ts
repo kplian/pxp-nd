@@ -1,10 +1,23 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Automatically load all controllers
+ *
+ * @summary Automatically load all controllers
+ * @author Jaime Rivera
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 19:17:28
+ */
 import fs from 'fs';
 import util from 'util';
-import Controller from './ControllerInterface';
+import { ControllerInterface as Controller } from './index';
 
 const readdir = util.promisify(fs.readdir);
 export default async (): Promise<Controller[]> => {
-  const modulesPath = `${__dirname}/../modules`;
+  const modulesPath = `${__dirname}/../../modules`;
   let modules: string[] = [];
   const controllers: Controller[] = [];
   let controllerFiles: Record<string, string>[] = [];

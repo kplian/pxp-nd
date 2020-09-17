@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Local config
+ *
+ * @summary Local config
+ * @author Israel Colque
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:46:44
+ */
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
 import { validPassword } from '../utils/password';

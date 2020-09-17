@@ -1,8 +1,20 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Person Controller
+ *
+ * @summary Person Controller
+ * @author Jaime Rivera
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-17 19:04:17
+ */
 import { EntityManager } from 'typeorm';
-import { validate } from 'class-validator';
-import Controller, { Get, Post, DbSettings, ReadOnly, Log, Model, Authentication } from '../../../lib/Controller';
+import { Controller, Get, Post, DbSettings, ReadOnly, Log, Model, __ } from '../../../lib/pxp';
 import PersonModel from '../entity/Person';
-import { PxpError, __ } from '../../../lib/PxpError';
+
 
 @Model('pxp/Person')
 class Person extends Controller {

@@ -1,26 +1,26 @@
 /**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
  * Controller Class.
  *
- * All common controllers functionality should go here (all controllers should inherit this class).
+ * @summary All common controllers functionality go here (all controllers should inherit this class).
+ * @author Jaime Rivera
  *
- * @link   src/lib/ControlMiddle.js
- * @file   BaseController Class.
- * @author Jaime Rivera (Kplian).
- * @since  10.06.2020
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 19:20:42
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
-import Joi, { date } from '@hapi/joi';
 import _ from 'lodash';
-import { Router, Request, Response, NextFunction, response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { RouteDefinition } from './RouteDefinition';
-import { PxpError, __, errorMiddleware } from './PxpError';
-import ControllerInterface from './ControllerInterface';
-import ListParam from './ListParamInterface';
-import config from '../config';
-import User from '../modules/pxp/entity/User';
-import { isAuthenticated } from '../auth/config/passport-local';
-import { userHasPermission, insertLog } from './utils/Security'
+import { PxpError, __, errorMiddleware, ControllerInterface, ListParam, userHasPermission, insertLog } from './index';
+import config from '../../config';
+import User from '../../modules/pxp/entity/User';
+import { isAuthenticated } from '../../auth/config/passport-local';
+
 
 class Controller implements ControllerInterface {
   public validated: boolean;
@@ -54,7 +54,7 @@ class Controller implements ControllerInterface {
       const modelArray = this.modelString.split('/');
       try {
         import(
-          `../modules/${modelArray[0]}/entity/${modelArray[1]}`
+          `../../modules/${modelArray[0]}/entity/${modelArray[1]}`
         ).then(model => {
           this.model = model.default;
         });
@@ -159,7 +159,7 @@ class Controller implements ControllerInterface {
             this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
             try {
               await this.genericMethodWrapper(
-                params, 
+                params,
                 req,
                 next,
                 res,
@@ -182,7 +182,7 @@ class Controller implements ControllerInterface {
 
   async genericMethodWrapper(
     params: Record<string, unknown>,
-    req : Request,
+    req: Request,
     next: NextFunction,
     res: Response,
     methodName: string,
@@ -268,14 +268,14 @@ class Controller implements ControllerInterface {
     }
 
     if (log) {
-      
+
 
       const now = new Date();
-      const iniAt =req.start as Date;
+      const iniAt = req.start as Date;
       const endsAt = now.valueOf() - iniAt.valueOf();
       const logId = __(insertLog(this.user.username, 'mac', req.ip, 'success', 'descr', this.module,
-      this.transactionCode , JSON.stringify(req.query), JSON.stringify(req.params), 'response','error',endsAt));
-      console.log (logId);
+        this.transactionCode, JSON.stringify(req.query), JSON.stringify(req.params), 'response', 'error', endsAt));
+      console.log(logId);
 
     }
     res.json(metResponse);
@@ -322,7 +322,7 @@ class Controller implements ControllerInterface {
 
   getListParams(params: Record<string, unknown>): ListParam {
 
-      const res: ListParam = {
+    const res: ListParam = {
       where: [],
       skip: params.start as number,
       take: params.limit as number,
@@ -381,223 +381,6 @@ class Controller implements ControllerInterface {
   }
 }
 
-/*************************DECORATORS***********************************/
 
-const Get = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-    // console.log('get', target);
-    // console.log('get', target.constructor);
 
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
-      RouteDefinition
-    >;
-
-    routes.push({
-      requestMethod: 'get',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
-
-const Post = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
-      RouteDefinition
-    >;
-
-    routes.push({
-      requestMethod: 'post',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
-
-const Put = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
-      RouteDefinition
-    >;
-
-    routes.push({
-      requestMethod: 'put',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
-
-const Delete = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
-      RouteDefinition
-    >;
-
-    routes.push({
-      requestMethod: 'delete',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
-
-const Patch = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as Array<
-      RouteDefinition
-    >;
-
-    routes.push({
-      requestMethod: 'patch',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
-
-const Route = (controller_path = ''): ClassDecorator => {
-  return (target: any) => {
-    Reflect.defineMetadata('controller_path', controller_path, target);
-
-    // Since routes are set by our methods this should almost never be true (except the controller has no methods)
-    if (!Reflect.hasMetadata('routes', target)) {
-      Reflect.defineMetadata('routes', [], target);
-    }
-  };
-};
-
-const Model = (model: string): ClassDecorator => {
-  return (target: any) => {
-    Reflect.defineMetadata('model', model, target);
-  };
-};
-
-const StoredProcedure = (storedProcedure: string): ClassDecorator => {
-  return (target: any) => {
-    Reflect.defineMetadata('storedprocedure', storedProcedure, target);
-  };
-};
-
-const Authentication = (authentication = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('authentication', target.constructor)) {
-      Reflect.defineMetadata('authentication', {}, target.constructor);
-    }
-    const aut = Reflect.getMetadata('authentication', target.constructor) as {
-      [id: string]: boolean;
-    };
-    aut[propertyKey] = authentication;
-
-    Reflect.defineMetadata('authentication', aut, target.constructor);
-  };
-};
-
-const Log = (log = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('log', target.constructor)) {
-      Reflect.defineMetadata('log', [], target.constructor);
-    }
-    const logVar = Reflect.getMetadata('log', target.constructor) as {
-      [id: string]: boolean;
-    };
-    logVar[propertyKey] = log;
-    Reflect.defineMetadata('log', logVar, target.constructor);
-  };
-};
-
-const Permission = (permission = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('permission', target.constructor)) {
-      Reflect.defineMetadata('permission', [], target.constructor);
-    }
-    const perVar = Reflect.getMetadata('permission', target.constructor) as {
-      [id: string]: boolean;
-    };
-    perVar[propertyKey] = permission;
-    Reflect.defineMetadata('permission', perVar, target.constructor);
-  };
-};
-
-const ReadOnly = (ronly = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('readonly', target.constructor)) {
-      Reflect.defineMetadata('readonly', [], target.constructor);
-    }
-    const rOnlyVar = Reflect.getMetadata('readonly', target.constructor) as {
-      [id: string]: boolean;
-    };
-    rOnlyVar[propertyKey] = ronly;
-    Reflect.defineMetadata('readonly', rOnlyVar, target.constructor);
-  };
-};
-
-const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('dbsettings', target.constructor)) {
-      Reflect.defineMetadata('dbsettings', [], target.constructor);
-    }
-    const dbvar = Reflect.getMetadata('dbsettings', target.constructor) as {
-      [id: string]: 'Procedure' | 'Orm' | 'Query';
-    };
-    dbvar[propertyKey] = modelType;
-
-    Reflect.defineMetadata('dbsettings', dbvar, target.constructor);
-  };
-};
-
-export default Controller;
-export {
-  Get,
-  Post,
-  Put,
-  Delete,
-  Patch,
-  Route,
-  Authentication,
-  Log,
-  Permission,
-  DbSettings,
-  ReadOnly,
-  Model,
-  StoredProcedure
-};
+export { Controller };

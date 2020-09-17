@@ -1,12 +1,15 @@
 /**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
  * Error class and middlewares.
  *
- * Here is defined Pxp error class, middleware and promise handler __.
+ * @summary Here is defined Pxp error class, middleware and promise handler __.
+ * @author Jaime Rivera
  *
- * @link   src/lib/PxpError.js
- * @file   Error class and functions.
- * @author Jaime Rivera (Kplian).
- * @since  10.06.2020
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:13:39
  */
 
 import express from 'express';
@@ -26,7 +29,6 @@ class PxpError extends Error {
     this.errorObject = errorObject;
     this.tecMessage = message;
     this.stack = stack || this.stack;
-    console.log('constructor', this);
   }
 }
 

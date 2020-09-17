@@ -1,7 +1,20 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-17 18:57:50
+ */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import FileType from './FileType';
 import HistoryFile from './HistoryFile';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
 @Entity({ name: 'tpar_file', schema: 'pxp' })
 export default class File extends PxpEntity {

@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-17 19:00:27
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,7 +22,7 @@ import {
 } from 'typeorm';
 import Person from './Person';
 import Role from './Role';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
 @Entity({ schema: 'pxp', name: 'tsec_user' })
 export default class User extends PxpEntity {

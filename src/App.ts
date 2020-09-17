@@ -1,29 +1,32 @@
 /**
- * Index file for pxp-nd.
+ * Kplian Ltda 2020
  *
- * Handles all requests for pxp-ui or pxp-nd.
+ * MIT
  *
- * @link   index.js
- * @file   index script.
- * @author Jaime Rivera (Kplian).
- * @since  10.06.2020
+ * Main pxp-nd file.
+ *
+ * @summary Handles all requests for pxp-ui or pxp-nd.
+ * @author Jaime Rivera
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:38:22
  */
 
 import 'reflect-metadata';
 import { createConnections } from 'typeorm';
 import * as bodyParser from 'body-parser';
 import express from 'express';
-import Controller from './lib/ControllerInterface';
-import loadControllers from './lib/loadControllers';
-import { errorMiddleware } from './lib/PxpError';
 import passport from 'passport';
-import { authRouter } from './auth/auth-routes';
-import { configPassport } from './auth/config';
 import session from 'express-session';
 import { getConnection } from 'typeorm';
+import cors from 'cors';
+import { ControllerInterface as Controller } from './lib/pxp';
+import loadControllers from './lib/pxp/loadControllers';
+import { errorMiddleware } from './lib/pxp';
+import { authRouter } from './auth/auth-routes';
+import { configPassport } from './auth/config';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
-import cors from 'cors';
 import config from './config';
 class App {
   public app: express.Application;

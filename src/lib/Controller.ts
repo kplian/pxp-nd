@@ -10,9 +10,9 @@
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
-import Joi from '@hapi/joi';
+import Joi, { date } from '@hapi/joi';
 import _ from 'lodash';
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction, response } from 'express';
 import { RouteDefinition } from './RouteDefinition';
 import { PxpError, __, errorMiddleware } from './PxpError';
 import ControllerInterface from './ControllerInterface';
@@ -20,7 +20,8 @@ import ListParam from './ListParamInterface';
 import config from '../config';
 import User from '../modules/pxp/entity/User';
 import { isAuthenticated } from '../auth/config/passport-local';
-import { userHasPermission } from './utils/Security'
+import { userHasPermission, insertLog } from './utils/Security'
+
 class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
@@ -131,6 +132,7 @@ class Controller implements ControllerInterface {
             const params = { ...req.query, ...req.body, ...req.params };
             await this.genericMethodWrapper(
               params,
+              req,
               next,
               res,
               route.methodName,
@@ -157,7 +159,8 @@ class Controller implements ControllerInterface {
             this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
             try {
               await this.genericMethodWrapper(
-                params,
+                params, 
+                req,
                 next,
                 res,
                 route.methodName,
@@ -179,6 +182,7 @@ class Controller implements ControllerInterface {
 
   async genericMethodWrapper(
     params: Record<string, unknown>,
+    req : Request,
     next: NextFunction,
     res: Response,
     methodName: string,
@@ -191,6 +195,7 @@ class Controller implements ControllerInterface {
 
       await __(this.ormMethodWrapper(
         params,
+        req,
         next,
         res,
         methodName,
@@ -224,6 +229,7 @@ class Controller implements ControllerInterface {
 
   async ormMethodWrapper(
     params: Record<string, unknown>,
+    req: Request,
     next: NextFunction,
     res: Response,
     methodName: string,
@@ -262,7 +268,15 @@ class Controller implements ControllerInterface {
     }
 
     if (log) {
-      console.log('insert into log');
+      
+
+      const now = new Date();
+      const iniAt =req.start as Date;
+      const endsAt = now.valueOf() - iniAt.valueOf();
+      const logId = __(insertLog(this.user.username, 'mac', req.ip, 'success', 'descr', this.module,
+      this.transactionCode , JSON.stringify(req.query), JSON.stringify(req.params), 'response','error',endsAt));
+      console.log (logId);
+
     }
     res.json(metResponse);
 
@@ -307,7 +321,8 @@ class Controller implements ControllerInterface {
   }
 
   getListParams(params: Record<string, unknown>): ListParam {
-    const res: ListParam = {
+
+      const res: ListParam = {
       where: [],
       skip: params.start as number,
       take: params.limit as number,

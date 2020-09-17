@@ -1,6 +1,8 @@
 import 'reflect-metadata';
-import { getManager } from 'typeorm';
+import { AdvancedConsoleLogger, getManager } from 'typeorm';
 import Role from '../../modules/pxp/entity/Role';
+import Log from '../../modules/pxp/entity/Log';
+import { number } from '@hapi/joi';
 
 const userHasPermission = async (userId: number, transaction: string): Promise<boolean> => {
 
@@ -18,6 +20,38 @@ const userHasPermission = async (userId: number, transaction: string): Promise<b
   return user.count == '0' ? false : true;
 
 };
-export { userHasPermission };
+
+
+const insertLog = async (username: string, macaddres:string,ip: string, logType: string, desc :string, proc :string, trans :string, 
+  query :string, req :string, resp :string, err :string, timeEx: number): Promise<number> => {
+
+    const log = new Log; 
+    log.username = username;
+    log.macaddres = macaddres;
+    log.ip=ip;
+    log.logType=logType;
+    log.description=desc;
+    log.procedure=proc;
+    log.transaction=trans;
+    log.query=query;
+    log.request=req;
+    log.response=resp;
+   // log.logDate='';
+    log.execTime=timeEx;
+    log.errorCode=err;
+
+    
+//subsystem:{subsystemId:1} 
+     const logIds= await getManager()
+        .createQueryBuilder()
+        .insert()
+        .into(Log)
+        .values([log])
+        .execute();
+
+        return  logIds.identifiers[0].logId;
+
+}
+export { userHasPermission, insertLog  };
 
 

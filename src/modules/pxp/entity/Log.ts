@@ -16,7 +16,7 @@ export default class Log extends BaseEntity {
   @Column({ name: 'ip', type: 'varchar', length: 100, nullable: true })
   ip: string;
 
-  @Column({ name: 'logType', type: 'varchar', length: 50, nullable: false })
+  @Column({ name: 'log_type', type: 'varchar', length: 50, nullable: false })
   logType: string;
 
   @Column({ name: 'description', type: 'varchar', nullable: true })
@@ -43,7 +43,7 @@ export default class Log extends BaseEntity {
   @Column({ name: 'exec_time', nullable: true })
   execTime: number;
 
-  @Column({ name: 'errorCode', type: 'varchar', length: 100, nullable: true })
+  @Column({ name: 'error_code', type: 'varchar', length: 100, nullable: true })
   errorCode: string;
 
 }

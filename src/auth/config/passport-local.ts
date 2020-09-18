@@ -9,7 +9,7 @@
  * @author Israel Colque
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 18:46:44
+ * Last modified  : 2020-09-18 01:22:51
  */
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
@@ -77,14 +77,12 @@ function configPassportLocal(): void {
   passport.use(strategy);
   // This method is used to store the user identifier locally.
   passport.serializeUser((user: User, done: any) => {
-    console.log('serialize');
     done(null, user.userId);
   });
   // This method is used to extract user data.
   passport.deserializeUser((userId: string, done: any) => {
-    console.log('deserialize');
     const userRepository = getCustomRepository(UserRepository);
-    console.time('Time this');
+
 
     userRepository.createQueryBuilder('user')
       //.leftJoinAndSelect('role.uis', 'ui')
@@ -92,8 +90,6 @@ function configPassportLocal(): void {
       .where('"user".user_id = :id', { id: userId })
       .getOne()
       .then((user) => {
-        console.timeEnd('Time this');
-        console.log(user);
         done(null, user);
       })
       .catch((err) => done(err));

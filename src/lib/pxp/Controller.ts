@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 19:20:42
+ * Last modified  : 2020-09-18 01:04:34
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -127,20 +127,42 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           async (req: Request, res: Response, next: NextFunction) => {
-            console.log('not authenticated');
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-            await this.genericMethodWrapper(
-              params,
-              req,
-              next,
-              res,
-              route.methodName,
-              methodDbSettings,
-              readonly[route.methodName],
-              false,
-              log[route.methodName]
-            );
+            this.transactionCode = (this.module + this.path + route.path).split('/').join('.').toLowerCase();
+            try {
+              await __(this.genericMethodWrapper(
+                params,
+                req,
+                next,
+                res,
+                route.methodName,
+                methodDbSettings,
+                readonly[route.methodName],
+                false,
+                log[route.methodName]
+              ));
+            } catch (ex) {
+              const now = new Date();
+              const iniAt = req.start as Date;
+              const endsAt = now.valueOf() - iniAt.valueOf();
+              res.logId = await __(insertLog(
+                this.user.username,
+                'mac',
+                req.ip,
+                'error',
+                ex.tecMessage,
+                this.module,
+                this.transactionCode,
+                '',// query
+                JSON.stringify(params),
+                ex.stack,
+                ex.statusCode,
+                endsAt)) as number;
+
+              errorMiddleware(ex, req, res);
+            }
+
           }
         );
       } else {
@@ -152,13 +174,12 @@ class Controller implements ControllerInterface {
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-            console.log('authenticated');
             if (req.user) {
               this.user = (req.user as User);
             }
-            this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
+            this.transactionCode = (this.module + this.path + route.path).split('/').join('.').toLowerCase();
             try {
-              await this.genericMethodWrapper(
+              await __(this.genericMethodWrapper(
                 params,
                 req,
                 next,
@@ -168,9 +189,24 @@ class Controller implements ControllerInterface {
                 readonly[route.methodName],
                 permission[route.methodName],
                 log[route.methodName]
-              );
-              console.log('after');
+              ));
             } catch (ex) {
+              const now = new Date();
+              const iniAt = req.start as Date;
+              const endsAt = now.valueOf() - iniAt.valueOf();
+              res.logId = await __(insertLog(
+                this.user.username,
+                'mac',
+                req.ip,
+                'error',
+                ex.tecMessage,
+                this.module,
+                this.transactionCode,
+                '',// query
+                JSON.stringify(params),
+                ex.stack,
+                ex.statusCode,
+                endsAt)) as number;
               errorMiddleware(ex, req, res);
             }
 
@@ -273,10 +309,19 @@ class Controller implements ControllerInterface {
       const now = new Date();
       const iniAt = req.start as Date;
       const endsAt = now.valueOf() - iniAt.valueOf();
-      const logId = __(insertLog(this.user.username, 'mac', req.ip, 'success', 'descr', this.module,
-        this.transactionCode, JSON.stringify(req.query), JSON.stringify(req.params), 'response', 'error', endsAt));
-      console.log(logId);
-
+      __(insertLog(
+        this.user.username,
+        'mac',
+        req.ip,
+        'success',
+        'successful transaction',
+        this.module,
+        this.transactionCode,
+        '',
+        JSON.stringify(params),
+        JSON.stringify(metResponse),
+        '200',
+        endsAt));
     }
     res.json(metResponse);
 

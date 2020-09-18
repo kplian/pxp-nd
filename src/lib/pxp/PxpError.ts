@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 18:13:39
+ * Last modified  : 2020-09-18 01:11:14
  */
 
 import express from 'express';
@@ -51,8 +51,9 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
   const {
     statusCode, message, stack, tecMessage, errorObject
   } = err;
+  console.log(process.env.NODE_ENV);
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
-  console.log('error middleware:', err);
+
   // @todo if production not show tecMessage and stack
   res.status(500).json(
     {
@@ -60,6 +61,7 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
         ...{
           code: statusCode,
           message,
+          logId: res.logId ? res.logId : undefined,
           errorObject,
         },
         ...extraObj,

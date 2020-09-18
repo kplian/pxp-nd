@@ -9,13 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:59:15
+ * Last modified  : 2020-09-18 13:50:48
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Type from './Type';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tpar_subtype' })
+@Entity({ name: 'tpar_subtype' })
 export default class Subtype extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'subtype_id' })

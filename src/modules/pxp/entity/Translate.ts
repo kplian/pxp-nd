@@ -9,14 +9,14 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 19:00:09
+ * Last modified  : 2020-09-18 13:51:59
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Language from './Language';
 import Word from './Word';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tpar_translate' })
+@Entity({ name: 'tpar_translate' })
 export default class Translate extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'translate_id' })

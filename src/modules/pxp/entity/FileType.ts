@@ -9,13 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:45
+ * Last modified  : 2020-09-18 13:46:18
  */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import File from './File';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tpar_file_type' })
+@Entity({ name: 'tpar_file_type' })
 export default class FileType extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'file_type_id' })

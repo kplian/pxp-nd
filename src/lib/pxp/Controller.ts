@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-18 01:04:34
+ * Last modified  : 2020-09-18 14:39:22
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -285,7 +285,7 @@ class Controller implements ControllerInterface {
     if (readonly) {
       metResponse = await __(eval(`this.${methodName}(params)`));
     } else {
-      const connection = getConnection();
+      const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
       const queryRunner = connection.createQueryRunner();
 
       // establish real database connection using our new query runner

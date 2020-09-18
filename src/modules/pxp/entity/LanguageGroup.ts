@@ -9,13 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:27
+ * Last modified  : 2020-09-18 13:48:15
  */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import Word from './Word';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tpar_language_group' })
+@Entity({ name: 'tpar_language_group' })
 export default class LanguageGroup extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'language_group_id' })

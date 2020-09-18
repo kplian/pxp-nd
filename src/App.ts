@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 18:38:22
+ * Last modified  : 2020-09-18 13:57:06
  */
 
 import 'reflect-metadata';
@@ -143,19 +143,7 @@ class App {
   }
 
   private async connectToTheDatabase(): Promise<void> {
-    await createConnections([
-      {
-        name: String('default'),
-        type: 'postgres',
-        host: String(process.env.PG_HOST),
-        port: Number(process.env.PG_PORT),
-        username: String(process.env.PG_USER),
-        password: String(process.env.PG_PASSWORD),
-        database: String(process.env.PG_DATABASE),
-        entities: [__dirname + '/modules/**/entity/*.js'],
-        cache: true
-      }
-    ]);
+    await createConnections();
   }
 }
 

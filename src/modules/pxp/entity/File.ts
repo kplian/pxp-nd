@@ -9,14 +9,14 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:50
+ * Last modified  : 2020-09-18 13:45:13
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import FileType from './FileType';
 import HistoryFile from './HistoryFile';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tpar_file', schema: 'pxp' })
+@Entity({ name: 'tpar_file' })
 export default class File extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'file_id' })

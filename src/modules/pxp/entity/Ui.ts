@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 19:00:20
+ * Last modified  : 2020-09-18 14:19:01
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import Role from './Role';
@@ -17,7 +17,7 @@ import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tsec_ui' })
+@Entity({ name: 'tsec_ui' })
 export default class Ui extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_id' })
@@ -46,7 +46,6 @@ export default class Ui extends PxpEntity {
 
   @ManyToMany(() => Role)
   @JoinTable({
-    schema: 'pxp',
     name: 'tsec_ui_role',
     joinColumn: {
       name: 'ui_id',

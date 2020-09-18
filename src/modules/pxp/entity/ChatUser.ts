@@ -9,13 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:54
+ * Last modified  : 2020-09-18 13:44:57
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Chat from './Chat';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tpar_chat_user', schema: 'pxp' })
+@Entity({ name: 'tpar_chat_user' })
 export default class ChatUser extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'chat_user_id' })

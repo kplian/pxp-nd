@@ -9,12 +9,12 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:08
+ * Last modified  : 2020-09-18 13:48:03
  */
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn } from 'typeorm';
 
 
-@Entity({ schema: 'pxp', name: 'tsec_log' })
+@Entity({ name: 'tsec_log' })
 export default class Log extends BaseEntity {
 
   @PrimaryGeneratedColumn({ name: 'log_id' })

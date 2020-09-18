@@ -9,14 +9,14 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:59:48
+ * Last modified  : 2020-09-18 14:18:09
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable } from 'typeorm';
 import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tsec_transaction' })
+@Entity({ name: 'tsec_transaction' })
 export default class Transaction extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'transaction_id' })

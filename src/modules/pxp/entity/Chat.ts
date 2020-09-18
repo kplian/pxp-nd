@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:58:03
+ * Last modified  : 2020-09-18 13:44:26
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import ChatType from './ChatType';
@@ -17,7 +17,7 @@ import Message from './Message';
 import ChatUser from './ChatUser';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tpar_chat', schema: 'pxp' })
+@Entity({ name: 'tpar_chat' })
 export default class Chat extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'chat_id' })

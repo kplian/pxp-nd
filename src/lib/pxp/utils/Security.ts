@@ -9,7 +9,7 @@
  * @author Mercedes Zambrana
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 18:54:46
+ * Last modified  : 2020-09-18 14:40:26
  */
 import 'reflect-metadata';
 import { getManager } from 'typeorm';
@@ -53,7 +53,7 @@ const insertLog = async (username: string, macaddres: string, ip: string, logTyp
   log.errorCode = err;
 
 
-  const logIds = await getManager()
+  const logIds = await getManager(process.env.DB_LOG_CONNECTION_NAME)
     .createQueryBuilder()
     .insert()
     .into(Log)

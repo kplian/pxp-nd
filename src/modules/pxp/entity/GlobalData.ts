@@ -9,12 +9,12 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:41
+ * Last modified  : 2020-09-18 13:46:27
  */
 import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tpar_global_data' })
+@Entity({ name: 'tpar_global_data' })
 @Unique(['data'])
 export default class GlobalData extends PxpEntity {
 

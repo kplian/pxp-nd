@@ -9,13 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:58:45
+ * Last modified  : 2020-09-18 13:49:18
  */
 import { Entity, PrimaryGeneratedColumn, Column, AfterLoad } from 'typeorm';
 import { IsInt, Length, IsEmail, IsDate, IsOptional } from 'class-validator';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tsec_person' })
+@Entity({ name: 'tsec_person' })
 export default class Person extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'person_id' })

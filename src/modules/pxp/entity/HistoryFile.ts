@@ -9,13 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-17 18:57:37
+ * Last modified  : 2020-09-18 13:47:08
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import File from './File';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tpar_history_file', schema: 'pxp' })
+@Entity({ name: 'tpar_history_file' })
 export default class HistoryFile extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'history_file_id' })

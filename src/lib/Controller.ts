@@ -146,15 +146,17 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
-          isAuthenticated,
+          // isAuthenticated,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
             console.log('authenticated');
             if (req.user) {
-              this.user = (req.user as User);
+              this.user = req.user as User;
             }
-            this.transactionCode = (this.module + this.path + route.path).split('/').join('.');
+            this.transactionCode = (this.module + this.path + route.path)
+              .split('/')
+              .join('.');
             try {
               await this.genericMethodWrapper(
                 params,
@@ -170,7 +172,6 @@ class Controller implements ControllerInterface {
             } catch (ex) {
               errorMiddleware(ex, req, res);
             }
-
           }
         );
       }
@@ -233,8 +234,10 @@ class Controller implements ControllerInterface {
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
-      if (this.user.roles.length === 0) {
-        const hasPermission = await __(userHasPermission(this.user.userId as number, this.transactionCode));
+      if (this.user && this.user.roles && this.user.roles.length === 0) {
+        const hasPermission = await __(
+          userHasPermission(this.user.userId as number, this.transactionCode)
+        );
         if (!hasPermission) {
           throw new PxpError(403, 'Access denied to execute this method');
         }

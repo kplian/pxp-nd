@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { isAuthenticated, verifyCallback } from './config/passport-local';
 import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '../modules/pxp/repository/User';
+import { UserRepository } from '../modules/pxp/repositories/user.repository';
 import { validPassword } from './utils/password';
 import { issueJWT } from './config/passport-jwt';
 import config from '../config';

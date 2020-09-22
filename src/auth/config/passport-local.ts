@@ -3,7 +3,7 @@ import * as passportLocal from 'passport-local';
 import { validPassword } from '../utils/password';
 import User from 'modules/pxp/entity/User';
 import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '../../modules/pxp/repository/User';
+import { UserRepository } from '../../modules/pxp/repositories/user.repository';
 import { NextFunction, Response, Request } from 'express';
 
 const LocalStrategy = passportLocal.Strategy;

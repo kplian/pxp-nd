@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy, Profile, VerifyFunction } from 'passport-facebook';
-import { UserRepository } from '../../modules/pxp/repository/User';
+import { UserRepository } from '../../modules/pxp/repositories/user.repository';
 import { getCustomRepository } from 'typeorm';
 import User from 'modules/pxp/entity/User';
 

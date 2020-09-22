@@ -9,12 +9,13 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-18 14:39:22
+ * Last modified  : 2020-09-22 08:10:54
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
+import Joi, { Schema } from '@hapi/joi';
 import { RouteDefinition } from './RouteDefinition';
 import { PxpError, __, errorMiddleware, ControllerInterface, ListParam, userHasPermission, insertLog } from './index';
 import config from '../../config';
@@ -328,6 +329,8 @@ class Controller implements ControllerInterface {
   }
 
   async list(params: Record<string, unknown>): Promise<unknown> {
+    const schema = this.getListSchema();
+    await __(this.schemaValidate(schema));
     const listParam = this.getListParams(params);
     const [rows, count] = await __(this.model.findAndCount(listParam)) as unknown[];
     return { data: rows, count };
@@ -366,7 +369,6 @@ class Controller implements ControllerInterface {
   }
 
   getListParams(params: Record<string, unknown>): ListParam {
-
     const res: ListParam = {
       where: [],
       skip: params.start as number,
@@ -422,8 +424,26 @@ class Controller implements ControllerInterface {
     if (errors.length > 0) {
       throw new PxpError(406, 'Validation failed!', errors as unknown as undefined);
     }
-
   }
+
+  async schemaValidate(schema: Schema): Promise<boolean> {
+    const value = await __(schema.validateAsync(this.params, { abortEarly: false }), true) as boolean;
+    this.validated = true;
+    return value;
+  }
+
+  getListSchema(): Schema {
+    const schema = Joi.object({
+      start: Joi.number().integer().positive().required(),
+      limit: Joi.number().integer().positive().required(),
+      sort: Joi.string().min(2).required(),
+      dir: Joi.string().min(3).max(4).required(),
+      genericFilterFields: Joi.string().min(2).required(),
+      genericFilterValue: Joi.string().min(1),
+    });
+    return schema;
+  }
+
 }
 
 

@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-18 13:57:06
+ * Last modified  : 2020-09-20 18:24:45
  */
 
 import 'reflect-metadata';
@@ -140,6 +140,17 @@ class App {
     this.controllers.forEach((controller) => {
       this.app.use(controller.router);
     });
+    this.app.all('*', function (req, res) {
+      res.status(404).json(
+        {
+          error: {
+            code: 404,
+            message: 'Route not found'
+          }
+        }
+      );
+    });
+
   }
 
   private async connectToTheDatabase(): Promise<void> {

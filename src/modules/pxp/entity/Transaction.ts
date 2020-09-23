@@ -29,11 +29,14 @@ export default class Transaction extends PxpEntity {
   description: string
 
   @ManyToOne(() => Subsystem, subsystem => subsystem.transactions)
-  @JoinColumn({ name: 'transaction_id' })
+  @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
 
   @OneToMany(() => UiTransaction, uiTransaction => uiTransaction.transaction)
   @JoinTable()
   uis: UiTransaction[];
+
+  @Column({ nullable: true, name: 'subsystem_id' })
+  subsystemId: number;
 
 }

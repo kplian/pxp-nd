@@ -90,4 +90,12 @@ export default class Ui extends PxpEntity {
     return uis;
   }
 
+  @Column({ nullable: true, name: 'subsystem_id' })
+  subsystemId: number;
+
+  @Column({ nullable: true, name: 'role_id' })
+  roleId: number;
+
+  
+
 }

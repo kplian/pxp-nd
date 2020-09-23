@@ -65,6 +65,9 @@ export default class User extends PxpEntity {
   @Column({ name: 'salt', type: 'varchar', length: 500 })
   salt?: string;
 
+  @Column({ nullable: true, name: 'person_id' })
+  personId: number;
+
   @OneToOne(() => Person, {
     eager: true,
     cascade: true

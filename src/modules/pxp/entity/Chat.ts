@@ -38,4 +38,7 @@ export default class Chat extends PxpEntity {
 
   @OneToMany(() => ChatUser, chatUser => chatUser.chat)
   users: ChatUser[];
+
+  @Column({ nullable: true, name: 'chat_type_id' })
+  chatTypeId: number;
 }

@@ -85,4 +85,11 @@ export default class User extends PxpEntity {
     }
   })
   roles: Role[];
+
+  @Column({ nullable: true, name: 'person_id' })
+  personId: number;
+
+  @Column({ nullable: true, name: 'role_id' })
+  roleId: number;
+
 }

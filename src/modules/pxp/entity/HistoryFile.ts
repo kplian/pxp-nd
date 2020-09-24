@@ -30,4 +30,7 @@ export default class HistoryFile extends PxpEntity {
   @ManyToOne(() => File, file => file.historyFiles)
   @JoinColumn({ name: 'file_id' })
   file: File;
+
+  @Column({ nullable: true, name: 'file_id' })
+  fileId: number;
 }

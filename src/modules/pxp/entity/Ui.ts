@@ -9,13 +9,14 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-18 14:19:01
+ * Last modified  : 2020-09-22 10:51:11
  */
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn, IsNull } from 'typeorm';
 import Role from './Role';
 import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
-import { PxpEntity } from '../../../lib/pxp';
+import { PxpEntity, __ } from '../../../lib/pxp';
+import { find } from 'lodash';
 
 @Entity({ name: 'tsec_ui' })
 export default class Ui extends PxpEntity {
@@ -62,6 +63,9 @@ export default class Ui extends PxpEntity {
   @JoinTable()
   transactions: UiTransaction[];
 
+  @Column({ nullable: true, name: 'parent_ui_id' })
+  parentId: number;
+
   @ManyToOne(() => Ui, ui => ui.children)
   @JoinColumn({ name: 'parent_ui_id' })
   parent: Ui;
@@ -72,5 +76,26 @@ export default class Ui extends PxpEntity {
   @ManyToOne(() => Subsystem, subsystem => subsystem.uis)
   @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
+
+  static async findRecursive(parentId?: number): Promise<unknown> {
+    let uis: Ui[];
+    if (parentId) {
+      uis = await __(this.find({ where: { parentId } })) as Ui[];
+    } else {
+      uis = await __(this.find({ where: { parentId: IsNull() } })) as Ui[];
+    }
+    for (const ui of uis) {
+      ui.children = await __(this.findRecursive(ui.uiId)) as Ui[];
+    }
+    return uis;
+  }
+
+  @Column({ nullable: true, name: 'subsystem_id' })
+  subsystemId: number;
+
+  @Column({ nullable: true, name: 'role_id' })
+  roleId: number;
+
+  
 
 }

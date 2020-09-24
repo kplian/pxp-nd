@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-18 01:11:14
+ * Last modified  : 2020-09-20 18:20:43
  */
 
 import express from 'express';
@@ -51,7 +51,7 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
   const {
     statusCode, message, stack, tecMessage, errorObject
   } = err;
-  console.log(process.env.NODE_ENV);
+  console.log('name:', err.constructor.name);
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
 
   // @todo if production not show tecMessage and stack

@@ -187,7 +187,7 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
-          // isAuthenticated,
+          isAuthenticated,
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
@@ -216,22 +216,22 @@ class Controller implements ControllerInterface {
               const now = new Date();
               const iniAt = req.start as Date;
               const endsAt = now.valueOf() - iniAt.valueOf();
-              // res.logId = (await __(
-              //   insertLog(
-              //     this.user.username,
-              //     'mac',
-              //     req.ip,
-              //     'error',
-              //     ex.tecMessage,
-              //     this.module,
-              //     this.transactionCode,
-              //     '', // query
-              //     JSON.stringify(params),
-              //     ex.stack,
-              //     ex.statusCode,
-              //     endsAt
-              //   )
-              // )) as number;
+              res.logId = (await __(
+                insertLog(
+                  this.user.username,
+                  'mac',
+                  req.ip,
+                  'error',
+                  ex.tecMessage,
+                  this.module,
+                  this.transactionCode,
+                  '', // query
+                  JSON.stringify(params),
+                  ex.stack,
+                  ex.statusCode,
+                  endsAt
+                )
+              )) as number;
               errorMiddleware(ex, req, res);
             }
           }
@@ -249,7 +249,7 @@ class Controller implements ControllerInterface {
     dbsettings: string,
     readonly: boolean,
     permission = true,
-    log = false
+    log = true
   ): Promise<void> {
     if (dbsettings === 'Orm') {
       await __(
@@ -297,7 +297,7 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = false
+    log = true
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
@@ -437,7 +437,7 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = false
+    log = true
   ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);

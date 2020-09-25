@@ -1,6 +1,7 @@
 import express from 'express';
 import { getManager, UpdateResult } from 'typeorm';
-import Controller, {
+import { Controller } from '../../../lib/pxp/Controller';
+import {
   Get,
   Route,
   Post,
@@ -10,7 +11,7 @@ import Controller, {
   DbSettings,
   ReadOnly,
   Model
-} from '../../../lib/Controller';
+} from '../../../lib/pxp/Decorators';
 import { AccountStatus as AccountStatusModel } from '../entity/AccountStatus';
 
 @Route('/acount-status')

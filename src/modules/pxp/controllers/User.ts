@@ -1,15 +1,28 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * User Controller
+ *
+ * @summary User Controller
+ * @author Jaime Rivera
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-17 19:04:30
+ */
 import { getManager } from 'typeorm';
-import Controller, {
+import {
+  Controller,
   Get,
   Route,
-  Post,
   StoredProcedure,
   DbSettings,
   ReadOnly,
   Model
-} from '../../../lib/Controller';
+} from '../../../lib/pxp';
 import UserModel from '../entity/User';
-import { genPassword } from '../../../auth/utils/password';
+
 
 @Route('/user')
 @StoredProcedure('pxp.ftusuario')

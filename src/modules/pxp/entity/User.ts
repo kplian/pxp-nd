@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-18 14:18:29
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,9 +22,9 @@ import {
 } from 'typeorm';
 import Person from './Person';
 import Role from './Role';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tsec_user' })
+@Entity({ name: 'tsec_user' })
 export default class User extends PxpEntity {
   @PrimaryGeneratedColumn({ name: 'user_id' })
   userId?: number;
@@ -61,7 +74,6 @@ export default class User extends PxpEntity {
 
   @ManyToMany(() => Role)
   @JoinTable({
-    schema: 'pxp',
     name: 'tsec_user_role',
     joinColumn: {
       name: 'user_id',

@@ -1,29 +1,33 @@
 /**
- * Index file for pxp-nd.
+ * Kplian Ltda 2020
  *
- * Handles all requests for pxp-ui or pxp-nd.
+ * MIT
  *
- * @link   index.js
- * @file   index script.
- * @author Jaime Rivera (Kplian).
- * @since  10.06.2020
+ * Main pxp-nd file.
+ *
+ * @summary Handles all requests for pxp-ui or pxp-nd.
+ * @author Jaime Rivera
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-20 18:24:45
  */
 
 import 'reflect-metadata';
 import { createConnections } from 'typeorm';
 import * as bodyParser from 'body-parser';
 import express from 'express';
-import Controller from './lib/ControllerInterface';
-import loadControllers from './lib/loadControllers';
-import { errorMiddleware } from './lib/PxpError';
 import passport from 'passport';
-import { authRouter } from './auth/auth-routes';
-import { configPassport } from './auth/config';
 import session from 'express-session';
 import { getConnection } from 'typeorm';
+import cors from 'cors';
+import { ControllerInterface as Controller } from './lib/pxp';
+import loadControllers from './lib/pxp/loadControllers';
+import { errorMiddleware } from './lib/pxp';
+import { authRouter } from './auth/auth-routes';
+import { configPassport } from './auth/config';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
-import cors from 'cors';
+import config from './config';
 class App {
   public app: express.Application;
   public controllers: Controller[];
@@ -61,18 +65,20 @@ class App {
   private initializeMiddlewares() {
     this.app.use((req, res, next) => {
       req.start = new Date();
-      console.log(`${req.method} ${req.originalUrl} [STARTED]`)
-      const start = process.hrtime()
+      if (config.logDuration) {
+        console.log(`${req.method} ${req.originalUrl} [STARTED]`);
+        const start = process.hrtime();
 
-      res.on('finish', () => {
-        const durationInMilliseconds = this.getDurationInMilliseconds(start)
-        console.log(`${req.method} ${req.originalUrl} [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`)
-      })
+        res.on('finish', () => {
+          const durationInMilliseconds = this.getDurationInMilliseconds(start);
+          console.log(`${req.method} ${req.originalUrl} [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`);
+        })
 
-      res.on('close', () => {
-        const durationInMilliseconds = this.getDurationInMilliseconds(start)
-        console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
-      })
+        res.on('close', () => {
+          const durationInMilliseconds = this.getDurationInMilliseconds(start);
+          console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`);
+        })
+      }
 
       next()
     });
@@ -134,22 +140,21 @@ class App {
     this.controllers.forEach((controller) => {
       this.app.use(controller.router);
     });
+    this.app.all('*', function (req, res) {
+      res.status(404).json(
+        {
+          error: {
+            code: 404,
+            message: 'Route not found'
+          }
+        }
+      );
+    });
+
   }
 
   private async connectToTheDatabase(): Promise<void> {
-    await createConnections([
-      {
-        name: String('default'),
-        type: 'postgres',
-        host: String(process.env.PG_HOST),
-        port: Number(process.env.PG_PORT),
-        username: String(process.env.PG_USER),
-        password: String(process.env.PG_PASSWORD),
-        database: String(process.env.PG_DATABASE),
-        entities: [__dirname + '/modules/**/entity/*.js'],
-        cache: true
-      }
-    ]);
+    await createConnections();
   }
 }
 

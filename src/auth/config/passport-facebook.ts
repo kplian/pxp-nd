@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Facebook config
+ *
+ * @summary Facebook config
+ * @author Israel Colque
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:44:52
+ */
 import passport from 'passport';
 import { Strategy, Profile, VerifyFunction } from 'passport-facebook';
 import { UserRepository } from '../../modules/pxp/repositories/user.repository';
@@ -31,6 +44,6 @@ const facebookStrategy = new Strategy(
   }
 );
 
-export const configFacebookStrategy = () => {
+export const configFacebookStrategy = (): void => {
   passport.use(facebookStrategy);
 };

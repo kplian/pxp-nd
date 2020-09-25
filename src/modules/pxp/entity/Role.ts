@@ -1,11 +1,24 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-18 14:19:16
+ */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 
 import User from './User';
 import Subsystem from './Subsystem';
 import Ui from './Ui';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'pxp', name: 'tsec_role' })
+@Entity({ name: 'tsec_role' })
 export default class Role extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'role_id' })
@@ -19,7 +32,6 @@ export default class Role extends PxpEntity {
 
   @ManyToMany(() => User)
   @JoinTable({
-    schema: 'pxp',
     name: 'tsec_user_role',
     joinColumn: {
       name: 'role_id',
@@ -38,7 +50,6 @@ export default class Role extends PxpEntity {
 
   @ManyToMany(() => Ui)
   @JoinTable({
-    schema: 'pxp',
     name: 'tsec_ui_role',
     joinColumn: {
       name: 'role_id',

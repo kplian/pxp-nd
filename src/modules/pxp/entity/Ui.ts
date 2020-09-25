@@ -1,10 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-22 10:51:11
+ */
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn, IsNull } from 'typeorm';
 import Role from './Role';
 import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
-import PxpEntity from './PxpEntity';
+import { PxpEntity, __ } from '../../../lib/pxp';
+import { find } from 'lodash';
 
-@Entity({ schema: 'pxp', name: 'tsec_ui' })
+@Entity({ name: 'tsec_ui' })
 export default class Ui extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_id' })
@@ -33,7 +47,6 @@ export default class Ui extends PxpEntity {
 
   @ManyToMany(() => Role)
   @JoinTable({
-    schema: 'pxp',
     name: 'tsec_ui_role',
     joinColumn: {
       name: 'ui_id',
@@ -50,6 +63,9 @@ export default class Ui extends PxpEntity {
   @JoinTable()
   transactions: UiTransaction[];
 
+  @Column({ nullable: true, name: 'parent_ui_id' })
+  parentId: number;
+
   @ManyToOne(() => Ui, ui => ui.children)
   @JoinColumn({ name: 'parent_ui_id' })
   parent: Ui;
@@ -60,5 +76,18 @@ export default class Ui extends PxpEntity {
   @ManyToOne(() => Subsystem, subsystem => subsystem.uis)
   @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
+
+  static async findRecursive(parentId?: number): Promise<unknown> {
+    let uis: Ui[];
+    if (parentId) {
+      uis = await __(this.find({ where: { parentId } })) as Ui[];
+    } else {
+      uis = await __(this.find({ where: { parentId: IsNull() } })) as Ui[];
+    }
+    for (const ui of uis) {
+      ui.children = await __(this.findRecursive(ui.uiId)) as Ui[];
+    }
+    return uis;
+  }
 
 }

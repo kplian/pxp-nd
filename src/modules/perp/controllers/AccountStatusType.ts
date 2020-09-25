@@ -1,14 +1,17 @@
 import express from 'express';
 import { getManager, UpdateResult } from 'typeorm';
-import Controller, {
+import { Controller } from '../../../lib/pxp/Controller';
+import {
   Get,
   Route,
   Post,
   Patch,
   Delete,
+  StoredProcedure,
   DbSettings,
-  ReadOnly
-} from '../../../lib/Controller';
+  ReadOnly,
+  Model
+} from '../../../lib/pxp/Decorators';
 import { AccountStatusType as AccountStatusTypeModel } from '../entity/AccountStatusType';
 
 @Route('/acount-status-type')

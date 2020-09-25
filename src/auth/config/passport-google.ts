@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Google config
+ *
+ * @summary Google config
+ * @author Israel Colque
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:46:00
+ */
 import passport from 'passport';
 import { OAuth2Strategy, Profile } from 'passport-google-oauth';
 import { UserRepository } from '../../modules/pxp/repositories/user.repository';
@@ -37,6 +50,6 @@ const googleStrategy = new OAuth2Strategy(
   }
 );
 
-export const configGoogleStrategy = () => {
+export const configGoogleStrategy = (): void => {
   passport.use(googleStrategy);
 };

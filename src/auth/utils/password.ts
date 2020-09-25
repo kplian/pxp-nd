@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Password functions
+ *
+ * @summary Password functions.
+ * @author Israel Colque
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:42:01
+ */
 import crypto from 'crypto';
 
 export function genPassword(password: string): any {

@@ -1,7 +1,20 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * long description for the file
+ *
+ * @summary short description for the file
+ * @author No author
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  : 2020-09-18 13:48:03
+ */
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn } from 'typeorm';
 
 
-@Entity({ schema: 'pxp', name: 'tsec_log' })
+@Entity({ name: 'tsec_log' })
 export default class Log extends BaseEntity {
 
   @PrimaryGeneratedColumn({ name: 'log_id' })
@@ -16,7 +29,7 @@ export default class Log extends BaseEntity {
   @Column({ name: 'ip', type: 'varchar', length: 100, nullable: true })
   ip: string;
 
-  @Column({ name: 'logType', type: 'varchar', length: 50, nullable: false })
+  @Column({ name: 'log_type', type: 'varchar', length: 50, nullable: false })
   logType: string;
 
   @Column({ name: 'description', type: 'varchar', nullable: true })
@@ -43,7 +56,7 @@ export default class Log extends BaseEntity {
   @Column({ name: 'exec_time', nullable: true })
   execTime: number;
 
-  @Column({ name: 'errorCode', type: 'varchar', length: 100, nullable: true })
+  @Column({ name: 'error_code', type: 'varchar', length: 100, nullable: true })
   errorCode: string;
 
 }

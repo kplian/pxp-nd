@@ -1,6 +1,19 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * PxpEntity Class
+ *
+ * @summary Common fields for all entities
+ * @author Jaime Rivera
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 19:12:39
+ */
 import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-export default class PxpEntity extends BaseEntity {
+class PxpEntity extends BaseEntity {
 
   @Column({ name: 'created_by', type: 'varchar', length: 500, default: 'admin' })
   createdBy: string;
@@ -24,3 +37,4 @@ export default class PxpEntity extends BaseEntity {
   isActive: boolean;
 
 }
+export { PxpEntity };

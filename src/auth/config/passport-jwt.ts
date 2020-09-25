@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Jwt config
+ *
+ * @summary Jwt config
+ * @author Israel Colque
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:46:18
+ */
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import passport from 'passport';
 import { UserRepository } from '../../modules/pxp/repositories/user.repository';

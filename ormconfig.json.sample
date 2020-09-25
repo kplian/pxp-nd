@@ -1,24 +1,27 @@
-{
-  "type": "postgres",
-  "host": "dbkplian.gfdgfsdgfsdg.us-east-2.rds.amazonaws.com",
-  "port": 5432,
-  "username": "kplian",
-  "password": "zzzzz",
-  "database": "dbkplian",
-  "synchronize": true,
-  "logging": false,
-  "entities": [
-    "dist/modules/**/entity/*.js"
-  ],
-  "migrations": [
-    "src/migration/**/*.ts"
-  ],
-  "subscribers": [
-    "src/subscriber/**/*.ts"
-  ],
-  "cli": {
-    "entitiesDir": "src/modules",
-    "migrationsDir": "src/migration",
-    "subscribersDir": "src/subscriber"
+[
+  {
+    "name": "default",
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "dbkplian",
+    "synchronize": true,
+    "logging": false,
+    "entities": [
+      "dist/modules/**/entity/*.js"
+    ],
+    "migrations": [
+      "src/migration/**/*.ts"
+    ],
+    "subscribers": [
+      "src/subscriber/**/*.ts"
+    ],
+    "cli": {
+      "entitiesDir": "src/modules",
+      "migrationsDir": "src/migration",
+      "subscribersDir": "src/subscriber"
+    }
   }
-}
+]

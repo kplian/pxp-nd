@@ -2,9 +2,9 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMa
 import Transaction from './Transaction';
 import Ui from './Ui';
 import Role from './Role';
-import PxpEntity from './PxpEntity';
+import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tsec_ui_transaction', schema: 'pxp' })
+@Entity({ name: 'tsec_ui_transaction' })
 export default class UiTransaction extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_transaction_id' })
@@ -26,7 +26,6 @@ export default class UiTransaction extends PxpEntity {
 
   @ManyToMany(() => Role)
   @JoinTable({
-    schema: 'pxp',
     name: 'tsec_ui_transaction_role',
     joinColumn: {
       name: 'ui_transaction_id',

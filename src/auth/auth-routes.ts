@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Authentication Routes
+ *
+ * @summary Authentication Routes.
+ * @author Israel Colque
+ *
+ * Created at     : 2020-06-13 18:09:48
+ * Last modified  : 2020-09-17 18:41:21
+ */
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { isAuthenticated, verifyCallback } from './config/passport-local';

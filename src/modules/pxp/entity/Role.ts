@@ -62,4 +62,13 @@ export default class Role extends PxpEntity {
   })
   uis: Ui[];
 
+  @Column({ nullable: true, name: 'user_id' })
+  userId: number;
+
+  @Column({ nullable: true, name: 'subsystem_id' })
+  subsystemId: number;
+
+  @Column({ nullable: true, name: 'iu_id' })
+  uiId: number;
+
 }

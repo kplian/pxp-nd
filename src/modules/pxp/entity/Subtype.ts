@@ -33,4 +33,7 @@ export default class Subtype extends PxpEntity {
   @ManyToOne(() => Type, type => type.subtypes)
   @JoinColumn({ name: 'type_id' })
   type: Type;
+
+  @Column({ nullable: true, name: 'type_id' })
+  typeId: number;
 }

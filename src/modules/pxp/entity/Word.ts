@@ -35,4 +35,8 @@ export default class Word extends PxpEntity {
   @OneToMany(() => Translate, translate => translate.word, { eager: true, cascade: true })
   translates: Translate[];
 
+  @Column({ nullable: true, name: 'language_group_id' })
+  languageGroupId: number;
+
+
 }

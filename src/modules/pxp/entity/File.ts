@@ -40,4 +40,7 @@ export default class File extends PxpEntity {
 
   @OneToMany(() => HistoryFile, HistoryFile => HistoryFile.file)
   historyFiles: HistoryFile[];
+
+  @Column({ nullable: true, name: 'file_type_id' })
+  fileTypeId: number;
 }

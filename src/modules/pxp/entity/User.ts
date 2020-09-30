@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-30 09:54:14
+ * Last modified  : 2020-09-30 09:59:20
  */
 import {
   Entity,
@@ -87,6 +87,12 @@ export default class User extends PxpEntity {
   })
   roles: Role[];
 
+  @Column({ nullable: true, name: 'person_id' })
+  personId: number;
+
+  @Column({ nullable: true, name: 'role_id' })
+  roleId: number;
+
   static async getUis(userId: number): Promise<number[]> {
 
     const uiArray = await __(getManager()
@@ -101,4 +107,5 @@ export default class User extends PxpEntity {
     const result = uiArray.map((a: any) => a.ui_id);
     return result;
   }
+
 }

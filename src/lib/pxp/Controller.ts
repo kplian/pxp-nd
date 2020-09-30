@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-30 09:44:17
+ * Last modified  : 2020-09-30 11:33:30
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -17,11 +17,18 @@ import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi, { Schema } from '@hapi/joi';
 import { RouteDefinition } from './RouteDefinition';
-import { PxpError, __, errorMiddleware, ControllerInterface, ListParam, userHasPermission, insertLog } from './index';
+import {
+  PxpError,
+  __,
+  errorMiddleware,
+  ControllerInterface,
+  ListParam,
+  userHasPermission,
+  insertLog
+} from './index';
 import config from '../../config';
 import User from '../../modules/pxp/entity/User';
 import { isAuthenticated } from '../../auth/config/passport-local';
-
 
 class Controller implements ControllerInterface {
   public validated: boolean;
@@ -54,11 +61,11 @@ class Controller implements ControllerInterface {
       this.modelString = Reflect.getMetadata('model', this.constructor);
       const modelArray = this.modelString.split('/');
       try {
-        import(
-          `../../modules/${modelArray[0]}/entity/${modelArray[1]}`
-        ).then(model => {
-          this.model = model.default;
-        });
+        import(`../../modules/${modelArray[0]}/entity/${modelArray[1]}`).then(
+          (model) => {
+            this.model = model.default;
+          }
+        );
       } catch {
         throw new PxpError(
           500,
@@ -70,7 +77,10 @@ class Controller implements ControllerInterface {
   }
 
   private initializeRoutes() {
-    let routes = Reflect.getMetadata('routes', this.constructor) as RouteDefinition[];
+    let routes = Reflect.getMetadata(
+      'routes',
+      this.constructor
+    ) as RouteDefinition[];
     this.path = '/' + this.constructor.name;
     // get controller path
     if (Reflect.hasMetadata('controller_path', this.constructor)) {
@@ -105,7 +115,7 @@ class Controller implements ControllerInterface {
     // define basic routes
     if (this.modelString !== '') {
       routes = _.union(this.basicRoutes, routes);
-      readonly = { ...this.basicReadOnly, ...readonly }
+      readonly = { ...this.basicReadOnly, ...readonly };
     }
 
     routes.forEach((route) => {
@@ -130,20 +140,25 @@ class Controller implements ControllerInterface {
           async (req: Request, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-            this.transactionCode = (this.module + this.path + route.path).split('/').join('.').toLowerCase();
+            this.transactionCode = (this.module + this.path + route.path)
+              .split('/')
+              .join('.')
+              .toLowerCase();
             this.validated = false;
             try {
-              await __(this.genericMethodWrapper(
-                params,
-                req,
-                next,
-                res,
-                route.methodName,
-                methodDbSettings,
-                readonly[route.methodName],
-                false,
-                log[route.methodName]
-              ));
+              await __(
+                this.genericMethodWrapper(
+                  params,
+                  req,
+                  next,
+                  res,
+                  route.methodName,
+                  methodDbSettings,
+                  readonly[route.methodName],
+                  false,
+                  log[route.methodName]
+                )
+              );
             } catch (ex) {
               const now = new Date();
               const iniAt = req.start as Date;
@@ -165,11 +180,9 @@ class Controller implements ControllerInterface {
 
               errorMiddleware(ex, req, res);
             }
-
           }
         );
       } else {
-
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
@@ -178,42 +191,50 @@ class Controller implements ControllerInterface {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
             if (req.user) {
-              this.user = (req.user as User);
+              this.user = req.user as User;
             }
-            this.transactionCode = (this.module + this.path + route.path).split('/').join('.').toLowerCase();
+            this.transactionCode = (this.module + this.path + route.path)
+              .split('/')
+              .join('.')
+              .toLowerCase();
+
             this.validated = false;
             try {
-              await __(this.genericMethodWrapper(
-                params,
-                req,
-                next,
-                res,
-                route.methodName,
-                methodDbSettings,
-                readonly[route.methodName],
-                permission[route.methodName],
-                log[route.methodName]
-              ));
+              await __(
+                this.genericMethodWrapper(
+                  params,
+                  req,
+                  next,
+                  res,
+                  route.methodName,
+                  methodDbSettings,
+                  readonly[route.methodName],
+                  permission[route.methodName],
+                  log[route.methodName]
+                )
+              );
             } catch (ex) {
               const now = new Date();
               const iniAt = req.start as Date;
               const endsAt = now.valueOf() - iniAt.valueOf();
-              res.logId = await __(insertLog(
-                this.user.username,
-                'mac',
-                req.ip,
-                'error',
-                ex.tecMessage,
-                this.module,
-                this.transactionCode,
-                '',// query
-                JSON.stringify(params),
-                ex.stack,
-                ex.statusCode,
-                endsAt)) as number;
+              res.logId = (await __(
+                insertLog(
+                  this.user.username,
+                  'mac',
+                  req.ip,
+                  'error',
+                  ex.tecMessage,
+                  this.module,
+                  this.transactionCode,
+                  '', // query
+                  JSON.stringify(params),
+                  ex.stack,
+                  ex.statusCode,
+                  endsAt
+                )
+              )) as number;
               errorMiddleware(ex, req, res);
             }
-
           }
         );
       }
@@ -232,28 +253,30 @@ class Controller implements ControllerInterface {
     log = true
   ): Promise<void> {
     if (dbsettings === 'Orm') {
-
-      await __(this.ormMethodWrapper(
-        params,
-        req,
-        next,
-        res,
-        methodName,
-        readonly,
-        permission,
-        log
-      ));
-
+      await __(
+        this.ormMethodWrapper(
+          params,
+          req,
+          next,
+          res,
+          methodName,
+          readonly,
+          permission,
+          log
+        )
+      );
     } else if (dbsettings === 'Procedure') {
-      await __(this.procedureMethodWrapper(
-        params,
-        next,
-        res,
-        methodName,
-        readonly,
-        permission,
-        log
-      ));
+      await __(
+        this.procedureMethodWrapper(
+          params,
+          next,
+          res,
+          methodName,
+          readonly,
+          permission,
+          log
+        )
+      );
     } else {
       await this.sqlMethodWrapper(
         params,
@@ -279,8 +302,10 @@ class Controller implements ControllerInterface {
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
-      if (this.user.roles.length === 0) {
-        const hasPermission = await __(userHasPermission(this.user.userId as number, this.transactionCode));
+      if (this.user && this.user.roles && this.user.roles.length === 0) {
+        const hasPermission = await __(
+          userHasPermission(this.user.userId as number, this.transactionCode)
+        );
         if (!hasPermission) {
           throw new PxpError(403, 'Access denied to execute this method');
         }
@@ -297,9 +322,10 @@ class Controller implements ControllerInterface {
       await __(queryRunner.connect());
       await __(queryRunner.startTransaction());
       try {
-        metResponse = await eval(`this.${methodName}(params, queryRunner.manager)`) as Record<string, unknown>;
+        metResponse = (await eval(
+          `this.${methodName}(params, queryRunner.manager)`
+        )) as Record<string, unknown>;
         await queryRunner.commitTransaction();
-
       } catch (err) {
         await queryRunner.rollbackTransaction();
         throw err;
@@ -309,27 +335,27 @@ class Controller implements ControllerInterface {
     }
 
     if (log) {
-
-
       const now = new Date();
       const iniAt = req.start as Date;
       const endsAt = now.valueOf() - iniAt.valueOf();
-      __(insertLog(
-        this.user.username,
-        'mac',
-        req.ip,
-        'success',
-        'successful transaction',
-        this.module,
-        this.transactionCode,
-        '',
-        JSON.stringify(params),
-        JSON.stringify(metResponse),
-        '200',
-        endsAt));
+      __(
+        insertLog(
+          this.user.username,
+          'mac',
+          req.ip,
+          'success',
+          'successful transaction',
+          this.module,
+          this.transactionCode,
+          '',
+          JSON.stringify(params),
+          JSON.stringify(metResponse),
+          '200',
+          endsAt
+        )
+      );
     }
     res.json(metResponse);
-
   }
 
   async list(params: Record<string, unknown>): Promise<unknown> {
@@ -340,31 +366,40 @@ class Controller implements ControllerInterface {
     return { data: rows, count };
   }
 
-  async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+  async add(
+    params: Record<string, unknown>,
+    manager: EntityManager
+  ): Promise<unknown> {
     const modelInstance = new this.model();
     Object.assign(modelInstance, params);
-    modelInstance.createdBy = (this.user.username as string);
+    modelInstance.createdBy = this.user.username as string;
     await __(this.classValidate(modelInstance));
     await manager.save(modelInstance);
     return modelInstance;
   }
 
-  async edit(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
-    const modelInstance = await __(this.model.findOne(params.id)) as any;
+  async edit(
+    params: Record<string, unknown>,
+    manager: EntityManager
+  ): Promise<unknown> {
+    const modelInstance = (await __(this.model.findOne(params.id))) as any;
     if (!modelInstance) {
       throw new PxpError(406, 'Record not found');
     }
     const editParams = params;
     Object.assign(modelInstance, editParams);
     delete editParams.id;
-    modelInstance.modifiedBy = (this.user.username as string);
+    modelInstance.modifiedBy = this.user.username as string;
     await __(this.classValidate(modelInstance));
     await manager.save(modelInstance);
     return modelInstance;
   }
 
-  async delete(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
-    const modelInstance = await __(this.model.findOne(params.id)) as any;
+  async delete(
+    params: Record<string, unknown>,
+    manager: EntityManager
+  ): Promise<unknown> {
+    const modelInstance = (await __(this.model.findOne(params.id))) as any;
     if (!modelInstance) {
       throw new PxpError(406, 'Record not found');
     }
@@ -388,7 +423,7 @@ class Controller implements ControllerInterface {
         if (res.where) {
           res.where.push({
             [field]: Like('%' + (params.genericFilterValue as string) + '%')
-          })
+          });
         }
       });
     }
@@ -427,7 +462,11 @@ class Controller implements ControllerInterface {
     const errors = await __(validate(model)) as unknown[];
     this.validated = true;
     if (errors.length > 0) {
-      throw new PxpError(406, 'Validation failed!', errors as unknown as undefined);
+      throw new PxpError(
+        406,
+        'Validation failed!',
+        (errors as unknown) as undefined
+      );
     }
   }
 
@@ -448,9 +487,6 @@ class Controller implements ControllerInterface {
     });
     return schema;
   }
-
 }
-
-
 
 export { Controller };

@@ -30,4 +30,7 @@ export default class ChatUser extends PxpEntity {
   @ManyToOne(() => Chat, chat => chat.users)
   @JoinColumn({ name: 'chat_id' })
   chat: Chat;
+
+  @Column({ nullable: true, name: 'chat_id' })
+  chatId: number;
 }

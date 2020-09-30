@@ -32,4 +32,10 @@ export default class Translate extends PxpEntity {
   @ManyToOne(() => Word, word => word.translates)
   @JoinColumn({ name: 'word_id' })
   word: Word;
+
+  @Column({ nullable: true, name: 'language_id' })
+  languageId: number;
+  
+  @Column({ nullable: true, name: 'word_id' })
+  wordId: number;
 }

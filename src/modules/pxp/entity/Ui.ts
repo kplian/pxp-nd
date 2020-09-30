@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-25 03:01:35
+ * Last modified  : 2020-09-30 10:00:02
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn, getManager } from 'typeorm';
 import Role from './Role';
@@ -79,11 +79,13 @@ export default class Ui extends PxpEntity {
   @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
 
+  @Column({ nullable: true, name: 'role_id' })
+  roleId: number;
+
   static async findRecursive(params: Record<string, unknown>, parentId: number, isAdmin?: boolean, uiList: number[] = []): Promise<unknown> {
     if (uiList.length === 0 && !isAdmin) {
       return [];
     }
-
 
     const qb = getManager()
       .createQueryBuilder(Ui, 'ui')
@@ -140,4 +142,5 @@ export default class Ui extends PxpEntity {
     }
     return resUis;
   }
+
 }

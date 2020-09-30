@@ -38,4 +38,14 @@ export default class UiTransaction extends PxpEntity {
   })
   roles: Role[];
 
+  @Column({ nullable: true, name: 'role_id' })
+  roleId: number;
+
+  @Column({ nullable: true, name: 'transaction_id' })
+  transactionId: number;
+
+  @Column({ nullable: true, name: 'ui_id' })
+  uiId: number;
+
+
 }

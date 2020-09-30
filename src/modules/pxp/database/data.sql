@@ -16,6 +16,6 @@ VALUES (1, 1);
 INSERT INTO tsec_subsystem (created_by, code, name, folder_name, prefix)
 VALUES (1, 'PXP', 'PXP', 'PXP', 'PXP');
 
-INSERT INTO tsec_ui (created_by, code, name, description)
-VALUES (1, 'PXP', 'Pxp (root ui)', 'This should not show in menu all subssystems depend on this');
+INSERT INTO tsec_ui (created_by, code, name, description, subsystem_id)
+VALUES (1, 'PXP', 'Pxp (root ui)', 'This should not show in menu all subssystems depend on this', 1);
 /********************************************F-DAT-JRR-SEGU-0-06/09/2019********************************************/

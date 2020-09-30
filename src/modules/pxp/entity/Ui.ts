@@ -9,14 +9,13 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-22 10:51:11
+ * Last modified  : 2020-09-25 03:01:35
  */
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn, IsNull } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn, getManager } from 'typeorm';
 import Role from './Role';
 import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
 import { PxpEntity, __ } from '../../../lib/pxp';
-import { find } from 'lodash';
 
 @Entity({ name: 'tsec_ui' })
 export default class Ui extends PxpEntity {
@@ -66,6 +65,9 @@ export default class Ui extends PxpEntity {
   @Column({ nullable: true, name: 'parent_ui_id' })
   parentId: number;
 
+  @Column({ nullable: false, name: 'subsystem_id' })
+  subsystemId: number;
+
   @ManyToOne(() => Ui, ui => ui.children)
   @JoinColumn({ name: 'parent_ui_id' })
   parent: Ui;
@@ -77,17 +79,65 @@ export default class Ui extends PxpEntity {
   @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
 
-  static async findRecursive(parentId?: number): Promise<unknown> {
-    let uis: Ui[];
-    if (parentId) {
-      uis = await __(this.find({ where: { parentId } })) as Ui[];
-    } else {
-      uis = await __(this.find({ where: { parentId: IsNull() } })) as Ui[];
+  static async findRecursive(params: Record<string, unknown>, parentId: number, isAdmin?: boolean, uiList: number[] = []): Promise<unknown> {
+    if (uiList.length === 0 && !isAdmin) {
+      return [];
     }
-    for (const ui of uis) {
-      ui.children = await __(this.findRecursive(ui.uiId)) as Ui[];
-    }
-    return uis;
-  }
 
+
+    const qb = getManager()
+      .createQueryBuilder(Ui, 'ui')
+      .innerJoin('ui.subsystem', 'ss')
+      .select('ui.uiId', 'uiId')
+      .addSelect('ui.parentId', 'parentId')
+      .addSelect('ui.code', 'code')
+      .addSelect('ui.name', 'name')
+      .addSelect('ui.description', 'description')
+      .addSelect('ui.route', 'route')
+      .addSelect('ui.order', 'order')
+      .addSelect('ui.icon', 'icon')
+      .addSelect('ss.code', 'subsystem')
+      .where('"ui".parent_ui_id = :parentId', { parentId });
+
+    if (params.system) {
+      qb.andWhere('"ss".code = :system', { system: params.system });
+    }
+
+    // validate permission
+    if (!isAdmin) {
+      qb.andWhere('"ui".ui_id IN(:...uiList)', { uiList });
+    }
+
+    const uis = await __(qb.getRawMany()) as Ui[];
+    let resUis = uis;
+    let isPush = false;
+
+    if (parentId === 1 && !params.includeSystemRoot) {
+      resUis = [] as Ui[];
+      isPush = true;
+    }
+
+    if (params.folder) {
+      resUis = [] as Ui[];
+      isPush = true;
+    }
+
+    let count = 0;
+    console.log('resuis', resUis);
+    // recursive call
+    for (const ui of uis) {
+      if (isPush) {
+        const newParams = Object.assign(params);
+        if (newParams.folder && newParams.folder === ui.code) {
+          delete newParams.folder;
+        }
+        resUis.push(...await __(this.findRecursive(newParams, ui.uiId, isAdmin, uiList)) as Ui[]);
+      } else {
+        resUis[count].children = await __(this.findRecursive(params, ui.uiId, isAdmin, uiList)) as Ui[];
+        count++;
+      }
+
+    }
+    return resUis;
+  }
 }

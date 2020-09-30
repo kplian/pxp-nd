@@ -9,10 +9,12 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-22 09:30:51
+ * Last modified  : 2020-09-30 08:25:04
  */
-import { Controller, Get, DbSettings, ReadOnly, Model, __ } from '../../../lib/pxp';
+import Joi from '@hapi/joi';
+import { Controller, Get, DbSettings, ReadOnly, Model, __, Permission, Authentication, Log } from '../../../lib/pxp';
 import UiModel from '../entity/Ui';
+import User from '../entity/User';
 
 
 @Model('pxp/Ui')
@@ -20,8 +22,23 @@ class Ui extends Controller {
   @Get()
   @DbSettings('Orm')
   @ReadOnly(true)
+  @Permission(false)
   async list(params: Record<string, unknown>): Promise<unknown> {
-    const uis = await __(UiModel.findRecursive()) as unknown[];
+
+    const schema = Joi.object({
+      system: Joi.string().min(2),
+      includeSystemRoot: Joi.boolean().default(true),
+      folder: Joi.string().min(2),
+    });
+    const valParams = await __(this.schemaValidate(schema, params));
+    let isAdmin = true;
+    let uiList = [] as number[];
+    // not admin
+    if (this.user.roles.length === 0) {
+      isAdmin = false;
+      uiList = await __(User.getUis(this.user.userId as number));
+    }
+    const uis = await __(UiModel.findRecursive(valParams, 1, isAdmin, uiList)) as unknown[];
     return { data: uis };
   }
 }

@@ -54,3 +54,4 @@ build/Release
 /src/modules/*/
 !/src/modules/pxp
 !/src/modules/params
+!/src/modules/perp

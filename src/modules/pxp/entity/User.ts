@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-18 14:18:29
+ * Last modified  : 2020-09-30 09:59:20
  */
 import {
   Entity,
@@ -18,16 +18,17 @@ import {
   OneToOne,
   JoinColumn,
   ManyToMany,
-  JoinTable
+  JoinTable,
+  getManager
 } from 'typeorm';
 import Person from './Person';
 import Role from './Role';
-import { PxpEntity } from '../../../lib/pxp';
+import { PxpEntity, __ } from '../../../lib/pxp';
 
 @Entity({ name: 'tsec_user' })
 export default class User extends PxpEntity {
   @PrimaryGeneratedColumn({ name: 'user_id' })
-  userId?: number;
+  userId: number;
 
   @Column({ name: 'username', type: 'varchar', length: 500 })
   username: string;
@@ -91,5 +92,20 @@ export default class User extends PxpEntity {
 
   @Column({ nullable: true, name: 'role_id' })
   roleId: number;
+
+  static async getUis(userId: number): Promise<number[]> {
+
+    const uiArray = await __(getManager()
+      .createQueryBuilder(Role, 'role')
+      .innerJoinAndSelect('role.uis', 'ui')
+      .innerJoin('role.users', 'user')
+      .select(['ui.ui_id'])
+      .distinct(true)
+      .where('"user".user_id = :userId', { userId })
+      .getRawMany());
+
+    const result = uiArray.map((a: any) => a.ui_id);
+    return result;
+  }
 
 }

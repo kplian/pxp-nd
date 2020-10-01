@@ -13,7 +13,7 @@
  */
 import passport from 'passport';
 import { OAuth2Strategy, Profile } from 'passport-google-oauth';
-import { UserRepository } from '../../modules/pxp/repository/User';
+import { UserRepository } from '../../modules/pxp/repositories/user.repository';
 import { getCustomRepository } from 'typeorm';
 import User from 'modules/pxp/entity/User';
 

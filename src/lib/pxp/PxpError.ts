@@ -33,7 +33,7 @@ class PxpError extends Error {
 }
 
 // Pxp async promise error handler
-const __ = (promise: Promise<unknown>, myShowError = false): Promise<unknown> => (
+const __ = (promise: Promise<any>, myShowError = false): Promise<any> => (
   promise
     .then((data) => data)
     .catch((error) => {

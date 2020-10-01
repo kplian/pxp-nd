@@ -118,7 +118,7 @@ class App {
     //     }
     //   }
     // };
-    this.app.use(cors());
+    this.app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
     this.app.options('*', cors());
   }
   private initializeSession() {

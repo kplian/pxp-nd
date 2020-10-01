@@ -53,3 +53,4 @@ build/Release
 # Ingore all modules but pxp
 /src/modules/*/
 !/src/modules/pxp
+!/src/modules/params

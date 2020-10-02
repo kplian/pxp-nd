@@ -13,11 +13,11 @@
  */
 export interface ListParam {
   where?: {
-    [key: string]: any
-  }[];
-  skip: number;
-  take: number;
-  order: {
-    [key: string]: string
-  }
+    [key: string]: any;
+  };
+  skip?: number;
+  take?: number;
+  order?: {
+    [key: string]: string;
+  };
 }

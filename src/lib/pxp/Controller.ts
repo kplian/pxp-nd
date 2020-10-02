@@ -29,6 +29,7 @@ import {
 import config from '../../config';
 import User from '../../modules/pxp/entity/User';
 import { isAuthenticated } from '../../auth/config/passport-local';
+import { parseParams } from './ParseParams';
 
 class Controller implements ControllerInterface {
   public validated: boolean;
@@ -187,10 +188,11 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
-          isAuthenticated,
-          async (req: Request, res: Response, next: NextFunction) => {
+          [parseParams, isAuthenticated],
+          async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
-            const params = { ...req.query, ...req.body, ...req.params };
+            // const params = { ...req.query, ...req.body, ...req.params };
+            const params = req.pxpParams;
             if (req.user) {
               this.user = req.user as User;
             }

@@ -28,6 +28,7 @@ import { configPassport } from './auth/config';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
 import config from './config';
+import { reportsRouter } from './lib/reports/report-routes';
 class App {
   public app: express.Application;
   public controllers: Controller[];
@@ -104,6 +105,7 @@ class App {
       next();
     });
     this.app.use(authRouter);
+    this.app.use(reportsRouter);
   }
 
   private configCors() {
@@ -118,7 +120,7 @@ class App {
     //     }
     //   }
     // };
-    this.app.use(cors());
+    this.app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
     this.app.options('*', cors());
   }
   private initializeSession() {

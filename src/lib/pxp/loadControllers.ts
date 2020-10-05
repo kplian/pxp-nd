@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 19:17:28
+ * Last modified  : 2020-10-04 19:04:18
  */
 import fs from 'fs';
 import util from 'util';
@@ -24,24 +24,23 @@ export default async (): Promise<Controller[]> => {
   let auxFiles: Record<string, string>[] = [];
   try {
     modules = await readdir(modulesPath);
-    for (let i = 0; i < modules.length; i++) {
-      const files = await readdir(modulesPath + '/' + modules[i] + '/controllers');
-      //this adds javascript files not ts
+    for (const module of modules) {
+      const files = await readdir(modulesPath + '/' + module + '/controllers');
+      // this adds javascript files not ts
       auxFiles = files.reduce((result: Record<string, string>[], j) => {
         if (!j.includes('.map')) {
           result.push({
-            url: modulesPath + '/' + modules[i] + '/controllers/' + j,
-            module: modules[i]
+            url: modulesPath + '/' + module + '/controllers/' + j,
+            module
           });
         }
         return result;
       }, []);
       controllerFiles = [...controllerFiles, ...auxFiles];
     }
-
-    for (let i = 0; i < controllerFiles.length; i++) {
-      const ControllerClass = await import(controllerFiles[i].url);
-      controllers.push(new ControllerClass.default(controllerFiles[i].module));
+    for (const controllerFile of controllerFiles) {
+      const ControllerClass = await import(controllerFile.url);
+      controllers.push(new ControllerClass.default(controllerFile.module));
     }
 
   } catch (err) {

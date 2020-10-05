@@ -26,7 +26,7 @@ import {
 import AccountStatus from './AccountStatus';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'params', name: 'taccount_status_type' })
+@Entity({ name: 'taccount_status_type' })
 @Unique('code_index_unique', ['code']) // one field
 
 export default class AccountStatusType extends PxpEntity {

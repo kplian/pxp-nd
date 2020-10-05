@@ -29,7 +29,7 @@ import { PxpEntity } from '../../../lib/pxp';
 import AccountStatusType from './AccountStatusType';
 
 
-@Entity({ schema: 'params', name: 'taccount_status' })
+@Entity({ name: 'taccount_status' })
 
 export default class AccountStatus extends PxpEntity {
 

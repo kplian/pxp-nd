@@ -32,7 +32,7 @@ import AccountStatusTypeModel from '../entity/AccountStatusType';
 import PersonModel from '../../pxp/entity/Person';
 
 // @Route('/accountStatusType')
-@Model('params/AccountStatusType')
+@Model('pxp/AccountStatusType')
 class AccountStatusType extends Controller {
 
   /*  @Get()

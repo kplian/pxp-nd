@@ -27,6 +27,7 @@ import {
 import { PxpEntity } from '../../../lib/pxp';
 
 import AccountStatusType from './AccountStatusType';
+import { IsDate, IsOptional } from 'class-validator';
 
 
 @Entity({ name: 'tpar_account_status' })
@@ -44,6 +45,11 @@ export default class AccountStatus extends PxpEntity {
 
   @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
   description: string;
+
+  @IsOptional()
+  @Column({ name: 'date', type: 'date', nullable: true, default: () => 'CURRENT_TIMESTAMP' })
+  date: string;
+
 
   @Column({
     name: 'account_status_type_id',

@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Person Controller
+ *
+ * @summary Account Status Type Entity
+ * @author Favio Figueroa
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  :
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -13,7 +26,7 @@ import {
 import AccountStatus from './AccountStatus';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ schema: 'params', name: 'taccount_status_type' })
+@Entity({ name: 'tpar_account_status_type' })
 @Unique('code_index_unique', ['code']) // one field
 
 export default class AccountStatusType extends PxpEntity {

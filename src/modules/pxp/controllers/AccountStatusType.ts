@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Person Controller
+ *
+ * @summary Account Status Type Controller
+ * @author Favio Figueroa
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  :
+ */
 import { EntityManager } from 'typeorm';
 
 import {
@@ -22,15 +35,15 @@ import PersonModel from '../../pxp/entity/Person';
 @Model('params/AccountStatusType')
 class AccountStatusType extends Controller {
 
-/*  @Get()
-  @DbSettings('Orm')
-  @ReadOnly(true)
-  async list(params: Record<string, unknown>): Promise<unknown> {
-    console.log('paramssss',params)
-    const listParam = this.getListParams(params);
-    const [data, count] = await __(AccountStatusTypeModel.findAndCount(listParam)) as unknown[];
-    return { data, count };
-  }*/
+  /*  @Get()
+    @DbSettings('Orm')
+    @ReadOnly(true)
+    async list(params: Record<string, unknown>): Promise<unknown> {
+      console.log('paramssss',params)
+      const listParam = this.getListParams(params);
+      const [data, count] = await __(AccountStatusTypeModel.findAndCount(listParam)) as unknown[];
+      return { data, count };
+    }*/
 
   @Post()
   @DbSettings('Orm')

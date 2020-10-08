@@ -1,3 +1,16 @@
+/**
+ * Kplian Ltda 2020
+ *
+ * MIT
+ *
+ * Person Controller
+ *
+ * @summary Account Status Controller
+ * @author Favio Figueroa
+ *
+ * Created at     : 2020-09-17 18:55:38
+ * Last modified  :
+ */
 import { EntityManager, getManager } from 'typeorm';
 
 import {

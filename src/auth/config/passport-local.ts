@@ -53,6 +53,7 @@ export const verifyCallback = (
       'person.lastName2',
       'person.mail',
     ])
+    .where('user.username = :name', { name: username })
     .getOne()
     .then((user) => {
       if (!user) {

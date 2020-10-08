@@ -14,7 +14,7 @@
 import { Column, BaseEntity, Entity, PrimaryColumn } from 'typeorm';
 import { SessionEntity } from 'typeorm-store';
 
-@Entity({ name: 'tsec_session' })
+@Entity({ name: 'tsec_session', schema: 'pxp' })
 export class Session extends BaseEntity implements SessionEntity {
   @PrimaryColumn()
   id: string;

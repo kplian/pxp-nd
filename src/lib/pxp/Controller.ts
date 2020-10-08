@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-22 08:10:54
+ * Last modified  : 2020-09-30 11:33:30
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -126,10 +126,10 @@ class Controller implements ControllerInterface {
         throw new PxpError(
           500,
           'ReadOnly decorator was not defined for ' +
-            route.methodName +
-            ' in ' +
-            this.constructor.name +
-            ' controller.'
+          route.methodName +
+          ' in ' +
+          this.constructor.name +
+          ' controller.'
         );
       }
       if (
@@ -145,6 +145,7 @@ class Controller implements ControllerInterface {
               .split('/')
               .join('.')
               .toLowerCase();
+            this.validated = false;
             try {
               await __(
                 this.genericMethodWrapper(
@@ -163,22 +164,20 @@ class Controller implements ControllerInterface {
               const now = new Date();
               const iniAt = req.start as Date;
               const endsAt = now.valueOf() - iniAt.valueOf();
-              res.logId = (await __(
-                insertLog(
-                  this.user.username,
-                  'mac',
-                  req.ip,
-                  'error',
-                  ex.tecMessage,
-                  this.module,
-                  this.transactionCode,
-                  '', // query
-                  JSON.stringify(params),
-                  ex.stack,
-                  ex.statusCode,
-                  endsAt
-                )
-              )) as number;
+
+              res.logId = await __(insertLog(
+                'nouser',
+                'mac',
+                req.ip,
+                'error',
+                ex.tecMessage,
+                this.module,
+                this.transactionCode,
+                '',// query
+                JSON.stringify(params),
+                ex.stack,
+                ex.statusCode,
+                endsAt)) as number;
 
               errorMiddleware(ex, req, res);
             }
@@ -193,6 +192,8 @@ class Controller implements ControllerInterface {
             // Execute our method for this path and pass our express request and response object.
             // const params = { ...req.query, ...req.body, ...req.params };
             const params = req.pxpParams;
+            console.log('pxpp', params);
+            
             if (req.user) {
               this.user = req.user as User;
             }
@@ -200,6 +201,8 @@ class Controller implements ControllerInterface {
               .split('/')
               .join('.')
               .toLowerCase();
+
+            this.validated = false;
             try {
               await __(
                 this.genericMethodWrapper(
@@ -314,6 +317,7 @@ class Controller implements ControllerInterface {
     }
     if (readonly) {
       metResponse = await __(eval(`this.${methodName}(params)`));
+
     } else {
       const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
       const queryRunner = connection.createQueryRunner();
@@ -360,11 +364,9 @@ class Controller implements ControllerInterface {
 
   async list(params: Record<string, unknown>): Promise<unknown> {
     const schema = this.getListSchema();
-    await __(this.schemaValidate(schema));
-    const listParam = this.getListParams(params);
-    const [rows, count] = (await __(
-      this.model.findAndCount(listParam)
-    )) as unknown[];
+    const resParams = await __(this.schemaValidate(schema, params));
+    const listParam = this.getListParams(resParams);
+    const [rows, count] = await __(this.model.findAndCount(listParam)) as unknown[];
     return { data: rows, count };
   }
 
@@ -461,7 +463,8 @@ class Controller implements ControllerInterface {
   }
 
   async classValidate(model: any): Promise<void> {
-    const errors = (await __(validate(model))) as unknown[];
+    const errors = await __(validate(model)) as unknown[];
+    this.validated = true;
     if (errors.length > 0) {
       throw new PxpError(
         406,
@@ -471,23 +474,20 @@ class Controller implements ControllerInterface {
     }
   }
 
-  async schemaValidate(schema: Schema): Promise<boolean> {
-    const value = (await __(
-      schema.validateAsync(this.params, { abortEarly: false }),
-      true
-    )) as boolean;
+  async schemaValidate(schema: Schema, params: Record<string, unknown>): Promise<unknown> {
+    const value = await __(schema.validateAsync(params, { abortEarly: false }), true) as boolean;
     this.validated = true;
     return value;
   }
 
   getListSchema(): Schema {
     const schema = Joi.object({
-      start: Joi.number().integer().positive().required(),
+      start: Joi.number().integer().required(),
       limit: Joi.number().integer().positive().required(),
       sort: Joi.string().min(2).required(),
       dir: Joi.string().min(3).max(4).required(),
-      genericFilterFields: Joi.string().min(2).required(),
-      genericFilterValue: Joi.string().min(1)
+      genericFilterFields: Joi.string().min(2),
+      genericFilterValue: Joi.string().min(1),
     });
     return schema;
   }

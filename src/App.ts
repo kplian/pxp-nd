@@ -56,12 +56,12 @@ class App {
   }
 
   private getDurationInMilliseconds = (start: [number, number]) => {
-    const NS_PER_SEC = 1e9
-    const NS_TO_MS = 1e6
-    const diff = process.hrtime(start)
+    const NS_PER_SEC = 1e9;
+    const NS_TO_MS = 1e6;
+    const diff = process.hrtime(start);
 
-    return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS
-  }
+    return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
+  };
 
   private initializeMiddlewares() {
     this.app.use((req, res, next) => {
@@ -72,16 +72,24 @@ class App {
 
         res.on('finish', () => {
           const durationInMilliseconds = this.getDurationInMilliseconds(start);
-          console.log(`${req.method} ${req.originalUrl} [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`);
-        })
+          console.log(
+            `${req.method} ${
+              req.originalUrl
+            } [FINISHED] ${durationInMilliseconds.toLocaleString()} ms`
+          );
+        });
 
         res.on('close', () => {
           const durationInMilliseconds = this.getDurationInMilliseconds(start);
-          console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`);
-        })
+          console.log(
+            `${req.method} ${
+              req.originalUrl
+            } [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`
+          );
+        });
       }
 
-      next()
+      next();
     });
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
@@ -120,7 +128,7 @@ class App {
     //     }
     //   }
     // };
-    this.app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+    this.app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
     this.app.options('*', cors());
   }
   private initializeSession() {
@@ -135,7 +143,7 @@ class App {
           maxAge: 1000 * 60 * 60 * 24 // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
         }
       })
-    )
+    );
   }
 
   private initializeRoutes() {
@@ -143,16 +151,13 @@ class App {
       this.app.use(controller.router);
     });
     this.app.all('*', function (req, res) {
-      res.status(404).json(
-        {
-          error: {
-            code: 404,
-            message: 'Route not found'
-          }
+      res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Route not found'
         }
-      );
+      });
     });
-
   }
 
   private async connectToTheDatabase(): Promise<void> {

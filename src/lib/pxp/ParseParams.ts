@@ -12,8 +12,8 @@ const getListParams = (params: Record<string, any>): ListParam => {
       delete params[key];
     } else if (key === 'sort') {
       params.order = {
-        [String(params.sort).replace(/\\"/g, '')]:
-          String(params.dir).replace(/\\"/g, '') || 'ASC'
+        [String(params.sort).replace(/\"/g, '')]:
+          String(params.dir).replace(/\"/g, '') || 'ASC'
       };
       delete params[key];
     } else params[key] = JSON.parse(params[key]);
@@ -45,6 +45,8 @@ export const parseParams = (
   res: Response,
   next: NextFunction
 ): void => {
+  console.log('here', req.query);
+  
   req.pxpParams = { ...getListParams(req.query), ...req.body, ...req.params };
   next();
 };

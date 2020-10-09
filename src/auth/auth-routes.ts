@@ -9,7 +9,7 @@
  * @author Israel Colque
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-17 18:41:21
+ * Last modified  : 2020-10-09 09:53:26
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
@@ -94,7 +94,7 @@ authRouter.get(config.apiPrefix + '/auth/guard', isAuthenticated, (req, res, nex
   });
 });
 
-authRouter.get(config.apiPrefix + '/auth/logout', (req, res, next) => {
+authRouter.post(config.apiPrefix + '/auth/logout', (req, res, next) => {
   req.logout();
   res.status(200).send({
     message: 'Logout correct'

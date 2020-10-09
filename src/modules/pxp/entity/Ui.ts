@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-30 10:00:02
+ * Last modified  : 2020-10-09 09:10:00
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany, JoinColumn, getManager } from 'typeorm';
 import Role from './Role';
@@ -82,6 +82,9 @@ export default class Ui extends PxpEntity {
   @Column({ nullable: true, name: 'role_id' })
   roleId: number;
 
+  type: string;
+
+
   static async findRecursive(params: Record<string, unknown>, parentId: number, isAdmin?: boolean, uiList: number[] = []): Promise<unknown> {
     if (uiList.length === 0 && !isAdmin) {
       return [];
@@ -93,15 +96,16 @@ export default class Ui extends PxpEntity {
       .select('ui.uiId', 'uiId')
       .addSelect('ui.parentId', 'parentId')
       .addSelect('ui.code', 'code')
-      .addSelect('ui.name', 'name')
+      .addSelect('ui.name', 'text')
       .addSelect('ui.description', 'description')
-      .addSelect('ui.route', 'route')
+      .addSelect('ui.route', 'component')
       .addSelect('ui.order', 'order')
       .addSelect('ui.icon', 'icon')
       .addSelect('ss.code', 'subsystem')
       .where('"ui".parent_ui_id = :parentId', { parentId });
 
-    if (params.system) {
+    if (params.system && params.system !== undefined) {
+      console.log('folder', params.system);
       qb.andWhere('"ss".code = :system', { system: params.system });
     }
 
@@ -119,13 +123,13 @@ export default class Ui extends PxpEntity {
       isPush = true;
     }
 
-    if (params.folder) {
+    if (params.folder && params.folder !== undefined) {
+      console.log('folder', params.folder);
       resUis = [] as Ui[];
       isPush = true;
     }
 
     let count = 0;
-    console.log('resuis', resUis);
     // recursive call
     for (const ui of uis) {
       if (isPush) {
@@ -136,6 +140,11 @@ export default class Ui extends PxpEntity {
         resUis.push(...await __(this.findRecursive(newParams, ui.uiId, isAdmin, uiList)) as Ui[]);
       } else {
         resUis[count].children = await __(this.findRecursive(params, ui.uiId, isAdmin, uiList)) as Ui[];
+        if (resUis[count].children.length === 0) {
+          resUis[count].type = 'leaf';
+        } else {
+          resUis[count].type = 'branch';
+        }
         count++;
       }
 

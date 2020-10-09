@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-30 08:25:04
+ * Last modified  : 2020-10-06 10:36:44
  */
 import Joi from '@hapi/joi';
 import { Controller, Get, DbSettings, ReadOnly, Model, __, Permission, Authentication, Log } from '../../../lib/pxp';
@@ -26,9 +26,9 @@ class Ui extends Controller {
   async list(params: Record<string, unknown>): Promise<unknown> {
 
     const schema = Joi.object({
-      system: Joi.string().min(2),
+      system: Joi.string().min(2).optional(),
       includeSystemRoot: Joi.boolean().default(true),
-      folder: Joi.string().min(2),
+      folder: Joi.string().min(2).optional(),
     });
     const valParams = await __(this.schemaValidate(schema, params));
     let isAdmin = true;

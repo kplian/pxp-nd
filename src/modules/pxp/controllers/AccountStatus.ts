@@ -33,7 +33,7 @@ import PersonModel from '../../pxp/entity/Person';
 import AccountStatusTypeModel from '../entity/AccountStatusType';
 
 // @Route('/accountStatusType')
-@Model('params/AccountStatus')
+@Model('pxp/AccountStatus')
 class AccountStatus extends Controller {
 
   @Get()
@@ -69,8 +69,8 @@ class AccountStatus extends Controller {
   @DbSettings('Orm')
   @ReadOnly(false)
   @Log(true)
-  async add(params: Record<string, unknown>, manager: EntityManager): Promise<AccountStatusModel> {
-    console.log('llega aca');
+  async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
+    console.log('llega aca',params);
     const getAccountStatusTypeData = await getManager()
       .createQueryBuilder(AccountStatusTypeModel, 'astm')
       .where('"astm".code = :code', { code: params.code })

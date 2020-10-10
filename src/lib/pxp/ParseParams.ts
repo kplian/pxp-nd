@@ -3,6 +3,8 @@ import { Like } from 'typeorm';
 import { ListParam } from '.';
 
 const getListParams = (params: Record<string, any>): ListParam => {
+  console.log(params);
+  
   Object.keys(params).map((key) => {
     if (key === 'start') {
       params.skip = JSON.parse(params[key]);
@@ -16,26 +18,40 @@ const getListParams = (params: Record<string, any>): ListParam => {
           String(params.dir).replace(/\"/g, '') || 'ASC'
       };
       delete params[key];
-    } else params[key] = JSON.parse(params[key]);
+      delete params['dir'];
+    } else {
+      console.log(params[key])
+      // params[key] = JSON.parse(params[key])
+    };
   });
 
-  const res: ListParam = {
+  const res: any = {
     ...params
   };
 
   if (params.genericFilterFields) {
+    console.log('ok', params);
+    
     const genericFilterFields = params.genericFilterFields as string;
     const filterFieldsArray = genericFilterFields.split('#');
     filterFieldsArray.forEach((field) => {
-      if (res.where) {
-        // res.where.push({
-        //   [field]: Like('%' + (params.genericFilterValue as string) + '%')
-        // });
-        res.where[field] = Like(
-          '%' + (params.genericFilterValue as string) + '%'
-        );
+      res.where = {
+        ...res.where,
+        [field]:
+          Like('%' + (params.genericFilterValue as string) + '%')
       }
+      // if (res.where) {
+      //   // res.where.push({
+      //   //   [field]: Like('%' + (params.genericFilterValue as string) + '%')
+      //   // });
+      //   res.where[field] = Like(
+      //     '%' + (params.genericFilterValue as string) + '%'
+      //   );
+      // }
     });
+    res.filterValue = res['genericFilterValue'];
+    delete res['genericFilterFields'];
+    delete res['genericFilterValue'];
   }
   return res;
 };

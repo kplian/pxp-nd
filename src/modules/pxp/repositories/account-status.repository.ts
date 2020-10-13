@@ -25,8 +25,6 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       }
     });
 
-    console.log(type);
-
     if (!type) {
       type = await statusTypeRepo.save(data.accountStatusType);
     }
@@ -53,8 +51,6 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       // relations: ['accountStatusType']
     });
 
-    console.log('[ACC]', accountStatusDb);
-
     const accountStatusId = accountStatusDb
       ? accountStatusDb.accountStatusId
       : null;
@@ -65,8 +61,6 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
         // date: moment().format()
       });
     } else {
-      console.log('[PRINT]');
-
       accountStatus = await this.save({
         ...data.accountStatus,
         accountStatusTypeId: type.accountStatusTypeId,

@@ -3,7 +3,6 @@ import { Like } from 'typeorm';
 import { ListParam } from '.';
 
 const getListParams = (params: Record<string, any>): ListParam => {
-  console.log(params);
   
   Object.keys(params).map((key) => {
     if (key === 'start') {
@@ -29,9 +28,7 @@ const getListParams = (params: Record<string, any>): ListParam => {
     ...params
   };
 
-  if (params.genericFilterFields) {
-    console.log('ok', params);
-    
+  if (params.genericFilterFields) {    
     const genericFilterFields = params.genericFilterFields as string;
     const filterFieldsArray = genericFilterFields.split('#');
     filterFieldsArray.forEach((field) => {
@@ -61,8 +58,6 @@ export const parseParams = (
   res: Response,
   next: NextFunction
 ): void => {
-  console.log('here', req.query);
-  
   req.pxpParams = { ...getListParams(req.query), ...req.body, ...req.params };
   next();
 };

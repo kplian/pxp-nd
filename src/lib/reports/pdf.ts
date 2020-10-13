@@ -4,7 +4,7 @@ import path from 'path';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { getManager } from 'typeorm';
-import { Company } from '../../modules/cereals-nd/entity/Company';
+// import { Company } from '../../modules/cereals-nd/entity/Company';
 
 
 export const makePdf = async (req: any, res: any) => {
@@ -15,7 +15,9 @@ export const makePdf = async (req: any, res: any) => {
 
     const { module, model } = req.query;
     
-    const data = await getManager().find(Company);
+    const data = [{
+      id: 1,
+    },{id:2}]; //await getManager().find(Company);
 
     function createHeaders(keys: any) {
       var result = [];

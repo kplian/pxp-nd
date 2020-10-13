@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-10-07 19:53:44
+ * Last modified  : 2020-10-13 15:36:31
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -187,12 +187,12 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
-          [parseParams, isAuthenticated],
+          [/*parseParams,*/ isAuthenticated],
           async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
             // const params = req.pxpParams;
-            
+
             if (req.user) {
               this.user = req.user as User;
             }

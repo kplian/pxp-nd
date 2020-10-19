@@ -31,6 +31,7 @@ import {
 import AccountStatusModel from '../entity/AccountStatus';
 import PersonModel from '../../pxp/entity/Person';
 import AccountStatusTypeModel from '../entity/AccountStatusType';
+import { start } from 'repl';
 
 // @Route('/accountStatusType')
 @Model('pxp/AccountStatus')
@@ -40,13 +41,37 @@ class AccountStatus extends Controller {
   @DbSettings('Orm')
   @ReadOnly(true)
   async list(params: Record<string, unknown>): Promise<unknown> {
-    const listParam = this.getListParams(params);
+    // const listParam = this.getListParams(params);
+
     let qb = await getManager()
       .createQueryBuilder(AccountStatusModel, 'asm')
       .innerJoinAndSelect('asm.accountStatusType', 'ast')
       // .where('"ast".code = :code', { code: params.code })
       .where(params.code ? 'ast.code = :code' : '1=1', { code: params.code })
       .andWhere(params.tableId ? 'asm.table_id = :tableId' : '1=1', { tableId: params.tableId });
+
+    // get initial balance
+    const startDate = params.startDate; // todo change now
+    const endDate = params.endDate;
+    let initialBalance;
+    if(startDate && endDate) {
+      const qbInitialBalance = await qb.clone();
+       initialBalance = await qbInitialBalance.select('count(*) as count_initial_balance, sum(asm.amount) as sum_initial_balance')
+        .andWhere((params.startDate && params.endDate) ? 'asm.date <= :start' : '1=1', { start: startDate })
+        .getRawOne();
+
+      qb = qb.andWhere('asm.date BETWEEN :start AND :end', { start: startDate, end: endDate });
+
+    } else {
+      initialBalance = {
+        count_initial_balance: 0,
+        sum_initial_balance: 0,
+      };
+    }
+
+
+//      .andWhere((params.startDate && params.endDate) ? 'asm.date BETWEEN :start AND :end' : '1=1', { start: params.startDate, end: params.endDate });
+
 
     if(params.genericFilterFields && params.genericFilterValue){
       const genericFilterFields = params.genericFilterFields as string;
@@ -57,11 +82,11 @@ class AccountStatus extends Controller {
     }
 
     const count = await qb.select('count(*) as count, sum(asm.amount) as total_amount').getRawOne();
-    const data = await qb.offset(params.start as number).limit(params.limit as number).select('ast.code, ast.type, asm.amount, asm.description')
+    const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.date')
       .getRawMany();
 
     console.log(count)
-    return {  data, count: count.count, dataFooter:{totalAmount: count.total_amount, totalRange: 120} };
+    return {  data, count: count.count, extraData:{totalAmount: count.total_amount, totalRange: 120, initialBalance} };
 
   }
 

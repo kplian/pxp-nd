@@ -9,12 +9,17 @@
  * @author Mercedes Zambrana
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-18 14:40:26
+ * Last modified  : 2020-10-20 17:46:24
  */
 import 'reflect-metadata';
-import { getManager } from 'typeorm';
+import { getManager, EntityManager } from 'typeorm';
 import Role from '../../../modules/pxp/entity/Role';
 import Log from '../../../modules/pxp/entity/Log';
+
+interface ScriptInterface {
+  scriptCode: string,
+  scriptFunction: (manager: EntityManager) => void
+}
 
 
 const userHasPermission = async (userId: number, transaction: string): Promise<boolean> => {
@@ -61,8 +66,8 @@ const insertLog = async (username: string, macaddres: string, ip: string, logTyp
     .execute();
 
   return logIds.identifiers[0].logId;
-
 }
-export { userHasPermission, insertLog };
+
+export { userHasPermission, insertLog, ScriptInterface };
 
 

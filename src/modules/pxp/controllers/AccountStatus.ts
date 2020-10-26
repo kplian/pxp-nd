@@ -112,21 +112,21 @@ class AccountStatus extends Controller {
     * */
     let amount = params.amount as number;
     switch (params.typeTransaction) {
-      case 'account payable':
-      case 'account receivable':
+      case 'account_payable':
+      case 'account_receivable':
         if (Math.sign(amount) === -1) { // the amount is negative from client
           // the value must be a positive
           amount = amount * -1;
         }
         break;
-      case 'payment in advance':
+      case 'payment_in_advance':
       case 'payment':
         if (Math.sign(amount) === 1) { // the amount is positive from client
           // the value must be a negative
           amount = amount * -1;
         }
         break;
-      default:
+      default: // adjusting_account
         console.log('type transaction is not exist in the config')
     }
 

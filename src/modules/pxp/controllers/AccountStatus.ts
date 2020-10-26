@@ -82,7 +82,7 @@ class AccountStatus extends Controller {
     }
 
     const count = await qb.select('count(*) as count, sum(asm.amount) as total_amount').getRawOne();
-    const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.date')
+    const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.date, asm.typeTransaction')
       .getRawMany();
 
     console.log(count)
@@ -103,10 +103,41 @@ class AccountStatus extends Controller {
 
     console.log('getAccountStatusTypeData',getAccountStatusTypeData)
 
+    /*
+    account payable (positive)
+    account receivable (positive)
+    payment in advance (negative)
+    payment (negative)
+    adjusting account (from client)
+    * */
+    let amount = params.amount as number;
+    switch (params.typeTransaction) {
+      case 'account payable':
+      case 'account receivable':
+        if (Math.sign(amount) === -1) { // the amount is negative from client
+          // the value must be a positive
+          amount = amount * -1;
+        }
+        break;
+      case 'payment in advance':
+      case 'payment':
+        if (Math.sign(amount) === 1) { // the amount is positive from client
+          // the value must be a negative
+          amount = amount * -1;
+        }
+        break;
+      default:
+        console.log('type transaction is not exist in the config')
+    }
+
+    console.log(amount);
+
+
     const accountStatus = new AccountStatusModel();
     Object.assign(accountStatus, params);
     accountStatus.createdBy = (this.user.username as string);
     accountStatus.accountStatusTypeId = getAccountStatusTypeData.account_status_type_id;
+    accountStatus.amount = amount;
     await __(this.classValidate(accountStatus));
     await manager.save(accountStatus);
     return accountStatus;

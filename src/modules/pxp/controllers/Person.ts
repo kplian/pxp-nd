@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-10-07 20:06:20
+ * Last modified  : 2020-10-13 15:18:59
  */
 import { EntityManager } from 'typeorm';
 import { Controller, Get, Post, DbSettings, ReadOnly, Log, Model, __ } from '../../../lib/pxp';
@@ -18,14 +18,14 @@ import PersonModel from '../entity/Person';
 
 @Model('pxp/Person')
 class Person extends Controller {
-  @Get()
+  /*@Get()
   @DbSettings('Orm')
   @ReadOnly(true)
   async list(params: Record<string, unknown>): Promise<unknown> {
     const listParam = this.getListParams(params);
     const [persons, count] = await __(PersonModel.findAndCount(listParam)) as unknown[];
     return { data: persons, count };
-  }
+  }*/
 
   @Post()
   @DbSettings('Orm')

@@ -9,7 +9,7 @@
  * @author No author
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-09-18 13:50:14
+ * Last modified  : 2020-10-23 18:33:17
  */
 import { Column, BaseEntity, Entity, PrimaryColumn } from 'typeorm';
 import { SessionEntity } from 'typeorm-store';

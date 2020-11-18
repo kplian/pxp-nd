@@ -86,7 +86,7 @@ class AccountStatus extends Controller {
       .getRawMany();
 
     console.log(count)
-    return {  data, count: count.count, extraData:{totalAmount: count.total_amount, totalRange: 120, initialBalance} };
+    return {  data, count: count.count, extraData:{totalAmount: count.total_amount || 0, totalRange: 120, initialBalance: { count_initial_balance: initialBalance.count_initial_balance || 0, sum_initial_balance: initialBalance.sum_initial_balance || 0,  } } };
 
   }
 

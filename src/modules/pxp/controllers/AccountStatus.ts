@@ -57,7 +57,7 @@ class AccountStatus extends Controller {
     if(startDate && endDate) {
       const qbInitialBalance = await qb.clone();
        initialBalance = await qbInitialBalance.select('count(*) as count_initial_balance, sum(asm.amount) as sum_initial_balance')
-        .andWhere((params.startDate && params.endDate) ? 'asm.date <= :start' : '1=1', { start: startDate })
+        .andWhere((params.startDate && params.endDate) ? 'asm.date < :start' : '1=1', { start: startDate })
         .getRawOne();
 
       qb = qb.andWhere('asm.date BETWEEN :start AND :end', { start: startDate, end: endDate });
@@ -85,8 +85,11 @@ class AccountStatus extends Controller {
     const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.date, asm.typeTransaction')
       .getRawMany();
 
+    const initialBalanceAux = initialBalance.sum_initial_balance || 0;
+    const totalAmount = count.total_amount || 0;
+    const totalBalance = parseFloat(initialBalanceAux) + parseFloat(totalAmount);
     console.log(count)
-    return {  data, count: count.count, extraData:{totalAmount: count.total_amount || 0, totalRange: 120, initialBalance: { count_initial_balance: initialBalance.count_initial_balance || 0, sum_initial_balance: initialBalance.sum_initial_balance || 0,  } } };
+    return {  data, count: count.count, extraData:{totalAmount: count.total_amount || 0, totalBalance, totalRange: 120, initialBalance: { count_initial_balance: initialBalance.count_initial_balance || 0, sum_initial_balance: initialBalance.sum_initial_balance || 0,  } } };
 
   }
 

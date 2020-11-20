@@ -3,6 +3,7 @@ import { getManager, Entity } from 'typeorm';
 import moment from 'moment';
 import { getEntity, parseParams } from './helper';
 import _ from 'lodash';
+import { authRouter } from 'auth/auth-routes';
 
 export const makeXlsx = async (req: any, res: any) => { 
   try {
@@ -26,8 +27,12 @@ export const makeXlsx = async (req: any, res: any) => {
       heads,
     ]
     
-    data.forEach((item:any) => table.push(_.values(item)));
-    console.log(table);
+    data.forEach((item: any) => {
+      const aux: any = [];
+      keys.forEach(key => aux.push(item[key]));
+
+      table.push(aux);
+    });
     
     const ws = XLSX.utils.aoa_to_sheet(table);
     XLSX.utils.book_append_sheet(wb, ws, 'test');

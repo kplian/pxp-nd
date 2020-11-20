@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Like } from 'typeorm';
+import { Like, ILike } from 'typeorm';
 import { ListParam } from '.';
 
 const getListParams = (params: Record<string, any>): ListParam => {
@@ -29,29 +29,27 @@ const getListParams = (params: Record<string, any>): ListParam => {
   };
 
   if (params.genericFilterFields) {    
+    res.where = [];
     const genericFilterFields = params.genericFilterFields as string;
     const filterFieldsArray = genericFilterFields.split('#');
     filterFieldsArray.forEach((field) => {
-      res.where = {
-        ...res.where,
-        [field]:
-          Like('%' + (params.genericFilterValue as string) + '%')
-      }
-      // if (res.where) {
-      //   // res.where.push({
-      //   //   [field]: Like('%' + (params.genericFilterValue as string) + '%')
-      //   // });
-      //   res.where[field] = Like(
-      //     '%' + (params.genericFilterValue as string) + '%'
-      //   );
+      // res.where = {
+      //   ...res.where,
+      //   [field]:
+      //     Like('%' + (params.genericFilterValue as string) + '%')
       // }
+      if (res.where) {
+        res.where.push({
+          [field]: ILike('%' + String(params.genericFilterValue) + '%')
+        });
+      }
     });
     res.filterValue = res['genericFilterValue'];
-    delete res['genericFilterFields'];
+    // delete res['genericFilterFields'];
     delete res['genericFilterValue'];
   }
   return res;
-};
+}; 
 
 export const parseParams = (
   req: any,

@@ -58,10 +58,6 @@ class AccountStatusType extends Controller {
     await manager.save(accountStatusType);
     return accountStatusType;
   }
-
-
-
-
 }
 
 export default AccountStatusType;

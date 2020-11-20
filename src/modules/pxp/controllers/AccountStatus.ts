@@ -32,6 +32,7 @@ import AccountStatusModel from '../entity/AccountStatus';
 import PersonModel from '../../pxp/entity/Person';
 import AccountStatusTypeModel from '../entity/AccountStatusType';
 import { start } from 'repl';
+import { accountStatusRepository } from '../repositories/account-status.repository';
 
 // @Route('/accountStatusType')
 @Model('pxp/AccountStatus')
@@ -143,7 +144,15 @@ class AccountStatus extends Controller {
     return accountStatus;
   }
 
-
+  @Get('/balance')
+  @DbSettings('Orm')
+  @ReadOnly(false)
+  @Log(true)
+  async getBalance(params: Record<string, unknown>, manager: EntityManager): Promise<any> {
+    console.log(params);
+    
+    return await accountStatusRepository().accountBalance(Number(params.tableId), String(params.code));
+  }
 
 }
 

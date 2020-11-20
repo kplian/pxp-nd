@@ -37,7 +37,7 @@ export const makePdf = async (req: any, res: any) => {
   try {
 
     // s-params
-    const params: any  = parseParams(req);
+    const params: any  = await parseParams(req);
     const Entity = await getEntity(params.module, params.entity);
     // e-params
 

@@ -190,8 +190,8 @@ class Controller implements ControllerInterface {
           [parseParams, isAuthenticated],
           async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
-            // const params = { ...req.query, ...req.body, ...req.params };
-            const params = req.pxpParams;
+            const params = { ...req.query, ...req.body, ...req.params };
+            // const params = req.pxpParams;
 
             if (req.user) {
               this.user = req.user as User;

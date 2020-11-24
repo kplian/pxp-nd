@@ -7,21 +7,27 @@ import { authRouter } from 'auth/auth-routes';
 
 export const makeXlsx = async (req: any, res: any) => { 
   try {
-     // s-params
-     
-     const params: any = await parseParams(req);
-     const Entity = await getEntity(params.module, params.entity);
-     // e-params
-     
-     
+
+      let data, params: any;
+      if (!req.reportData) {
+        // s-params
+        params  = await parseParams(req);
+        const Entity = await getEntity(params.module, params.entity);
+        data = await getManager().find(Entity, {
+          // select: keys,
+        });
+        // e-params
+      } else {
+        data = req.reportData.data;
+        params = {
+          ...req.report
+        }
+      }
+        
      const heads = _.map(params.columns, 'header');
      const keys = _.map(params.columns, 'dataKey');
      console.log(heads, keys);
-    
-    const data = await getManager().find(Entity, {
-      select: keys,
-    });
-
+  
     const wb = XLSX.utils.book_new();
     const table = [
       heads,

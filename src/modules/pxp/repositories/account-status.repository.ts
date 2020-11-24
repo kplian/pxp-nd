@@ -19,7 +19,7 @@ export interface StatusData {
 
 @EntityRepository(AccountStatus)
 class AccountStatusCustomRepository extends Repository<AccountStatus> {
-  async saveStatus(data: StatusData): Promise<any | null> {
+  async saveStatus(data: StatusData, currentAccountId? : any): Promise<any | null> {
     const statusTypeRepo = getRepository(AccountStatusType);
     let accountStatus = null;
     let type = null;
@@ -55,9 +55,9 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       // relations: ['accountStatusType']
     });
 
-    const accountStatusId = accountStatusDb
+    const accountStatusId = currentAccountId || (accountStatusDb
       ? accountStatusDb.accountStatusId
-      : null;
+      : null);
 
     if (accountStatusId) {
       accountStatus = await this.update(accountStatusId, {

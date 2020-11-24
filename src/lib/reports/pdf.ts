@@ -35,16 +35,26 @@ const setRobotoFont = (doc: any) => {
 
 export const makePdf = async (req: any, res: any) => {
   try {
-
-    // s-params
-    const params: any  = await parseParams(req);
-    const Entity = await getEntity(params.module, params.entity);
-    // e-params
-
+    let data, params: any;
+    if (!req.reportData) {
+      // s-params
+      params  = await parseParams(req);
+      const Entity = await getEntity(params.module, params.entity);
+      data = await getManager().find(Entity);
+      // e-params
+    } else {
+      data = req.reportData.data;
+      params = {
+        ...req.report
+      }
+    }
+    console.log('[report]', req.reportData);
+    
+    
     const doc: any = new jsPDF({filters: ['ASCIIHexEncode']});
     const pdfPath = path.join(__dirname, params.filename + '.pdf');
-
-    const data = await getManager().find(Entity);
+    
+    
     
     res.setHeader(
       'Content-Disposition',

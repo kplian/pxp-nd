@@ -32,7 +32,10 @@ authRouter.post(
       if (!user) {
         return res
           .status(400)
-          .send({ message: info });
+          .send({
+            error: true,
+            message: info
+          });
       }
       req.logIn(user, function (err) {
         if (err) {

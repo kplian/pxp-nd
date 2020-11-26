@@ -108,7 +108,10 @@ export const isAuthenticated = (
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(401).send({ message: 'Not Authorized' });
+  res.status(401).send({
+    error: true,
+    message: 'Not Authorized'
+  });
 };
 
 export { configPassportLocal };

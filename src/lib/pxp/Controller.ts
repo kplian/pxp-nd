@@ -37,6 +37,7 @@ import { makeXlsx } from '../reports/xlsx';
 class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
+  public pxpParams: any;
   public router = Router();
   public path = '';
   public module = '';
@@ -198,7 +199,7 @@ class Controller implements ControllerInterface {
           async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-            // const params = req.pxpParams;
+            this.pxpParams = req.pxpParams;
 
             if (req.user) {
               this.user = req.user as User;

@@ -2,30 +2,31 @@ import { NextFunction, Request, Response } from 'express';
 import { Like, ILike } from 'typeorm';
 import { ListParam } from '.';
 
-const getListParams = (params: Record<string, any>): ListParam => {
-  
+export const getListParams = (params: Record<string, any>): ListParam => {
+  const newParams: any = {};
   Object.keys(params).map((key) => {
     if (key === 'start') {
-      params.skip = JSON.parse(params[key]);
-      delete params[key];
+      newParams.skip = JSON.parse(params[key]);
+      // delete params[key];
     } else if (key === 'limit') {
-      params.take = JSON.parse(params[key]);
-      delete params[key];
+      newParams.take = JSON.parse(params[key]);
+      // delete params[key];
     } else if (key === 'sort') {
-      params.order = {
+      newParams.order = {
         [String(params.sort).replace(/\"/g, '')]:
           String(params.dir).replace(/\"/g, '') || 'ASC'
       };
-      delete params[key];
-      delete params['dir'];
+      // delete params[key];
+      // delete params['dir'];
     } else {
       console.log(params[key])
+      newParams[key] = params[key];
       // params[key] = JSON.parse(params[key])
     };
   });
 
   const res: any = {
-    ...params
+    ...newParams
   };
 
   if (params.genericFilterFields) {    

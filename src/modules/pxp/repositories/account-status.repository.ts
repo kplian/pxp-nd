@@ -46,7 +46,8 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       },
       where: (qb: any) => {
         qb.where({
-          tableId: data.accountStatus.tableId
+          tableId: data.accountStatus.tableId,
+          accountStatusId: currentAccountId,
         }).andWhere('type.code = :code', {
           code: data.accountStatusType.code
         });
@@ -86,11 +87,6 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
                                             ON acc.account_status_type_id = ast.account_status_type_id
                                             WHERE ast.code = '${code}'
                                               AND acc.table_id = ${tableId};`);
-    
-    // const data = await this
-    console.log(rawData);
-    
-    
     return rawData[0]; 
   }
 

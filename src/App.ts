@@ -128,7 +128,7 @@ class App {
     //     }
     //   }
     // };
-    this.app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+    this.app.use(cors({ credentials: true, origin: process.env.HOST_FRONT }));
     this.app.options('*', cors());
   }
   private initializeSession() {

@@ -9,7 +9,7 @@
  * @author Israel Colque
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-10-09 09:53:26
+ * Last modified  : 2020-12-01 11:23:10
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
@@ -19,6 +19,7 @@ import { UserRepository } from '../modules/pxp/repositories/user.repository';
 import { validPassword } from './utils/password';
 import { issueJWT } from './config/passport-jwt';
 import config from '../config';
+import { PxpError, errorMiddleware } from '../lib/pxp';
 
 const authRouter = Router();
 authRouter.post(
@@ -27,16 +28,13 @@ authRouter.post(
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     passport.authenticate('local', (err, user, info) => {
       if (err) {
-        return next(err);
+        errorMiddleware(err, req, res);
       }
+
       if (!user) {
-        return res
-          .status(400)
-          .send({
-            error: true,
-            message: info
-          });
+        throw new PxpError(400, info);
       }
+
       req.logIn(user, function (err) {
         if (err) {
           return next(err);

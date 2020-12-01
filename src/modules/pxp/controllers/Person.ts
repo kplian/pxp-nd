@@ -9,7 +9,7 @@
  * @author Jaime Rivera
  *
  * Created at     : 2020-09-17 18:55:38
- * Last modified  : 2020-10-13 15:18:59
+ * Last modified  : 2020-11-02 11:58:05
  */
 import { EntityManager } from 'typeorm';
 import { Controller, Get, Post, DbSettings, ReadOnly, Log, Model, __ } from '../../../lib/pxp';

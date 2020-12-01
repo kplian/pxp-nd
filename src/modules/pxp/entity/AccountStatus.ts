@@ -21,10 +21,11 @@ import {
   OneToMany,
   Unique,
   OneToOne,
-  ManyToOne
+  ManyToOne, AfterLoad
 } from 'typeorm';
 
 import { PxpEntity } from '../../../lib/pxp';
+import moment from 'moment';
 
 import AccountStatusType from './AccountStatusType';
 import { IsDate, IsOptional } from 'class-validator';
@@ -68,5 +69,13 @@ export default class AccountStatus extends PxpEntity {
   })
   @JoinColumn({ name: 'account_status_type_id' })
   accountStatusType: AccountStatusType;
+
+
+  dateString: string;
+
+  @AfterLoad()
+  setComputed(): void {
+    this.dateString = moment(this.date).format('YYYY-MM-DD');
+  }
 
 }

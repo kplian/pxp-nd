@@ -83,7 +83,7 @@ class AccountStatus extends Controller {
     }
 
     const count = await qb.select('count(*) as count, sum(asm.amount) as total_amount').getRawOne();
-    const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.date, asm.typeTransaction')
+    const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.typeTransaction, TO_CHAR(asm.date, \'YYYY-MM-DD\') as date')
       .getRawMany();
 
     const initialBalanceAux = initialBalance.sum_initial_balance || 0;
@@ -153,7 +153,7 @@ class AccountStatus extends Controller {
   @Log(true)
   async getBalance(params: Record<string, unknown>, manager: EntityManager): Promise<any> {
     console.log(params);
-    
+
     return await accountStatusRepository().accountBalance(Number(params.tableId), String(params.code));
   }
 

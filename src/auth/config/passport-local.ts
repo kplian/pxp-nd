@@ -9,7 +9,7 @@
  * @author Israel Colque
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-09-18 01:22:51
+ * Last modified  : 2020-12-01 10:57:09
  */
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
@@ -57,6 +57,7 @@ export const verifyCallback = (
     .getOne()
     .then((user) => {
       if (!user) {
+        console.log('no user');
         return done(null, false, 'Invalid username');
       }
       const isValid = validPassword(password, <string>user.hash, <string>user.salt);

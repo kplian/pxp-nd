@@ -30,10 +30,14 @@ import config from '../../config';
 import User from '../../modules/pxp/entity/User';
 import { isAuthenticated } from '../../auth/config/passport-local';
 import { parseParams } from './ParseParams';
+import { isReportMiddleware } from './isReportMiddleware';
+import { makePdf } from '../reports/pdf';
+import { makeXlsx } from '../reports/xlsx';
 
 class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
+  public pxpParams: any;
   public router = Router();
   public path = '';
   public module = '';
@@ -187,11 +191,15 @@ class Controller implements ControllerInterface {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
-          [/*parseParams,*/ isAuthenticated],
+          [
+            isAuthenticated,
+            isReportMiddleware,
+            parseParams
+          ],
           async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = { ...req.query, ...req.body, ...req.params };
-            // const params = req.pxpParams;
+            this.pxpParams = req.pxpParams;
 
             if (req.user) {
               this.user = req.user as User;
@@ -295,7 +303,7 @@ class Controller implements ControllerInterface {
 
   async ormMethodWrapper(
     params: Record<string, unknown>,
-    req: Request,
+    req: Request | any,
     next: NextFunction,
     res: Response,
     methodName: string,
@@ -358,7 +366,17 @@ class Controller implements ControllerInterface {
         )
       );
     }
-    res.json(metResponse);
+
+    console.log(req.report);
+    if (req.report && req.report.type === 'pdf' ) {
+      req.reportData = metResponse;
+      makePdf(req, res);
+    } else if (req.report && req.report.type === 'xlsx' ) {
+      req.reportData = metResponse;
+      makeXlsx(req, res);
+    } else {
+      res.json(metResponse);
+    }
   }
 
   async list(params: Record<string, unknown>): Promise<unknown> {

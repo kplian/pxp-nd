@@ -9,7 +9,7 @@
  * @author Israel Colque
  *
  * Created at     : 2020-06-13 18:09:48
- * Last modified  : 2020-12-01 11:10:23
+ * Last modified  : 2020-12-01 11:23:10
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';

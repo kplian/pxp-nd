@@ -434,7 +434,7 @@ class Controller implements ControllerInterface {
       skip: params.start as number,
       take: params.limit as number,
       order: {
-        [params.sort as string]: params.dir as string
+        [params.sort as string]: String(params.dir).toUpperCase()
       }
     };
     if (params.genericFilterFields) {

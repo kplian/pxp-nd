@@ -14,7 +14,7 @@ export const getListParams = (params: Record<string, any>): ListParam => {
     } else if (key === 'sort') {
       newParams.order = {
         [String(params.sort).replace(/\"/g, '')]:
-          String(params.dir).replace(/\"/g, '') || 'ASC'
+          String(params.dir).replace(/\"/g, '').toUpperCase() || 'ASC'
       };
       // delete params[key];
       // delete params['dir'];

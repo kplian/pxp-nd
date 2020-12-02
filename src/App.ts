@@ -117,18 +117,19 @@ class App {
   }
 
   private configCors() {
-    const whitelist = ['http://localhost:3100'];
+    const whitelist = process.env.WHITE_LIST ? String(process.env.WHITE_LIST).split(',') :[];
 
-    // const corsOptions = {
-    //   origin: function (origin, callback) {
-    //     if (whitelist.indexOf(origin) !== -1 || !origin) {
-    //       callback(null, true);
-    //     } else {
-    //       callback(new Error('Not allowed by CORS'));
-    //     }
-    //   }
-    // };
-    this.app.use(cors({ credentials: true, origin: process.env.HOST_FRONT }));
+    const corsOptions = {
+      credentials: true,
+      origin: function (origin: any, callback: any) {
+        if (whitelist.indexOf(origin) !== -1 || !origin) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      }
+    };
+    this.app.use(cors(corsOptions));
     this.app.options('*', cors());
   }
   private initializeSession() {

@@ -43,6 +43,15 @@ export default class Report {
   template?: string;
 
   @Column({ type: 'text', nullable: true })
-  params?: string;
+  filters?: string;
+
+  @Column({ type: 'text', nullable: true }) 
+  config?: string;
+
+  @Column({ type: 'integer', nullable: true }) 
+  order?: string;
+
+  @Column({ type: 'boolean', nullable: true }) 
+  active?: boolean;
 
 }

@@ -54,8 +54,6 @@ export const makePdf = async (req: any, res: any) => {
     const doc: any = new jsPDF({filters: ['ASCIIHexEncode']});
     const pdfPath = path.join(__dirname, params.filename + '.pdf');
     
-    
-    
     res.setHeader(
       'Content-Disposition',
       'inline; filename="' + params.filename + '.pdf" '

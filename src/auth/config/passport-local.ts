@@ -57,8 +57,7 @@ export const verifyCallback = (
     .getOne()
     .then((user) => {
       if (!user) {
-        console.log('no user');
-        return done(null, false, 'Invalid username');
+        return done(null, false, 'Invalid username or password');
       }
       const isValid = validPassword(password, <string>user.hash, <string>user.salt);
       delete user.hash;
@@ -66,7 +65,7 @@ export const verifyCallback = (
       if (isValid) {
         return done(null, user);
       } else {
-        return done(null, false, 'Invalid password');
+        return done(null, false, 'Invalid username or password');
       }
     })
     .catch((err) => {

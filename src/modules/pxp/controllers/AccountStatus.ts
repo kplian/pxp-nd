@@ -72,10 +72,6 @@ class AccountStatus extends Controller {
 
 
 //      .andWhere((params.startDate && params.endDate) ? 'asm.date BETWEEN :start AND :end' : '1=1', { start: params.startDate, end: params.endDate });
-
-
-    console.log('PARAMS', params);
-    
     if(params.genericFilterFields && params.genericFilterValue){
       const genericFilterFields = params.genericFilterFields as string;
       const filterFieldsArray = genericFilterFields.split('#');
@@ -100,14 +96,11 @@ class AccountStatus extends Controller {
     .orderBy('asm.account_status_id', 'ASC')
     .getRawMany();
     
-    console.log('PARAMS', qb.expressionMap);
-    
     const initialBalanceAux = initialBalance.sum_initial_balance || 0;
     const totalAmount = count.total_amount || 0;
     const totalBalance = parseFloat(initialBalanceAux) + parseFloat(totalAmount);
-    console.log(count)
-    return {  data, count: count.count, extraData:{totalAmount: count.total_amount || 0, totalBalance, totalRange: 120, initialBalance: { count_initial_balance: initialBalance.count_initial_balance || 0, sum_initial_balance: initialBalance.sum_initial_balance || 0,  } } };
 
+    return {  data, count: count.count, extraData:{totalAmount: count.total_amount || 0, totalBalance, totalRange: 120, initialBalance: { count_initial_balance: initialBalance.count_initial_balance || 0, sum_initial_balance: initialBalance.sum_initial_balance || 0,  } } };
   }
 
   @Post()

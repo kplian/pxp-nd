@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  :
  */
-import { EntityManager, getManager } from 'typeorm';
+import { Brackets, EntityManager, getManager } from 'typeorm';
 
 import {
   Controller,
@@ -44,7 +44,7 @@ class AccountStatus extends Controller {
   async list(params: Record<string, unknown>): Promise<unknown> {
     // const listParam = this.getListParams(params);
 
-    let qb = await getManager()
+    let qb:any = await getManager()
       .createQueryBuilder(AccountStatusModel, 'asm')
       .innerJoinAndSelect('asm.accountStatusType', 'ast')
       // .where('"ast".code = :code', { code: params.code })
@@ -74,18 +74,34 @@ class AccountStatus extends Controller {
 //      .andWhere((params.startDate && params.endDate) ? 'asm.date BETWEEN :start AND :end' : '1=1', { start: params.startDate, end: params.endDate });
 
 
+    console.log('PARAMS', params);
+    
     if(params.genericFilterFields && params.genericFilterValue){
       const genericFilterFields = params.genericFilterFields as string;
       const filterFieldsArray = genericFilterFields.split('#');
-      filterFieldsArray.forEach((field) => {
-        qb = qb.andWhere(`${field}::varchar like :value`, { value:`%${params.genericFilterValue}%` });
-      });
+      qb = qb.andWhere(new Brackets(sqb => {
+        filterFieldsArray.forEach((field, i) => {
+          if (i === 0) {
+            sqb = sqb.where(`${field}::text ilike :value`, { value:`%${params.genericFilterValue}%` });
+          } else {
+            qb = sqb.orWhere(`${field}::text ilike :value`, { value:`%${params.genericFilterValue}%` });
+          }
+        });
+      }));
+
+      
     }
-
+    
     const count = await qb.select('count(*) as count, sum(asm.amount) as total_amount').getRawOne();
-    const data = await qb.offset(params.start as number).limit(params.limit as number).select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.typeTransaction, TO_CHAR(asm.date, \'YYYY-MM-DD\') as date')
-      .getRawMany();
-
+    const data = await qb.offset(params.start as number)
+    .limit(params.limit as number)
+    .select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.typeTransaction, TO_CHAR(asm.date, \'YYYY-MM-DD\') as date')
+    .orderBy('asm.date', 'ASC')
+    .orderBy('asm.account_status_id', 'ASC')
+    .getRawMany();
+    
+    console.log('PARAMS', qb.expressionMap);
+    
     const initialBalanceAux = initialBalance.sum_initial_balance || 0;
     const totalAmount = count.total_amount || 0;
     const totalBalance = parseFloat(initialBalanceAux) + parseFloat(totalAmount);

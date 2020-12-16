@@ -12,7 +12,6 @@ const parseColumns = (columns: any) => Object.keys(columns).map((key) => ({
 
 export const generateReport = async (req: any, res: any) => {
   try {
-    console.log('[REPORT]', req.params);
     const report:any = await getManager().findOne(Report, {
       where: {
         reportId: req.params.id
@@ -23,8 +22,6 @@ export const generateReport = async (req: any, res: any) => {
       const filters = req.query.filters && req.query.filters !== 'null' ? JSON.parse(req.query.filters) : {};
       
       const qp = parseParamsReport(report.query, filters); 
-      console.log('[FILTERS]', filters);
-      console.log('[FILTERS]', qp);
       
       const data = await getManager().query(qp);
       const type: string = get(req.params, 'type');

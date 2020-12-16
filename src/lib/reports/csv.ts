@@ -7,8 +7,6 @@ export const makeCsv = async (req: any, res: any) => {
     const filename = req.body.filename || req.query.filename;
     const csvPath = path.join(__dirname, filename + '.csv');
 
-    console.log('NAME', csvPath, __dirname);
-
     res.setHeader(
       'Content-Disposition',
       'attachment; filename="' + filename + '" '

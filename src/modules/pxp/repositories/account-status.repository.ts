@@ -55,12 +55,14 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       // where: { tableId: purchaseId },
       // relations: ['accountStatusType']
     });
-
+    
+    
     const accountStatusId = currentAccountId || (accountStatusDb
       ? accountStatusDb.accountStatusId
       : null);
-
+      
     if (accountStatusId) {
+      data.accountStatus.description = !data.accountStatus.description ? accountStatusDb.description : data.accountStatus.description;
       accountStatus = await this.update(accountStatusId, {
         ...data.accountStatus
         // date: moment().format()

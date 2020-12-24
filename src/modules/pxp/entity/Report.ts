@@ -51,6 +51,9 @@ export default class Report {
   @Column({ type: 'integer', nullable: true }) 
   order?: string;
 
+  @Column({ name: 'report_group_id',type: 'integer', nullable: true }) 
+  reportGroupId?: number;
+
   @Column({ type: 'boolean', nullable: true }) 
   active?: boolean;
 

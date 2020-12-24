@@ -76,7 +76,7 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       accountStatus = await this.save({
         ...data.accountStatus,
         accountStatusTypeId: type.accountStatusTypeId,
-        date: moment().format()
+        // date: moment().format()
       });
     }
     return accountStatus;

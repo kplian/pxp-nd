@@ -1,6 +1,7 @@
 import { query } from 'express';
 import { getManager } from 'typeorm';
 import Report from '../../modules/pxp/entity/Report';
+import ReportGroup from '../../modules/pxp/entity/ReportGroup';
 import { startsWith, replace, get} from 'lodash';
 import { makePdf } from './pdf';
 import { makeXlsx } from './xlsx';
@@ -63,10 +64,23 @@ export const generateReport = async (req: any, res: any) => {
 
 };
 
+export const listGroup = async (req: any, res: any) => {
+  const reports: any = await getManager().find(ReportGroup, {
+    where: {
+      active: true,
+    },
+    select: ['title', 'reportGroupId'],
+  });  
+  return res.send(reports)
+};
+
 export const listReports = async (req: any, res: any) => {
+  console.log('REPORTPS', req.params);
+  
   const reports: any = await getManager().find(Report, {
     where: {
       active: true,
+      reportGroupId: req.params.groupId
     },
     select: ['reportId', 'name'],
     order: {

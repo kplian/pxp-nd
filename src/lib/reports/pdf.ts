@@ -13,7 +13,7 @@ const buildHeader = (doc:any, title:string) => {
   // doc.setTextColor(40);//optional
   // doc.setFontStyle('normal');//optional
   doc.setFontSize(16);
-  doc.text(title, 100, 10, 'center');
+  doc.text(title.toLocaleUpperCase(), 100, 10, 'center');
   doc.line(12, 12, 200, 12); // horizontal line
 };
 
@@ -53,7 +53,8 @@ export const makePdf = async (req: any, res: any) => {
     
     const doc: any = new jsPDF({filters: ['ASCIIHexEncode']});
     const pdfPath = path.join(__dirname, params.filename + '.pdf');
-    
+    const pageNumber = doc.internal.getNumberOfPages();
+
     res.setHeader(
       'Content-Disposition',
       'inline; filename="' + params.filename + '.pdf" '
@@ -80,8 +81,11 @@ export const makePdf = async (req: any, res: any) => {
     doc.autoTable({
       columns: params.columns,
       margin: { top: 20 },
-      body: data
+      body: data,
+      foot: [['Total', '2323']]
     });
+    
+    doc.setPage(pageNumber);
 
     buildFooter(doc, req.user)
     res.end(doc.output());

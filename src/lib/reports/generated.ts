@@ -2,7 +2,7 @@ import { query } from 'express';
 import { getManager } from 'typeorm';
 import Report from '../../modules/pxp/entity/Report';
 import ReportGroup from '../../modules/pxp/entity/ReportGroup';
-import { startsWith, replace, get} from 'lodash';
+import { startsWith, replace, get, set} from 'lodash';
 import { makePdf } from './pdf';
 import { makeXlsx } from './xlsx';
 
@@ -11,6 +11,14 @@ const parseColumns = (columns: any) => Object.keys(columns).map((key) => ({
     dataKey: key,
 }));
 
+const setLimitOffset = (query: string, limit: number, offset:number ) => {
+  return `${query} LIMIT ${limit} OFFSET ${offset} `;
+};
+
+const setCountData = (query: string ) => {
+  return `SELECT count(*) from (${query}) as report`;
+};
+
 export const generateReport = async (req: any, res: any) => {
   try {
     const report:any = await getManager().findOne(Report, {
@@ -18,14 +26,19 @@ export const generateReport = async (req: any, res: any) => {
         reportId: req.params.id
       }
     });
+    console.log('[QUERY]', req.query);
+    
 
     if (report) {
       const filters = req.query.filters && req.query.filters !== 'null' ? JSON.parse(req.query.filters) : {};
       
-      const qp = parseParamsReport(report.query, filters); 
-      
-      const data = await getManager().query(qp);
+      let qp = parseParamsReport(report.query, filters); 
       const type: string = get(req.params, 'type');
+      const dataCount = await getManager().query(setCountData(qp));
+
+      qp = !type ? setLimitOffset(qp, req.query.limit, req.query.start) : qp;
+        
+      const data = await getManager().query(qp);
 
       const reportData = () => {
         req.reportData = {data};
@@ -43,7 +56,7 @@ export const generateReport = async (req: any, res: any) => {
       } else {
         return res.send({
           data: data,
-          count: data.length
+          count: dataCount[0].count
         })
       }
       

@@ -66,9 +66,7 @@ authRouter.post(config.apiPrefix + '/auth/login/token', (req, res, next) => {
         String(user.salt)
       );
 
-      console.log('user', isValid);
       if (isValid) {
-        console.log('token', user);
         const tokenObject = issueJWT(user);
 
         return res.status(200).send({
@@ -77,8 +75,6 @@ authRouter.post(config.apiPrefix + '/auth/login/token', (req, res, next) => {
           expiresIn: tokenObject.expires
         });
       } else {
-        console.log('user error', isValid);
-
         return res
           .status(400)
           .send({ message: 'Invalid username or password' });
@@ -132,8 +128,6 @@ authRouter.get(
   config.apiPrefix + '/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/auth/login' }),
   function (req, res) {
-    console.log('res facebook');
-
     res.redirect('/');
   }
 );

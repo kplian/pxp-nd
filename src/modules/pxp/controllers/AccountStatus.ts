@@ -108,13 +108,13 @@ class AccountStatus extends Controller {
   @ReadOnly(false)
   @Log(true)
   async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
-    console.log('llega aca',params);
+    // console.log('llega aca',params);
     const getAccountStatusTypeData = await getManager()
       .createQueryBuilder(AccountStatusTypeModel, 'astm')
       .where('"astm".code = :code', { code: params.code })
       .select('astm.account_status_type_id as account_status_type_id').getRawOne();
 
-    console.log('getAccountStatusTypeData',getAccountStatusTypeData)
+    // console.log('getAccountStatusTypeData',getAccountStatusTypeData)
 
     /*
     account payable (positive)
@@ -140,7 +140,7 @@ class AccountStatus extends Controller {
         }
         break;
       default: // adjusting_account
-        console.log('type transaction is not exist in the config')
+        // console.log('type transaction is not exist in the config')
     }
 
     console.log(amount);
@@ -161,8 +161,6 @@ class AccountStatus extends Controller {
   @ReadOnly(false)
   @Log(true)
   async getBalance(params: Record<string, unknown>, manager: EntityManager): Promise<any> {
-    console.log(params);
-
     return await accountStatusRepository().accountBalance(Number(params.tableId), String(params.code));
   }
 

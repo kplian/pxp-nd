@@ -93,7 +93,7 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
   }
 
   async add(params: any, user: any): Promise<unknown>{
-        console.log('llega aca',params);
+        // console.log('llega aca',params);
     const getAccountStatusTypeData = await getManager()
       .createQueryBuilder(AccountStatusType, 'astm')
       .where('"astm".code = :code', { code: params.code })

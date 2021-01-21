@@ -367,7 +367,6 @@ class Controller implements ControllerInterface {
       );
     }
 
-    console.log(req.report);
     if (req.report && req.report.type === 'pdf' ) {
       req.reportData = metResponse;
       makePdf(req, res);

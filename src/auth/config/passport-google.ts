@@ -24,7 +24,6 @@ const googleStrategy = new OAuth2Strategy(
     callbackURL: 'http://localhost:3000/auth/google/callback'
   },
   (accessToken: string, refreshToken: string, profile: Profile, done) => {
-    console.log('PROFILE', profile);
     const UserRepo = getCustomRepository(UserRepository);
     UserRepo.findOrCreateSocial(
       {
@@ -38,13 +37,9 @@ const googleStrategy = new OAuth2Strategy(
       }
     )
       .then((user: User) => {
-        console.log('[USER]', user);
-
         return done(null, user);
       })
       .catch((err) => {
-        console.log('[ERROR]', err);
-
         done(err);
       });
   }

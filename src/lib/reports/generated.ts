@@ -133,8 +133,7 @@ export const generateReport = async (req: any, res: any) => {
       });
     }
   } catch (ex) {
-    console.log(ex);
-    
+    console.log(ex);    
     res.status(500).send({
         error: true,
         message: 'Internal Server Error'
@@ -154,8 +153,6 @@ export const listGroup = async (req: any, res: any) => {
 };
 
 export const listReports = async (req: any, res: any) => {
-  console.log('REPORTPS', req.params);
-  
   const reports: any = await getManager().find(Report, {
     where: {
       active: true,
@@ -176,8 +173,7 @@ export const getReport = async (req: any, res: any) => {
     },
     select: ['reportId', 'name', 'filters', 'config' ]
   });
-  console.log(report);
-  
+
   return res.send(report)
 };
 

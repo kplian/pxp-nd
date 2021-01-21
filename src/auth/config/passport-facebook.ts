@@ -24,7 +24,6 @@ const facebookStrategy = new Strategy(
     callbackURL: 'http://localhost:3000/auth/facebook/callback'
   },
   (accessToken: string, refreshToken: string, profile: Profile, done) => {
-    console.log('PROFILE', profile);
     const UserRepo = getCustomRepository(UserRepository);
     UserRepo.findOrCreateSocial(
       {

@@ -19,7 +19,6 @@ export const getListParams = (params: Record<string, any>): ListParam => {
       // delete params[key];
       // delete params['dir'];
     } else {
-      console.log(params[key])
       newParams[key] = params[key];
       // params[key] = JSON.parse(params[key])
     };

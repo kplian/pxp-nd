@@ -71,8 +71,6 @@ export const makePdf = async (req: any, res: any) => {
       };
       filters = req.reportData.filters;
     }
-    console.log('[report]', req.reportData);
-    
     
     const doc: any = new jsPDF({filters: ['ASCIIHexEncode']});
     const pdfPath = path.join(__dirname, params.filename + '.pdf');

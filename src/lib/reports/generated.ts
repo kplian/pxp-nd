@@ -1,10 +1,10 @@
-import { query } from 'express';
 import { getManager } from 'typeorm';
 import Report from '../../modules/pxp/entity/Report';
 import ReportGroup from '../../modules/pxp/entity/ReportGroup';
 import { startsWith, replace, get, set} from 'lodash';
 import { makePdf } from './pdf';
 import { makeXlsx } from './xlsx';
+import * as _ from 'lodash';
 
 const parseColumns = (columns: any) => Object.keys(columns).map((key) => ({
     header: columns[key].label,
@@ -19,6 +19,53 @@ const setCountData = (query: string ) => {
   return `SELECT count(*) from (${query}) as report`;
 };
 
+const getDataQuery = async (query: string, filters: any, type: string, limit: number, start: number) => {
+  let qp = parseParamsReport(query, filters); 
+  const dataCount = await getManager().query(setCountData(qp));
+  qp = !type ? setLimitOffset(qp, limit, start) : qp;
+  const data = await getManager().query(qp);
+
+  return {
+    data, 
+    count: dataCount[0].count
+  }
+};
+
+const totalCalculate = (data: any, columns: any) => {
+  const totals: any = {};
+  Object.keys(columns).map((key) => {
+    const column = columns[key];
+    if (column.total && column.total === 'sum') {
+      totals[key] = _.round(_.sumBy(data, (item:any) => parseFloat(item[key])), 2);
+    }
+  })
+  return totals;
+};
+
+const getSummaryDetail = (columns: any, columnsDetail: any, config: any ) => {
+  const result: any = {};
+  Object.keys(config).map(field => {
+    result[field] = {
+      value: eval(config[field].value),
+      label: config[field].label
+    };
+  });
+  return result;
+};
+
+const filtersLabelBuild = (filters:any, values: any) => {
+  const labels: any = {};
+  
+  Object.keys(filters).forEach(key => {
+    labels[key] = {
+      label: filters[key].label,
+      value: values[key],
+    }
+  });
+
+  return labels;
+};
+
 export const generateReport = async (req: any, res: any) => {
   try {
     const report:any = await getManager().findOne(Report, {
@@ -26,24 +73,39 @@ export const generateReport = async (req: any, res: any) => {
         reportId: req.params.id
       }
     });
-    console.log('[QUERY]', req.query);
-    
 
     if (report) {
+      const config = JSON.parse(report.config); 
       const filters = req.query.filters && req.query.filters !== 'null' ? JSON.parse(req.query.filters) : {};
-      
-      let qp = parseParamsReport(report.query, filters); 
       const type: string = get(req.params, 'type');
-      const dataCount = await getManager().query(setCountData(qp));
+      const limit = req.query.limit || 0;
+      const start = req.query.start || 0;
+      const result = await getDataQuery(report.query, filters, type, limit, start);
+      const resultTotal = await getDataQuery(report.query, filters, 'total', limit, start);
+      const totals = totalCalculate(resultTotal.data, config.columns);
 
-      qp = !type ? setLimitOffset(qp, req.query.limit, req.query.start) : qp;
-        
-      const data = await getManager().query(qp);
+      const resultDetail: any = report.detailQuery ? await getDataQuery(report.detailQuery, filters, type, limit, start) : null;
+      let totalsDetail: any = null, summaryData: any = null;
+      if (resultDetail) {
+        totalsDetail = totalCalculate(resultDetail.data, config.columnsDetail);
+        summaryData = getSummaryDetail(totals, totalsDetail, config.detailSummary);
+      }
 
       const reportData = () => {
-        req.reportData = {data};
+        const filtersReport = filtersLabelBuild(JSON.parse(report.filters), filters)
+        req.reportData = {
+          data: result.data,
+          totals,
+          filters: filtersReport
+        };
+        req.reportDetailData = resultDetail ? {
+          data: resultDetail.data,
+          columns: parseColumns(config.columnsDetail),
+          totals: totalsDetail
+        } : null;
+        req.reportSummary = summaryData;
         req.report = {};
-        req.report.columns = parseColumns(JSON.parse(report.config));
+        req.report.columns = parseColumns(config.columns);
         req.report.filename = report.name;
       };
 
@@ -55,8 +117,12 @@ export const generateReport = async (req: any, res: any) => {
         makeXlsx(req, res);
       } else {
         return res.send({
-          data: data,
-          count: dataCount[0].count
+          ...result,
+          totals,
+          dataDetail: resultDetail ? resultDetail.data: null,
+          countDetail: resultDetail ? resultDetail.count : null,
+          totalsDetail,
+          summaryData
         })
       }
       

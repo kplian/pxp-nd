@@ -36,6 +36,9 @@ export default class Report {
   @Column({ type: 'text', nullable: true })
   query?: string;
 
+  @Column({ name: 'detail_query', type: 'text', nullable: true })
+  detailQuery?: string;
+  
   @Column({ name: 'query_orm', type: 'text', nullable: true })
   queryOrm?: string;
 

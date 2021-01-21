@@ -17,13 +17,22 @@ const buildHeader = (doc:any, title:string) => {
   doc.line(12, 12, 200, 12); // horizontal line
 };
 
-
+ 
 const buildFooter = (doc: any, user: any) => {
-  console.log(user);
-  
   doc.setFontSize(12);
   doc.text('Usuario: ' + user.username, 10, 290);
   doc.text( moment().format('LLL'), 150, 290);
+};
+
+const buildParams = (doc: any, filters: any) => {
+  doc.setFontSize(10);
+  let init = 20;
+  Object.keys(filters).forEach(key => {
+    const filter = filters[key];
+    doc.text( filter.label + ': ', 24, init);
+    doc.text(filter.value.toString(), 50, init);
+    init += 4;
+  });
 };
 
 const setRobotoFont = (doc: any) => {
@@ -32,10 +41,23 @@ const setRobotoFont = (doc: any) => {
   doc.setFont('Roboto');
 };
 
+const totalRender = (columns: any =[], totals:any) => {
+  return columns.map((column:any) => {
+    if (totals[column.dataKey]) {
+      return totals[column.dataKey];
+    }
+    return '';
+  })
+}
 
+const footStyles = {
+  fillColor: '#e8e8e8',
+  textColor: '#2a2a2b',
+  fontSize: 11,
+}
 export const makePdf = async (req: any, res: any) => {
   try {
-    let data, params: any;
+    let data, params: any, filters= null;
     if (!req.reportData) {
       // s-params
       params  = await parseParams(req);
@@ -46,7 +68,8 @@ export const makePdf = async (req: any, res: any) => {
       data = req.reportData.data;
       params = {
         ...req.report
-      }
+      };
+      filters = req.reportData.filters;
     }
     console.log('[report]', req.reportData);
     
@@ -78,13 +101,29 @@ export const makePdf = async (req: any, res: any) => {
     doc.setFontSize(12);
 
     buildHeader(doc, params.filename);
+    buildParams(doc, filters);
     doc.autoTable({
       columns: params.columns,
-      margin: { top: 20 },
+      margin: { top: 20 + 4 * Object.keys(filters).length },
       body: data,
-      foot: [['Total', '2323']]
+      foot: [totalRender(params.columns, req.reportData.totals)],
+      footStyles
     });
     
+
+  /*** DETAIL REPORT START***/
+    const detail = req.reportDetailData;
+    if (detail) {
+      doc.autoTable({
+        columns: detail.columns,
+        margin: { top: 20 },
+        body: detail.data,
+        foot: [totalRender(detail.columns, req.reportDetailData.totals)],
+        footStyles
+      });
+    }
+    
+    /*** DETAIL REPORT END ***/
     doc.setPage(pageNumber);
 
     buildFooter(doc, req.user)

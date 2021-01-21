@@ -1,8 +1,6 @@
 import path from 'path';
 
 export const getEntity = async (module: string, entity: string) => {
-  console.log('DERNAME', __dirname, module, entity );
-  
   const filePath = path.join(__dirname, '../../modules', module, 'entity', entity);
   const Entity = await import(filePath);
   return Entity.default || Entity[entity];

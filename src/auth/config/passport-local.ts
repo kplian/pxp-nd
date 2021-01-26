@@ -77,7 +77,7 @@ function configPassportLocal(): void {
   const strategy = new LocalStrategy(customFields, verifyCallback);
   passport.use(strategy);
   // This method is used to store the user identifier locally.
-  passport.serializeUser((user: User, done: any) => {
+  passport.serializeUser((user: any, done: any) => {
     done(null, user.userId);
   });
   // This method is used to extract user data.

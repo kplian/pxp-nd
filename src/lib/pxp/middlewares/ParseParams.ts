@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Like, ILike } from 'typeorm';
-import { ListParam } from '.';
+import { ListParam } from '../ListParamInterface';
 
 export const getListParams = (params: Record<string, any>): ListParam => {
   const newParams: any = {};
@@ -56,6 +56,13 @@ export const parseParams = (
   res: Response,
   next: NextFunction
 ): void => {
-  req.pxpParams = { ...getListParams(req.query), ...req.body, ...req.params };
+  // default values 
+  const defaultValues = {
+    isActive: true,
+    createdBy: req.user.username || ' ',
+  };
+
+  req.pxpParams = { ...getListParams(req.query), ...req.body, ...req.params, ...defaultValues };
+  req.paramasMerge = { ...req.query, ...req.body, ...req.params, ...defaultValues };
   next();
 };

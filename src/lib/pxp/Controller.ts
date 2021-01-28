@@ -29,8 +29,8 @@ import {
 import config from '../../config';
 import User from '../../modules/pxp/entity/User';
 import { isAuthenticated } from '../../auth/config/passport-local';
-import { parseParams } from './ParseParams';
-import { isReportMiddleware } from './isReportMiddleware';
+import { parseParams } from './middlewares/ParseParams';
+import { isReportMiddleware } from './middlewares/isReportMiddleware';
 import { makePdf } from '../reports/pdf';
 import { makeXlsx } from '../reports/xlsx';
 
@@ -198,7 +198,7 @@ class Controller implements ControllerInterface {
           ],
           async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
-            const params = { ...req.query, ...req.body, ...req.params };
+            const params = req.paramasMerge;
             this.pxpParams = req.pxpParams;
 
             if (req.user) {

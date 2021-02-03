@@ -230,7 +230,7 @@ class Controller implements ControllerInterface {
               const endsAt = now.valueOf() - iniAt.valueOf();
               res.logId = (await __(
                 insertLog(
-                  this.user.username,
+                  this.user && this.user.username ? this.user.username : 'nouser',
                   'mac',
                   req.ip,
                   'error',
@@ -351,7 +351,7 @@ class Controller implements ControllerInterface {
       const endsAt = now.valueOf() - iniAt.valueOf();
       __(
         insertLog(
-          this.user.username,
+          this.user && this.user.username ? this.user.username : 'nouser',
           'mac',
           req.ip,
           'success',

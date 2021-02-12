@@ -7,3 +7,5 @@ declare namespace Express {
     logId?: number
   }
 }
+
+declare module 'passport-firebase-auth';

@@ -58,8 +58,8 @@ export const parseParams = (
 ): void => {
   // default values 
   const defaultValues = {
-    isActive: true,
-    createdBy: req.user.username || ' ',
+    // isActive: true,
+    // createdBy: req.user.username || ' ',
   };
 
   req.pxpParams = { ...getListParams(req.query), ...req.body, ...req.params, ...defaultValues };

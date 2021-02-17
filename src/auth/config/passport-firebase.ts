@@ -1,22 +1,13 @@
 import passport from 'passport';
 import * as passportFirebase from 'passport-firebase-auth';
-import firebase from "firebase/app";
+import firebase from "firebase-admin";
 
-// Add the Firebase services that you want to use
-import "firebase/auth";
-import "firebase/firestore";
-
-export const customFirebaseInitialize = (credentials: any, databaseURL: string = '' ) => {
-  firebase.initializeApp({
-    credential: credentials,
+export const customFirebaseInitialize = (credentials: any, databaseURL: string = '', name: string = 'default' ) => {
+  const app = firebase.initializeApp({
+    credential: firebase.credential.cert(credentials),
     databaseURL,
-  });
-
-   firebase.auth().signInWithEmailAndPassword('Dalton.thiel@yahoo.com','12345678').then((resp:any) => {
-      console.log(resp);
-      
-    });
-  return firebase;
+  }, name);
+  return app;
 }
 
 export const verifyCallback = (

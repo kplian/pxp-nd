@@ -85,9 +85,9 @@ class AccountStatus extends Controller {
         });
       }));
 
-      
+
     }
-    
+
     const count = await qb.select('count(*) as count, sum(asm.amount) as total_amount').getRawOne();
     const data = await qb.offset(params.start as number)
     .limit(params.limit as number)
@@ -95,7 +95,7 @@ class AccountStatus extends Controller {
     .orderBy('asm.date', 'ASC')
     .orderBy('asm.account_status_id', 'ASC')
     .getRawMany();
-    
+
     const initialBalanceAux = initialBalance.sum_initial_balance || 0;
     const totalAmount = count.total_amount || 0;
     const totalBalance = parseFloat(initialBalanceAux) + parseFloat(totalAmount);
@@ -127,6 +127,8 @@ class AccountStatus extends Controller {
     switch (params.typeTransaction) {
       case 'account_payable':
       case 'account_receivable':
+      case 'income':
+      case 'interest_payment':
         if (Math.sign(amount) === -1) { // the amount is negative from client
           // the value must be a positive
           amount = amount * -1;
@@ -134,6 +136,7 @@ class AccountStatus extends Controller {
         break;
       case 'payment_in_advance':
       case 'payment':
+      case 'expense':
         if (Math.sign(amount) === 1) { // the amount is positive from client
           // the value must be a negative
           amount = amount * -1;

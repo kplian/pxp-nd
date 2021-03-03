@@ -51,7 +51,7 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
   const {
     statusCode, message, stack, tecMessage, errorObject
   } = err;
-  console.log('name:', err.constructor.name);
+
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
 
   // @todo if production not show tecMessage and stack

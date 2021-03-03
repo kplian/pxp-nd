@@ -116,6 +116,11 @@ class Controller implements ControllerInterface {
       (Reflect.getMetadata('dbsettings', this.constructor) as {
         [id: string]: 'Procedure' | 'Orm' | 'Query';
       }) || {};
+    // get logConfig
+    const logConfig =
+      (Reflect.getMetadata('logConfig', this.constructor) as {
+        [id: string]: {};
+      }) || {};
 
     // define basic routes
     if (this.modelString !== '') {
@@ -161,7 +166,8 @@ class Controller implements ControllerInterface {
                   methodDbSettings,
                   readonly[route.methodName],
                   false,
-                  log[route.methodName]
+                  log[route.methodName],
+                  logConfig[route.methodName]
                 )
               );
             } catch (ex) {
@@ -178,21 +184,23 @@ class Controller implements ControllerInterface {
                 this.module,
                 this.transactionCode,
                 '',// query
-                JSON.stringify(params),
+                params,
                 ex.stack,
                 ex.statusCode,
-                endsAt)) as number;
+                endsAt,
+                logConfig)) as number;
 
               errorMiddleware(ex, req, res);
             }
           }
         );
       } else {
+	console.log(config.apiPrefix + '/' + this.module + this.path + route.path);
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
           [
-            isAuthenticated,
+            //isAuthenticated,
             isReportMiddleware,
             parseParams
           ],
@@ -221,7 +229,8 @@ class Controller implements ControllerInterface {
                   methodDbSettings,
                   readonly[route.methodName],
                   permission[route.methodName],
-                  log[route.methodName]
+                  log[route.methodName],
+                  logConfig[route.methodName]
                 )
               );
             } catch (ex) {
@@ -238,10 +247,11 @@ class Controller implements ControllerInterface {
                   this.module,
                   this.transactionCode,
                   '', // query
-                  JSON.stringify(params),
+                  params,
                   ex.stack,
                   ex.statusCode,
-                  endsAt
+                  endsAt,
+                  logConfig
                 )
               )) as number;
               errorMiddleware(ex, req, res);
@@ -261,7 +271,8 @@ class Controller implements ControllerInterface {
     dbsettings: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     if (dbsettings === 'Orm') {
       await __(
@@ -273,7 +284,8 @@ class Controller implements ControllerInterface {
           methodName,
           readonly,
           permission,
-          log
+          log,
+          logConfig
         )
       );
     } else if (dbsettings === 'Procedure') {
@@ -285,7 +297,8 @@ class Controller implements ControllerInterface {
           methodName,
           readonly,
           permission,
-          log
+          log,
+          logConfig
         )
       );
     } else {
@@ -296,7 +309,8 @@ class Controller implements ControllerInterface {
         methodName,
         readonly,
         permission,
-        log
+        log,
+        logConfig
       );
     }
   }
@@ -309,7 +323,8 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
@@ -359,10 +374,11 @@ class Controller implements ControllerInterface {
           this.module,
           this.transactionCode,
           '',
-          JSON.stringify(params),
+          params,
           JSON.stringify(metResponse),
           '200',
-          endsAt
+          endsAt,
+          logConfig
         )
       );
     }
@@ -457,7 +473,8 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);
@@ -471,7 +488,8 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);

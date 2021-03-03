@@ -59,4 +59,10 @@ export default class Log extends BaseEntity {
   @Column({ name: 'error_code', type: 'varchar', length: 100, nullable: true })
   errorCode: string;
 
+  @Column({ name: 'short_request', type: 'varchar', length: 150, nullable: true })
+  shortRequest: string;
+
+  @Column({ name: 'short_response', type: 'varchar', length: 150, nullable: true })
+  shortResponse: string;
+
 }

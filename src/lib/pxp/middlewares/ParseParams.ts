@@ -28,7 +28,7 @@ export const getListParams = (params: Record<string, any>): ListParam => {
     ...newParams
   };
 
-  if (params.genericFilterFields) {    
+  if (params.genericFilterFields) {
     res.where = [];
     const genericFilterFields = params.genericFilterFields as string;
     const filterFieldsArray = genericFilterFields.split('#');
@@ -49,14 +49,14 @@ export const getListParams = (params: Record<string, any>): ListParam => {
     delete res['genericFilterValue'];
   }
   return res;
-}; 
+};
 
 export const parseParams = (
   req: any,
   res: Response,
   next: NextFunction
 ): void => {
-  // default values 
+  // default values
   const defaultValues = {
     // isActive: true,
     // createdBy: req.user.username || ' ',

@@ -28,7 +28,7 @@ export default async (): Promise<Controller[]> => {
       const files = await readdir(modulesPath + '/' + module + '/controllers');
       // this adds javascript files not ts
       auxFiles = files.reduce((result: Record<string, string>[], j) => {
-        if (!j.includes('.map')) {
+        if (!j.includes('.map') && j.includes('.js')) {
           result.push({
             url: modulesPath + '/' + module + '/controllers/' + j,
             module

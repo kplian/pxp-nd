@@ -41,8 +41,21 @@ const userHasPermission = async (userId: number, transaction: string): Promise<b
 
 
 const insertLog = async (username: string, macaddres: string, ip: string, logType: string, desc: string, proc: string, trans: string,
-  query: string, req: string, resp: string, err: string, timeEx: number): Promise<number> => {
+  query: string, req:  Record<string, unknown>, resp: string, err: string, timeEx: number, logConfig: Record<string, unknown>): Promise<number> => {
 
+  for (const [key, value] of Object.entries(logConfig)) {
+    if (key in req) {
+      if (!value) {
+        delete req[key];
+      } else if (value === 'cc_mask') {
+        const aux = req[key] as string;
+        req[key] = '************' + aux.substr(-4);
+      } else if (value === 'complete_mask') {
+        const aux = req[key] as string;
+        req[key] = aux.replace(/./g, '*');
+      }
+    }
+  }
   const log = new Log();
   log.username = username;
   log.macaddres = macaddres;
@@ -52,10 +65,12 @@ const insertLog = async (username: string, macaddres: string, ip: string, logTyp
   log.procedure = proc;
   log.transaction = trans;
   log.query = query;
-  log.request = req;
+  log.request = JSON.stringify(req);
   log.response = resp;
   log.execTime = timeEx;
   log.errorCode = err;
+  log.shortRequest = JSON.stringify(req).substring(0, 150);
+  log.shortResponse = resp.substring(0, 150);
 
 
   const logIds = await getManager(process.env.DB_LOG_CONNECTION_NAME)

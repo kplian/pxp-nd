@@ -54,6 +54,7 @@
     "moment": "^2.29.0",
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
+    "passport-custom": "^1.1.1",
     "passport-facebook": "^3.0.0",
     "passport-firebase-auth": "0.0.0-beta.1",
     "passport-google-oauth": "^2.0.0",

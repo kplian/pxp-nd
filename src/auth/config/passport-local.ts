@@ -82,7 +82,6 @@ function configPassportLocal(): void {
     done(null, user.userId);
   });
   // This method is used to extract user data.
-  console.log('LOCAL STG');
   passport.deserializeUser((userId: string, done: any) => {
 
   console.log('auth portal bad');

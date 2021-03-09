@@ -29,7 +29,7 @@ export const getRoutesAuth = () => {
     .filter(module =>{
       const authDir = path.join(module, 'auth');
       const authFile = path.join(authDir, 'auth.js');
-      return isDirectory(authDir) && existsSync(authFile);
+      return existsSync(authDir) ? isDirectory(authDir) && existsSync(authFile) : false;
     });
 }
 

@@ -33,6 +33,7 @@
     "@types/figlet": "^1.2.0",
     "@types/passport": "^1.0.4",
     "@types/passport-local": "^1.0.33",
+    "@types/xml2js": "^0.4.8",
     "authorizenet": "^1.0.7",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
@@ -48,6 +49,7 @@
     "figlet": "^1.5.0",
     "firebase": "^8.2.7",
     "firebase-admin": "^9.5.0",
+    "html-entities": "^2.1.0",
     "json-2-csv": "^3.7.7",
     "jsonwebtoken": "^8.5.1",
     "jspdf": "^2.1.1",
@@ -68,7 +70,8 @@
     "stripe": "^8.132.0",
     "typeorm": "^0.2.30",
     "typeorm-store": "^1.2.0",
-    "xlsx": "^0.16.8"
+    "xlsx": "^0.16.8",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@types/connect-pg-simple": "^4.2.0",

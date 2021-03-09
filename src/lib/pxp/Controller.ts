@@ -195,7 +195,6 @@ class Controller implements ControllerInterface {
           }
         );
       } else {
-	console.log(config.apiPrefix + '/' + this.module + this.path + route.path);
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA

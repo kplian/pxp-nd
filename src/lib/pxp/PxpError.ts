@@ -47,7 +47,7 @@ const __ = (promise: Promise<any>, myShowError = false): Promise<any> => (
 );
 
 // error handler middleware
-const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response): void => {
+const errorMiddleware = (err: PxpError, req: express.Request, res: express.Response) => {
   const {
     statusCode, message, stack, tecMessage, errorObject
   } = err;
@@ -55,7 +55,7 @@ const errorMiddleware = (err: PxpError, req: express.Request, res: express.Respo
   const extraObj = process.env.NODE_ENV === 'production' ? {} : { extendedMessage: tecMessage, stack };
 
   // @todo if production not show tecMessage and stack
-  res.status(500).json(
+  return res.status(err.statusCode || 500).json(
     {
       error: {
         ...{

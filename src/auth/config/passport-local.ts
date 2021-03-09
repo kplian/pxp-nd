@@ -31,6 +31,7 @@ export const verifyCallback = (
   done: any
 ): void => {
   const userRepository = getCustomRepository(UserRepository);
+
   /*
   {
         select: ['username', 'userId', 'person', 'authenticationType', 'style', 'hash', 'salt'],
@@ -81,7 +82,11 @@ function configPassportLocal(): void {
     done(null, user.userId);
   });
   // This method is used to extract user data.
+  console.log('LOCAL STG');
   passport.deserializeUser((userId: string, done: any) => {
+
+  console.log('auth portal bad');
+
     const userRepository = getCustomRepository(UserRepository);
 
 

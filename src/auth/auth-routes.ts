@@ -20,6 +20,8 @@ import { validPassword } from './utils/password';
 import { issueJWT } from './config/passport-jwt';
 import config from '../config';
 import { PxpError, errorMiddleware } from '../lib/pxp';
+import { getRoutesAuth } from './config/passport-config';
+import path from 'path';
 
 const authRouter = Router();
 authRouter.post(
@@ -131,4 +133,18 @@ authRouter.get(
     res.redirect('/');
   }
 );
-export { authRouter };
+
+
+const customAuthRoutes = () => {
+  const routers: any = [];
+  getRoutesAuth()
+  .forEach(module =>{
+    const authFile = path.join(module, 'auth', 'auth.js');
+
+    routers.push(import(authFile));
+  });
+  return Promise.all(routers);
+}
+
+
+export { authRouter , customAuthRoutes};

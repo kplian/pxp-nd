@@ -149,16 +149,24 @@ const Authentication = (authentication = true) => {
   };
 };
 
-const Log = (log = true) => {
+const Log = (log = true, config: Record<string, unknown> = {}) => {
   return (target: any, propertyKey: string): void => {
     if (!Reflect.hasMetadata('log', target.constructor)) {
       Reflect.defineMetadata('log', [], target.constructor);
+    }
+    if (!Reflect.hasMetadata('logConfig', target.constructor)) {
+      Reflect.defineMetadata('logConfig', [], target.constructor);
     }
     const logVar = Reflect.getMetadata('log', target.constructor) as {
       [id: string]: boolean;
     };
     logVar[propertyKey] = log;
+    const logConfig = Reflect.getMetadata('logConfig', target.constructor) as {
+      [id: string]: Record<string, unknown>;
+    };
+    logConfig[propertyKey] = config;
     Reflect.defineMetadata('log', logVar, target.constructor);
+    Reflect.defineMetadata('logConfig', logConfig, target.constructor);
   };
 };
 

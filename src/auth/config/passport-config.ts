@@ -15,10 +15,43 @@ import { configPassportLocal } from './passport-local';
 import { configFacebookStrategy } from './passport-facebook';
 import { configGoogleStrategy } from './passport-google';
 import { configPassportJwtStrategy } from './passport-jwt';
+import { lstatSync, readdirSync, existsSync} from 'fs';
+import path from 'path';
+
+const isDirectory = (source: string) => lstatSync(source).isDirectory()
+const modulesFolder = __dirname + '/../../modules';
+
+export const getRoutesAuth = () => {
+  return readdirSync(modulesFolder)
+    .filter(name => name !== 'pxp')
+    .map(name =>path.join(modulesFolder, name))
+    .filter(isDirectory)
+    .filter(module =>{
+      const authDir = path.join(module, 'auth');
+      const authFile = path.join(authDir, 'auth.js');
+      return existsSync(authDir) ? isDirectory(authDir) && existsSync(authFile) : false;
+    });
+}
+
+
+
+const getCustomStrategies = () => {
+  getRoutesAuth()
+    .forEach(module =>{
+      const authFile = path.join(module, 'auth', 'auth.js');
+
+      import(authFile).then( authCustom =>{
+        authCustom.strategies.forEach( (stg:any) => stg());
+      });
+  });
+};
+
+
 
 export const configPassport = (): void => {
-  configPassportLocal();
+  getCustomStrategies();
   configPassportJwtStrategy();
   configGoogleStrategy();
   configFacebookStrategy();
+  setTimeout(() => configPassportLocal());
 };

@@ -23,7 +23,7 @@ import cors from 'cors';
 import { ControllerInterface as Controller } from './lib/pxp';
 import loadControllers from './lib/pxp/loadControllers';
 import { errorMiddleware } from './lib/pxp';
-import { authRouter } from './auth/auth-routes';
+import { authRouter, customAuthRoutes } from './auth/auth-routes';
 import { configPassport } from './auth/config';
 import { Session } from './modules/pxp/entity/Session';
 import { TypeormStore } from 'typeorm-store';
@@ -41,7 +41,7 @@ class App {
   public async loadControllers(): Promise<void> {
     this.controllers = await loadControllers();
     await this.connectToTheDatabase();
-    this.initializeAuthentication();
+    await this.initializeAuthentication();
     this.initializeRoutes();
     this.initializeErrorHandling();
   }
@@ -96,24 +96,47 @@ class App {
     this.configCors();
   }
 
-  initializeAuthentication(): void {
+  async initializeAuthentication() {
     this.initializeSession();
-    this.initializePassport();
+    await this.initializePassport();
   }
 
   initializeErrorHandling(): void {
     this.app.use(errorMiddleware);
   }
 
-  private initializePassport() {
+  private async initializePassport() {
     configPassport();
     this.app.use(passport.initialize());
     this.app.use(passport.session());
+
+    this.app.use((req, res, next) => {
+      if (req.headers.authorization) {
+        passport.authenticate('jwt',  { session: false }, function(err, user, info) {
+          if (user) {
+            req.logIn(user, function(err) {
+              next();
+            });
+          } else {
+            next();
+          }
+        })(req, res, next);
+      } else {
+        next();
+      }
+
+    });
+
     this.app.use((req, res, next) => {
       next();
     });
+
+    const routes: any = await customAuthRoutes();
+    routes.forEach((route:any) => this.app.use(route.router));
+
     this.app.use(authRouter);
     this.app.use(reportsRouter);
+
   }
 
   private configCors() {

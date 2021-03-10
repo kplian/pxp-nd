@@ -33,7 +33,7 @@ export const configPassportJwtStrategy = () => {
       const UserRepo = getCustomRepository(UserRepository);
       UserRepo.findOne({
         where: {
-          id: jwt_payload.sub
+          userId: jwt_payload.sub
         }
       })
         .then((user) => {

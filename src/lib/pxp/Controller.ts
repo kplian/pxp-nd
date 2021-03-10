@@ -199,7 +199,7 @@ class Controller implements ControllerInterface {
           config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
           [
-            //isAuthenticated,
+            isAuthenticated,
             isReportMiddleware,
             parseParams
           ],

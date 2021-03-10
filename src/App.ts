@@ -109,16 +109,34 @@ class App {
     configPassport();
     this.app.use(passport.initialize());
     this.app.use(passport.session());
+
+    this.app.use((req, res, next) => {
+      if (req.headers.authorization) {
+        passport.authenticate('jwt',  { session: false }, function(err, user, info) {
+          if (user) {
+            req.logIn(user, function(err) {
+              next();
+            });
+          } else {
+            next();
+          }
+        })(req, res, next);
+      } else {
+        next();
+      }
+
+    });
+
     this.app.use((req, res, next) => {
       next();
     });
-    
+
     const routes: any = await customAuthRoutes();
     routes.forEach((route:any) => this.app.use(route.router));
-    
+
     this.app.use(authRouter);
     this.app.use(reportsRouter);
-    
+
   }
 
   private configCors() {

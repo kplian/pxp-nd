@@ -10,6 +10,7 @@
  *
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-10-13 15:36:31
+ * Last modified  : 2021-03-10 15:36:31 - finguer
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -379,6 +380,17 @@ class Controller implements ControllerInterface {
   }
 
   async list(params: Record<string, unknown>): Promise<unknown> {
+
+    const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
+    const queryRunner:any = connection.getMetadata(this.model).ownColumns.find(column => column.isPrimary === true);
+
+    const primaryKeyColumn = queryRunner.propertyName;
+    if(primaryKeyColumn in params) {
+      const findOne = await __(this.model.findOne({where: { [primaryKeyColumn]: params[primaryKeyColumn] }})) as unknown[];
+      return { data : findOne, count : 1 };
+    }
+
+
     const schema = this.getListSchema();
     const resParams = await __(this.schemaValidate(schema, params));
     const listParam = this.getListParams(resParams);
@@ -436,6 +448,10 @@ class Controller implements ControllerInterface {
         [params.sort as string]: String(params.dir).toUpperCase()
       }
     };
+
+    // ffp search if in this request is sending the id
+
+
     if (params.genericFilterFields) {
       const genericFilterFields = params.genericFilterFields as string;
       const filterFieldsArray = genericFilterFields.split('#');

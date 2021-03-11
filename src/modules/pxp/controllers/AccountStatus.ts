@@ -129,6 +129,7 @@ class AccountStatus extends Controller {
       case 'account_receivable':
       case 'income':
       case 'interest_payment':
+      case 'add_to_debt':
         if (Math.sign(amount) === -1) { // the amount is negative from client
           // the value must be a positive
           amount = amount * -1;

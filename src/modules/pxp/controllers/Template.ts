@@ -19,6 +19,7 @@ import {
   Post,
   Put,
   Delete,
+  Patch,
   Route,
   StoredProcedure,
   DbSettings,
@@ -37,15 +38,18 @@ class Template extends Controller {
   @DbSettings('Orm')
   @ReadOnly(false)
   @Log(true)
+  @Authentication(false)
   async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
     console.log('llega',params)
     const template = new TemplateModel();
     Object.assign(template, params);
-    template.createdBy = (this.user.username as string);
+    template.createdBy = 'admin';
     await __(this.classValidate(template));
     await manager.save(template);
     return { ...template, mode: 'add'};
   }
+
+ 
 }
 
 export default Template;

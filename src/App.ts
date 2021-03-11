@@ -108,7 +108,9 @@ class App {
   private async initializePassport() {
     configPassport();
     this.app.use(passport.initialize());
+    // @todo only validate session if authorization is not set(10/03/2021)
     this.app.use(passport.session());
+
 
     this.app.use((req, res, next) => {
       if (req.headers.authorization) {
@@ -124,7 +126,6 @@ class App {
       } else {
         next();
       }
-
     });
 
     this.app.use((req, res, next) => {

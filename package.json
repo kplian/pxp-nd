@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node dist/server.js\"",
-    "script-loader": "tsc && node dist/ScriptManager.js"
+    "script-loader": "tsc && node dist/ScriptManager.js",
+    "cli-pxp": "tsc && node dist/ModelGenerator.js"
   },
   "repository": {
     "type": "git",
@@ -29,11 +30,6 @@
   "homepage": "https://github.com/kplian/pxp-nd#readme",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
-    "@types/crypto-js": "^4.0.1",
-    "@types/figlet": "^1.2.0",
-    "@types/passport": "^1.0.4",
-    "@types/passport-local": "^1.0.33",
-    "@types/xml2js": "^0.4.8",
     "authorizenet": "^1.0.7",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
@@ -75,6 +71,11 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.0.1",
+    "@types/figlet": "^1.2.0",
+    "@types/passport": "^1.0.4",
+    "@types/passport-local": "^1.0.33",
+    "@types/xml2js": "^0.4.8",
     "@types/connect-pg-simple": "^4.2.0",
     "@types/cors": "2.8.7",
     "@types/dotenv": "^8.2.0",

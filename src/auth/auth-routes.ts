@@ -69,7 +69,12 @@ authRouter.post(config.apiPrefix + '/auth/login/token', (req, res, next) => {
       );
 
       if (isValid) {
-        const tokenObject = issueJWT(user);
+        let tokenObject;
+        if (req.body.expiresIn) {
+          tokenObject = issueJWT(user, req.body.expiresIn);
+        } else {
+          tokenObject = issueJWT(user);
+        }
 
         return res.status(200).send({
           success: true,

@@ -60,6 +60,8 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.3.2",
+    "pm2": "^4.5.5",
+    "qs": "^6.9.6",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^2.3.0",
     "stripe": "^8.132.0",

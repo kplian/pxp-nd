@@ -9,3 +9,4 @@ declare namespace Express {
 }
 
 declare module 'passport-firebase-auth';
+declare module 'form-data';

@@ -38,7 +38,7 @@ class Template extends Controller {
   @DbSettings('Orm')
   @ReadOnly(false)
   @Log(true)
-  @Authentication(false)
+  //@Authentication(false)
   async add(params: Record<string, unknown>, manager: EntityManager): Promise<unknown> {
     console.log('llega',params)
     const template = new TemplateModel();
@@ -49,7 +49,7 @@ class Template extends Controller {
     return { ...template, mode: 'add'};
   }
 
- 
+
 }
 
 export default Template;

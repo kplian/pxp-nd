@@ -67,6 +67,24 @@ scriptsArray.push({
     await em.save(ui);
   }
 });
+/*
+scriptsArray.push({
+  scriptCode: 'JRR-PXP-20210407-001', scriptFunction: async (em) => {
+    subsystem = await __(Subsystem.findOne({ code: 'PXP'}));
+    parentUi = await __(Ui.findOne({ code: 'PXP'}));
+
+    const uiExample = new Ui();
+    uiExample.code = 'EXAMPLES';
+    uiExample.name = 'Examples';
+    uiExample.description = 'Examples';
+    uiExample.route = 'EXA_FormExample';
+    uiExample.subsystem = subsystem;
+    uiExample.createdBy = 'admin';
+    uiExample.parentId = parentUi;
+    await em.save(uiMainMenuMM);
+    
+  }
+});*/
 
 export default scriptsArray;
 

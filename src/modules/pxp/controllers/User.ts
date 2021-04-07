@@ -28,6 +28,7 @@ import { genPassword } from '../../../auth/utils/password'
 import UserModel from '../entity/User';
 import Person from '../entity/Person';
 import Role from '../entity/Role';
+import has = Reflect.has;
 
 
 @Route('/user')
@@ -65,6 +66,16 @@ class User extends Controller {
     user.roles = [role];
     const userResult = await __(manager.save(user));
     return { userId: userResult.userId };
+  }
+
+  @Get()
+  @DbSettings('Orm')
+  @ReadOnly(true)
+  async genPassword(params: Record<string, unknown>): Promise<UserModel[]> {
+    const hashSalt = genPassword(params.password as string);
+
+    return hashSalt;
+
   }
 
 }

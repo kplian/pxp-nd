@@ -446,7 +446,12 @@ class Controller implements ControllerInterface {
     params: Record<string, unknown>,
     manager: EntityManager
   ): Promise<unknown> {
-    const modelInstance = (await __(this.model.findOne(params.id))) as any;
+
+    const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
+    const queryRunner:any = connection.getMetadata(this.model).ownColumns.find(column => column.isPrimary === true);
+
+    const primaryKeyColumn = queryRunner.propertyName;
+    const modelInstance = await __(this.model.findOne({where: { [primaryKeyColumn]: params.id }})) as any;
     if (!modelInstance) {
       throw new PxpError(406, 'Record not found');
     }

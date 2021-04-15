@@ -84,15 +84,13 @@ function configPassportLocal(): void {
   // This method is used to extract user data.
   passport.deserializeUser((userId: string, done: any) => {
 
-  console.log('auth portal bad');
-
     const userRepository = getCustomRepository(UserRepository);
 
 
     userRepository.createQueryBuilder('user')
       //.leftJoinAndSelect('role.uis', 'ui')
       .leftJoinAndSelect('user.roles', 'role', 'role.roleId = 1')
-      .where('"user".user_id = :id', { id: userId })
+      .where('user.userId = :id', { id: userId })
       .getOne()
       .then((user) => {
         done(null, user);

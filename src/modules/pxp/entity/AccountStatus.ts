@@ -48,8 +48,8 @@ export default class AccountStatus extends PxpEntity {
   description: string;
 
   @IsOptional()
-  @Column({ name: 'date', type: 'date', nullable: true, default: () => 'CURRENT_TIMESTAMP' })
-  date: string;
+  @Column({ name: 'date', type: 'date', nullable: false })
+  date: string; 
 
   @Column({name:'typeTransaction', type:'varchar', length: 50, nullable: false })
   typeTransaction: string;

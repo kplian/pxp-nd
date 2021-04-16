@@ -67,25 +67,76 @@ scriptsArray.push({
     await em.save(ui);
   }
 });
-/*
+// ejemplo_1
 scriptsArray.push({
   scriptCode: 'JRR-PXP-20210407-001', scriptFunction: async (em) => {
-    subsystem = await __(Subsystem.findOne({ code: 'PXP'}));
-    parentUi = await __(Ui.findOne({ code: 'PXP'}));
 
-    const uiExample = new Ui();
-    uiExample.code = 'EXAMPLES';
-    uiExample.name = 'Examples';
-    uiExample.description = 'Examples';
-    uiExample.route = 'EXA_FormExample';
-    uiExample.subsystem = subsystem;
-    uiExample.createdBy = 'admin';
-    uiExample.parentId = parentUi;
-    await em.save(uiMainMenuMM);
+
+    const subsystem = new Subsystem();
+    subsystem.name = 'EXAMPLE';
+    subsystem.code = 'EXA';
+    subsystem.folderName = 'exa';
+    subsystem.prefix = 'EXA';
+    subsystem.createdBy = 'admin';
+    await em.save(subsystem);
+
+
+    const uiParent = new Ui();
+    uiParent.code = 'EXA';
+    uiParent.name = 'EXAMPLES';
+    uiParent.description = 'ROOT MENU FOR EXAMPLES';
+    uiParent.subsystem = subsystem;
+    uiParent.createdBy = 'admin';
+    await em.save(uiParent);
     
-  }
-});*/
 
+    const ui1 = new Ui();
+    ui1.code = 'EXA_FormExample';
+    ui1.name = ' FORM EXAMPLES';
+    ui1.description = 'ROOT MENU FOR EXAMPLES';
+    ui1.subsystem = subsystem;
+    ui1.createdBy = 'admin';
+    ui1.parent = uiParent;
+    ui1.route = "EXA_FormExample";
+    await em.save(ui1);
+  
+  }
+});
+
+/* mis scripts
+scriptsArray.push({
+  scriptCode: 'JRR-PXP-20210412-001', scriptFunction: async (em) => {
+
+
+    const subsystem = new Subsystem();
+    subsystem.name = 'EXAMPLE';
+    subsystem.code = 'EXA';
+    subsystem.folderName = 'exa';
+    subsystem.prefix = 'EXA';
+    subsystem.createdBy = 'admin';
+    await em.save(subsystem);
+
+    const uiParent = new Ui();
+    uiParent.code = 'EXA';
+    uiParent.name = 'EXAMPLES';
+    uiParent.description = 'ROOT MENU FOR EXAMPLES';
+    uiParent.subsystem = subsystem;
+    uiParent.createdBy = 'admin';
+    await em.save(uiParent);
+    
+
+    const ui1 = new Ui();
+    ui1.code = 'EXA_PickerExample';
+    ui1.name = ' FORM EXAMPLES_1';
+    ui1.description = 'ROOT MENU FOR EXAMPLES';
+    ui1.subsystem = subsystem;
+    ui1.createdBy = 'admin';
+    ui1.parent = uiParent;
+    ui1.route = "EXA_PickerExample";
+    await em.save(ui1);
+  
+  }
+}); */
 export default scriptsArray;
 
 

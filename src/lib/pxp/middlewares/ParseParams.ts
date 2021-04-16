@@ -57,12 +57,15 @@ export const parseParams = (
   next: NextFunction
 ): void => {
   // default values 
-  const defaultValues = {
-    isActive: true,
-    createdBy: req.user.username || ' ',
-  };
+  let defaultValues = {};
+  if(req.method !== 'GET') {
+    defaultValues = {
+      isActive: true,
+      createdBy: req.user.username || ' ',
+    };
+  }
 
   req.pxpParams = { ...getListParams(req.query), ...req.body, ...req.params, ...defaultValues };
-  req.paramasMerge = { ...req.query, ...req.body, ...req.params, ...defaultValues };
+  req.paramasMerge = { ...req.query, ...req.body, ...req.params };
   next();
 };

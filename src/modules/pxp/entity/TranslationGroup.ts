@@ -12,14 +12,14 @@
  * Last modified  : 2020-09-18 13:48:15
  */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import Word from './Word';
+import WordKey from './WordKey';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tpar_language_group' })
-export default class LanguageGroup extends PxpEntity {
+@Entity({ name: 'tpar_translation_group' })
+export default class TranslationGroup extends PxpEntity {
 
-  @PrimaryGeneratedColumn({ name: 'language_group_id' })
-  languageGroupId: number;
+  @PrimaryGeneratedColumn({ name: 'translation_group_id' })
+  translationGroupId: number;
 
   @Column({ name: 'code', type: 'varchar', length: 50, nullable: false })
   code: string;
@@ -30,6 +30,12 @@ export default class LanguageGroup extends PxpEntity {
   @Column({ name: 'type', type: 'varchar', length: 50, nullable: true })
   type: string;
 
-  @OneToMany(() => Word, word => word.languageGroup, { eager: true, cascade: true })
-  words: Word[];
+  @Column({ name: 'table_name', type: 'varchar', length: 150, nullable: true })
+  tableName: string;
+
+  @Column({ name: 'column_key', type: 'varchar', length: 150, nullable: true })
+  columnKey: string;
+
+  @OneToMany(() => WordKey, word => word.group, { eager: true, cascade: true })
+  words: WordKey[];
 }

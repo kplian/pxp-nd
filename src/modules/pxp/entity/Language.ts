@@ -27,7 +27,7 @@ export default class Language extends PxpEntity {
   @Column({ name: 'name', type: 'varchar', length: 50, nullable: true })
   name: string;
 
-  @Column({ name: 'id_default', default: false })
+  @Column({ name: 'is_default', default: false })
   isDefault: boolean;
 
   @OneToMany(() => Translate, translate => translate.language, { eager: true, cascade: true })

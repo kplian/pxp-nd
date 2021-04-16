@@ -13,7 +13,7 @@
  */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Language from './Language';
-import Word from './Word';
+import WordKey from './WordKey';
 import { PxpEntity } from '../../../lib/pxp';
 
 @Entity({ name: 'tpar_translate' })
@@ -29,9 +29,9 @@ export default class Translate extends PxpEntity {
   @JoinColumn({ name: 'language_id' })
   language: Language;
 
-  @ManyToOne(() => Word, word => word.translates)
+  @ManyToOne(() => WordKey, wordKey => wordKey.translates)
   @JoinColumn({ name: 'word_id' })
-  word: Word;
+  wordKey: WordKey;
 
   @Column({ nullable: true, name: 'language_id' })
   languageId: number;

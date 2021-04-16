@@ -77,6 +77,7 @@ export const generateReport = async (req: any, res: any) => {
     if (report) {
       const config = JSON.parse(report.config); 
       const filters = req.query.filters && req.query.filters !== 'null' ? JSON.parse(req.query.filters) : {};
+      
       const type: string = get(req.params, 'type');
       const limit = req.query.limit || 0;
       const start = req.query.start || 0;

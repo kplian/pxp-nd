@@ -25,7 +25,7 @@ export default class Report {
   @Column({ type: 'varchar', length: 250 })
   title: string;
 
-  @Column({ name: 'allow_roles', type: 'integer', nullable: true, array: true, })
+  @Column({ name: 'allow_roles', type: 'json', nullable: true })
   allowRoles?: Array<any>;
 
   @Column({ type: 'boolean', nullable: true }) 

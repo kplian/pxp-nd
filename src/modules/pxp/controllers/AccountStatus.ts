@@ -91,7 +91,8 @@ class AccountStatus extends Controller {
     const count = await qb.select('count(*) as count, sum(asm.amount) as total_amount').getRawOne();
     const data = await qb.offset(params.start as number)
     .limit(params.limit as number)
-    .select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.typeTransaction, TO_CHAR(asm.date, \'YYYY-MM-DD\') as date')
+    // .select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.typeTransaction, TO_CHAR(asm.date, \'YYYY-MM-DD\') as date')
+    .select('asm.account_status_id, ast.code, ast.type, asm.amount, asm.description, asm.typeTransaction, asm.date')
     .orderBy('asm.date', 'ASC')
     .orderBy('asm.account_status_id', 'ASC')
     .getRawMany();
@@ -111,7 +112,7 @@ class AccountStatus extends Controller {
     // console.log('llega aca',params);
     const getAccountStatusTypeData = await getManager()
       .createQueryBuilder(AccountStatusTypeModel, 'astm')
-      .where('"astm".code = :code', { code: params.code })
+      .where('astm.code = :code', { code: params.code })
       .select('astm.account_status_type_id as account_status_type_id').getRawOne();
 
     // console.log('getAccountStatusTypeData',getAccountStatusTypeData)

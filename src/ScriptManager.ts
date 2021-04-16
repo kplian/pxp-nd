@@ -99,8 +99,9 @@ const executeScripts = async (): Promise<void> => {
           figlet.textSync('thank you', { font: 'Mini', horizontalLayout: 'default' })
         )
       );
+      process.exit();
     } catch (err) {
-      console.log('Error running script manager');
+      console.log('Error running script manager', err);
     }
 
   } catch (e) {

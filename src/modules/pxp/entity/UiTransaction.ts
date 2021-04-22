@@ -4,14 +4,14 @@ import Ui from './Ui';
 import Role from './Role';
 import { PxpEntity } from '../../../lib/pxp';
 
-@Entity({ name: 'tsec_ui_transaction' })
+@Entity({  name: 'tsec_ui_transaction' })
 export default class UiTransaction extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'ui_transaction_id' })
   uiTransactionId: number;
 
-  @Column({ name: 'button', type: 'boolean', nullable: false, default: false })
-  button: string
+  @Column({ name: 'button', nullable: false, default: false })
+  button: boolean;
 
   @Column({ name: 'description', type: 'text', nullable: true })
   buttonName: string

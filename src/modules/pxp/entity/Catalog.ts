@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { CatalogValue } from './CatalogValue';
 
-@Entity({ schema: 'public', name: 'tcatalog' })
+@Entity({  name: 'tcatalog' })
 export class Catalog {
   @PrimaryGeneratedColumn({ name: 'catalog_id' })
   catalogId: number;

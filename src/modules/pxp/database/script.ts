@@ -67,7 +67,9 @@ scriptsArray.push({
     await em.save(ui);
   }
 });
-// ejemplo_1
+
+// ROOT MENU FOR EXAMPLES
+
 scriptsArray.push({
   scriptCode: 'JRR-PXP-20210407-001', scriptFunction: async (em) => {
 
@@ -81,7 +83,7 @@ scriptsArray.push({
     await em.save(subsystem);
 
 
-    const uiParent = new Ui();
+    const uiParent = new Ui();  
     uiParent.code = 'EXA';
     uiParent.name = 'EXAMPLES';
     uiParent.description = 'ROOT MENU FOR EXAMPLES';
@@ -97,46 +99,24 @@ scriptsArray.push({
     ui1.subsystem = subsystem;
     ui1.createdBy = 'admin';
     ui1.parent = uiParent;
-    ui1.route = "EXA_FormExample";
+    ui1.route = "EXA_FormExample"; 
     await em.save(ui1);
+
+
+    const ui2 = new Ui();
+    ui2.code = 'EXA_PickerExample';
+    ui2.name = 'PICKER EXAMPLES';
+    ui2.description = 'ROOT MENU FOR EXAMPLES';
+    ui2.subsystem = subsystem;
+    ui2.createdBy = 'admin';
+    ui2.parent = uiParent;
+    ui2.route = "EXA_PickerExample"; 
+    await em.save(ui2);
   
   }
 });
 
-/* mis scripts
-scriptsArray.push({
-  scriptCode: 'JRR-PXP-20210412-001', scriptFunction: async (em) => {
 
-
-    const subsystem = new Subsystem();
-    subsystem.name = 'EXAMPLE';
-    subsystem.code = 'EXA';
-    subsystem.folderName = 'exa';
-    subsystem.prefix = 'EXA';
-    subsystem.createdBy = 'admin';
-    await em.save(subsystem);
-
-    const uiParent = new Ui();
-    uiParent.code = 'EXA';
-    uiParent.name = 'EXAMPLES';
-    uiParent.description = 'ROOT MENU FOR EXAMPLES';
-    uiParent.subsystem = subsystem;
-    uiParent.createdBy = 'admin';
-    await em.save(uiParent);
-    
-
-    const ui1 = new Ui();
-    ui1.code = 'EXA_PickerExample';
-    ui1.name = ' FORM EXAMPLES_1';
-    ui1.description = 'ROOT MENU FOR EXAMPLES';
-    ui1.subsystem = subsystem;
-    ui1.createdBy = 'admin';
-    ui1.parent = uiParent;
-    ui1.route = "EXA_PickerExample";
-    await em.save(ui1);
-  
-  }
-}); */
 export default scriptsArray;
 
 

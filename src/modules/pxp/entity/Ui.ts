@@ -102,19 +102,19 @@ export default class Ui extends PxpEntity {
       .addSelect('ui.order', 'order')
       .addSelect('ui.icon', 'icon')
       .addSelect('ss.code', 'subsystem')
-      .where('"ui".parent_ui_id = :parentId', { parentId });
+      .where('ui.parent_ui_id = :parentId', { parentId });
 
-    if (params.system && params.system !== undefined) {
-      console.log('folder', params.system);
-      qb.andWhere('"ss".code = :system', { system: params.system });
+    if (params.system && params.system !== undefined ) {      
+      qb.andWhere('ss.code = :system', { system: params.system });
     }
 
     // validate permission
-    if (!isAdmin) {
-      qb.andWhere('"ui".ui_id IN(:...uiList)', { uiList });
+    if (!isAdmin) {      
+      qb.andWhere('ui.ui_id IN(:...uiList)', { uiList });
     }
 
     const uis = await __(qb.getRawMany()) as Ui[];
+    console.log(uis);
     let resUis = uis;
     let isPush = false;
 

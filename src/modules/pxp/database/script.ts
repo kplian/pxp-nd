@@ -20,6 +20,7 @@ import User from '../entity/User';
 import Role from '../entity/Role';
 import Subsystem from '../entity/Subsystem';
 import Ui from '../entity/Ui';
+import { FindRelationsNotFoundError } from 'typeorm';
 const scriptsArray: ScriptInterface[] = [];
 
 /***************************
@@ -76,18 +77,20 @@ scriptsArray.push({
 
     const subsystem = new Subsystem();
     subsystem.name = 'EXAMPLE';
-    subsystem.code = 'EXA';
+    subsystem.code = 'EXA ';
     subsystem.folderName = 'exa';
     subsystem.prefix = 'EXA';
     subsystem.createdBy = 'admin';
     await em.save(subsystem);
 
-
+    const rootUi = await Ui.findOne({ code: "PXP"});
+    
     const uiParent = new Ui();  
     uiParent.code = 'EXA';
     uiParent.name = 'EXAMPLES';
     uiParent.description = 'ROOT MENU FOR EXAMPLES';
     uiParent.subsystem = subsystem;
+    uiParent.parent = rootUi as Ui;
     uiParent.createdBy = 'admin';
     await em.save(uiParent);
     
@@ -112,6 +115,41 @@ scriptsArray.push({
     ui2.parent = uiParent;
     ui2.route = "EXA_PickerExample"; 
     await em.save(ui2);
+
+
+    /*const ui3 = new Ui();
+    ui3.code = 'EXA_TextFieldExample';
+    ui3.name = 'TEXT FIELd EXAMPLE';
+    ui3.description = 'ROOT MENU FOR EXAMPLES';
+    ui3.subsystem = subsystem;
+    ui3.createdBy = 'admin';
+    ui3.parent = uiParent;
+    ui3.route = "EXA_TextFieldExample"; 
+    await em.save(ui3);
+
+
+    const ui4 = new Ui();
+    ui4.code = 'EXA_AutocompleteExample';
+    ui4.name = 'AUTO COMPLETE EXAMPLE';
+    ui4.description = 'ROOT MENU FOR EXAMPLES';
+    ui4.subsystem = subsystem;
+    ui4.createdBy = 'admin';
+    ui4.parent = uiParent;
+    ui4.route = "EXA_AutocompleteExample"; 
+    await em.save(ui4);
+
+
+
+    const ui5 = new Ui();
+    ui5.code = 'EXA_TableExample';
+    ui5.name = 'TABLE EXAMPLE';
+    ui5.description = 'ROOT MENU FOR EXAMPLES';
+    ui5.subsystem = subsystem;
+    ui5.createdBy = 'admin';
+    ui5.parent = uiParent;
+    ui5.route = "EXA_TableExample"; 
+    await em.save(ui5);
+    */
   
   }
 });

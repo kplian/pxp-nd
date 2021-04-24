@@ -27,7 +27,7 @@ class PxpEntity extends BaseEntity {
   @Column({ name: 'modified_by', nullable: true, type: 'varchar', length: 500 })
   modifiedBy: string;
 
-  @CreateDateColumn({ name: 'created_at', nullable: true, default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ name: 'created_at', nullable: true, default: () => 'CURRENT_TIMESTAMP(6)' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'modified_at', nullable: true })

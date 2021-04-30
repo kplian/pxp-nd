@@ -43,15 +43,15 @@ const compare = (a: ScriptInterface, b: ScriptInterface): number => {
 }
 
 const executeScripts = async (): Promise<void> => {
-  const connection = getConnection();
-  const queryRunner = connection.createQueryRunner();
+  const connection = getConnection();  
+  
   while (scriptArray.length > 0) {
     const scriptObject = scriptArray.shift();
     if (scriptObject) {
       const foundSV = await ScriptVersion.findOne({ scriptCode: scriptObject.scriptCode });
       if (!foundSV) {
-
-        try {
+        let queryRunner = connection.createQueryRunner();
+        try {          
           await queryRunner.connect();
           await queryRunner.startTransaction();
           const manager = queryRunner.manager;

@@ -471,8 +471,20 @@ class Controller implements ControllerInterface {
   }
 
   getListParams(params: Record<string, unknown>, where: Record<string, unknown>): ListParam {
+
+    const whereGenericFilter = [] as any;
+    if (params.genericFilterFields) {
+      const genericFilterFields = params.genericFilterFields as string;
+      const filterFieldsArray = genericFilterFields.split('#');
+      filterFieldsArray.forEach((field) => {
+        whereGenericFilter.push({
+          [field]: Like('%' + (params.genericFilterValue as string) + '%'), ...where
+        });
+      });
+    }
+
     const res: ListParam = {
-      where: where || [],
+      where: whereGenericFilter.length > 0 ? whereGenericFilter : [where] ,
       skip: params.start as number,
       take: params.limit as number,
       order: {
@@ -483,17 +495,9 @@ class Controller implements ControllerInterface {
     // ffp search if in this request is sending the id
 
 
-    if (params.genericFilterFields) {
-      const genericFilterFields = params.genericFilterFields as string;
-      const filterFieldsArray = genericFilterFields.split('#');
-      filterFieldsArray.forEach((field) => {
-        if (res.where) {
-          res.where.push({
-            [field]: Like('%' + (params.genericFilterValue as string) + '%')
-          });
-        }
-      });
-    }
+
+    console.log('res',res)
+
     return res;
   }
 

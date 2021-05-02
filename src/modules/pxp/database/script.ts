@@ -20,7 +20,6 @@ import User from '../entity/User';
 import Role from '../entity/Role';
 import Subsystem from '../entity/Subsystem';
 import Ui from '../entity/Ui';
-import { FindRelationsNotFoundError } from 'typeorm';
 const scriptsArray: ScriptInterface[] = [];
 
 /***************************
@@ -84,8 +83,8 @@ scriptsArray.push({
     await em.save(subsystem);
 
     const rootUi = await Ui.findOne({ code: "PXP"});
-    
-    const uiParent = new Ui();  
+
+    const uiParent = new Ui();
     uiParent.code = 'EXA';
     uiParent.name = 'EXAMPLES';
     uiParent.description = 'ROOT MENU FOR EXAMPLES';
@@ -93,7 +92,7 @@ scriptsArray.push({
     uiParent.parent = rootUi as Ui;
     uiParent.createdBy = 'admin';
     await em.save(uiParent);
-    
+
 
     const ui1 = new Ui();
     ui1.code = 'EXA_FormExample';
@@ -102,7 +101,7 @@ scriptsArray.push({
     ui1.subsystem = subsystem;
     ui1.createdBy = 'admin';
     ui1.parent = uiParent;
-    ui1.route = "EXA_FormExample"; 
+    ui1.route = "EXA_FormExample";
     await em.save(ui1);
 
 
@@ -113,7 +112,7 @@ scriptsArray.push({
     ui2.subsystem = subsystem;
     ui2.createdBy = 'admin';
     ui2.parent = uiParent;
-    ui2.route = "EXA_PickerExample"; 
+    ui2.route = "EXA_PickerExample";
     await em.save(ui2);
 
 
@@ -124,7 +123,7 @@ scriptsArray.push({
     ui3.subsystem = subsystem;
     ui3.createdBy = 'admin';
     ui3.parent = uiParent;
-    ui3.route = "EXA_TextFieldExample"; 
+    ui3.route = "EXA_TextFieldExample";
     await em.save(ui3);
 
 
@@ -135,7 +134,7 @@ scriptsArray.push({
     ui4.subsystem = subsystem;
     ui4.createdBy = 'admin';
     ui4.parent = uiParent;
-    ui4.route = "EXA_AutocompleteExample"; 
+    ui4.route = "EXA_AutocompleteExample";
     await em.save(ui4);
 
 
@@ -147,10 +146,10 @@ scriptsArray.push({
     ui5.subsystem = subsystem;
     ui5.createdBy = 'admin';
     ui5.parent = uiParent;
-    ui5.route = "EXA_TableExample"; 
+    ui5.route = "EXA_TableExample";
     await em.save(ui5);
     */
-  
+
   }
 });
 

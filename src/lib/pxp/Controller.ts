@@ -10,7 +10,8 @@
  *
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-10-13 15:36:31
- * Last modified  : 2021-03-10 15:36:31 - finguer
+ * Last modified  : 2021-03-10 15:36:31 - Favio Figueroa
+ * Last modified  : 2021-05-01 18:35:31 - Favio Figueroa
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -399,16 +400,31 @@ class Controller implements ControllerInterface {
     const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
     const queryRunner:any = connection.getMetadata(this.model).ownColumns.find(column => column.isPrimary === true);
 
+    // ffp search if in the params has been sent the primary key
     const primaryKeyColumn = queryRunner.propertyName;
     if(primaryKeyColumn in params) {
       const findOne = await __(this.model.findOne({where: { [primaryKeyColumn]: params[primaryKeyColumn] }})) as unknown[];
       return { data : findOne, count : 1 };
     }
 
+    // filter by some column that exist in the entity
+    // ffp if some column is into of params for added in the condition
+    let ownColumnsForSchema = {};
+    const whereOwnColumns = connection.getMetadata(this.model).ownColumns.reduce((t, column) => {
+      if(`_${column.propertyName}` in params) {
+        ownColumnsForSchema = {
+          ...ownColumnsForSchema,
+          [`_${column.propertyName}`]: Joi.string()
+        }
+        t = {...t, [column.propertyName]: params[`_${column.propertyName}`]};
+      }
+      return t;
+    },{});
 
-    const schema = this.getListSchema();
+
+    const schema = this.getListSchema(ownColumnsForSchema);
     const resParams = await __(this.schemaValidate(schema, params));
-    const listParam = this.getListParams(resParams);
+    const listParam = this.getListParams(resParams, whereOwnColumns);
     const [rows, count] = await __(this.model.findAndCount(listParam)) as unknown[];
     return { data: rows, count };
   }
@@ -454,9 +470,9 @@ class Controller implements ControllerInterface {
     return modelInstance;
   }
 
-  getListParams(params: Record<string, unknown>): ListParam {
+  getListParams(params: Record<string, unknown>, where: Record<string, unknown>): ListParam {
     const res: ListParam = {
-      where: [],
+      where: where || [],
       skip: params.start as number,
       take: params.limit as number,
       order: {
@@ -524,12 +540,13 @@ class Controller implements ControllerInterface {
   }
 
   async schemaValidate(schema: Schema, params: Record<string, unknown>): Promise<unknown> {
+    console.log('params',params)
     const value = await __(schema.validateAsync(params, { abortEarly: false }), true) as boolean;
     this.validated = true;
     return value;
   }
 
-  getListSchema(): Schema {
+  getListSchema(ownColumns: Record<string, unknown>): Schema {
     const schema = Joi.object({
       start: Joi.number().integer().required(),
       limit: Joi.number().integer().positive().required(),
@@ -537,6 +554,7 @@ class Controller implements ControllerInterface {
       dir: Joi.string().min(3).max(4).required(),
       genericFilterFields: Joi.string().min(2),
       genericFilterValue: Joi.string().min(1),
+      ...ownColumns
     });
     return schema;
   }

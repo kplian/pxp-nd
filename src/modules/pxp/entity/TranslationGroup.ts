@@ -30,10 +30,13 @@ export default class TranslationGroup extends PxpEntity {
   @Column({ name: 'type', type: 'varchar', length: 50, nullable: true })
   type: string;
 
-  @Column({ name: 'table_name', type: 'varchar', length: 150, nullable: true })
+  @Column({ name: 'table_name', type: 'varchar', length: 250, nullable: true })
   tableName: string;
 
-  @Column({ name: 'column_key', type: 'varchar', length: 150, nullable: true })
+  @Column({ name: 'column_translate', type: 'varchar', length: 250, nullable: true })
+  columnTranslate: string;
+
+  @Column({ name: 'column_key', type: 'varchar', length: 250, nullable: true })
   columnKey: string;
 
   @OneToMany(() => WordKey, word => word.group, { eager: true, cascade: true })

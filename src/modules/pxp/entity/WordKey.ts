@@ -28,15 +28,16 @@ export default class WordKey extends PxpEntity {
   @Column({ name: 'default_text', type: 'varchar', length: 150, nullable: true })
   defaultText: string;
 
+  // @Column({ nullable: true, name: 'language_group_id' })
+  // languageGroupId: number;
+
+  @Column({ name: 'translation_group_id' })
+  translationGroupId: number;
+
   @ManyToOne(() => TranslationGroup, translationGroup => translationGroup.words)
   @JoinColumn({ name: 'translation_group_id' })
   group: TranslationGroup;
 
   @OneToMany(() => Translate, translate => translate.wordKey, { eager: true, cascade: true })
   translates: Translate[];
-
-  @Column({ nullable: true, name: 'language_group_id' })
-  languageGroupId: number;
-
-
 }

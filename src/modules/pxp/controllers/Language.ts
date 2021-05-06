@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
-import { getManager } from 'typeorm';
+import { EntityManager, getManager } from 'typeorm';
 import {
   Controller,
   Get,
@@ -21,7 +21,7 @@ import {
   ReadOnly,
   Model
 } from '../../../lib/pxp';
-import UserModel from '../entity/User';
+import LanguageModel from '../entity/Language';
 
 
 @Route('/languages')

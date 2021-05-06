@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
-import { getManager } from 'typeorm';
+import { EntityManager, getManager } from 'typeorm';
 import {
   Controller,
   Get,
@@ -21,13 +21,26 @@ import {
   ReadOnly,
   Model
 } from '../../../lib/pxp';
-import UserModel from '../entity/User';
+import TranslateModel from '../entity/Translate';
 
 
 @Route('/translate/translations')
 @Model('pxp/Translate')
 class Translate extends Controller {
+  @Get('/word/:wordId')
+  @DbSettings('Orm')
+  @ReadOnly(false)
+  async findByLang(params: any, manager: EntityManager) {
+    const [data, count] = await manager.findAndCount(TranslateModel, {
+      where: {
+        wordId: params.wordId,
+        // languageId: params.languageId,
+      },
+      relations: ['language']
+    });
 
+    return {data, count};
+  }
 }
 
 export default Translate;

@@ -22,8 +22,17 @@ export default class Translate extends PxpEntity {
   @PrimaryGeneratedColumn({ name: 'translate_id' })
   translateId: number;
 
-  @Column({ name: 'text', type: 'varchar', length: 30, nullable: false })
+  @Column({ name: 'text', type: 'text', nullable: false })
   text: string;
+
+  @Column({ name: 'state', type: 'varchar', length: 30, nullable: true })
+  state: string;
+
+  @Column({ name: 'word_id', nullable: false })
+  wordId: number;
+
+  @Column({ name: 'language_id', nullable: false })
+  languageId: number;
 
   @ManyToOne(() => Language, language => language.translates)
   @JoinColumn({ name: 'language_id' })
@@ -32,10 +41,4 @@ export default class Translate extends PxpEntity {
   @ManyToOne(() => WordKey, wordKey => wordKey.translates)
   @JoinColumn({ name: 'word_id' })
   wordKey: WordKey;
-
-  @Column({ nullable: true, name: 'language_id' })
-  languageId: number;
-  
-  @Column({ nullable: true, name: 'word_id' })
-  wordId: number;
 }

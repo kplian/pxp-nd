@@ -116,7 +116,7 @@ scriptsArray.push({
     await em.save(ui2);
 
 
-    /*const ui3 = new Ui();
+    const ui3 = new Ui();
     ui3.code = 'EXA_TextFieldExample';
     ui3.name = 'TEXT FIELd EXAMPLE';
     ui3.description = 'ROOT MENU FOR EXAMPLES';
@@ -137,18 +137,29 @@ scriptsArray.push({
     ui4.route = "EXA_AutocompleteExample";
     await em.save(ui4);
 
-
+  
 
     const ui5 = new Ui();
-    ui5.code = 'EXA_TableExample';
-    ui5.name = 'TABLE EXAMPLE';
+    ui5.code = 'EXA__MapExample';
+    ui5.name = 'MAP EXAMPLE';
     ui5.description = 'ROOT MENU FOR EXAMPLES';
     ui5.subsystem = subsystem;
     ui5.createdBy = 'admin';
     ui5.parent = uiParent;
-    ui5.route = "EXA_TableExample";
+    ui5.route = "EXA__MapExample";
     await em.save(ui5);
-    */
+
+
+
+    const ui6 = new Ui();
+    ui6.code = 'EXALIST__options';
+    ui6.name = 'LIST EXAMPLE OPTIONS';
+    ui6.description = 'ROOT MENU FOR EXAMPLES';
+    ui6.subsystem = subsystem;
+    ui6.createdBy = 'admin';
+    ui6.parent = uiParent;
+    ui6.route = "EXALIST__options";
+    await em.save(ui6);
 
   }
 });

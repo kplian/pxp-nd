@@ -33,7 +33,7 @@ export const configPassportJwtStrategy = () => {
       const UserRepo = getCustomRepository(UserRepository);
       UserRepo.findOne({
         where: {
-          id: jwt_payload.sub
+          userId: jwt_payload.sub
         }
       })
         .then((user) => {
@@ -51,10 +51,8 @@ export const configPassportJwtStrategy = () => {
 /**
  * @param {*} user - The user object.  We need this to set the JWT `sub` payload property to the User ID
  */
-export function issueJWT(user: User) {
+export function issueJWT(user: User, expiresIn= '1d') {
   const id = user.userId;
-
-  const expiresIn = '1d';
   const secret = String(process.env.SECRET);
 
   const payload = {

@@ -35,7 +35,7 @@ const buildParams = (doc: any, filters: any) => {
   });
 };
 
-const setRobotoFont = (doc: any) => {
+export const setRobotoFont = (doc: any) => {
   doc.addFileToVFS('Roboto-Regular.ttf', roboto);
   doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
   doc.setFont('Roboto');

@@ -11,17 +11,24 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
+import { EntityManager, } from 'typeorm';
 import { getManager } from 'typeorm';
 import {
   Controller,
   Get,
+  Post,
   Route,
   StoredProcedure,
   DbSettings,
   ReadOnly,
-  Model
+  Model,
+  __
 } from '../../../lib/pxp';
+import { genPassword } from '../../../auth/utils/password'
 import UserModel from '../entity/User';
+import Person from '../entity/Person';
+import Role from '../entity/Role';
+import has = Reflect.has;
 
 
 @Route('/user')
@@ -36,36 +43,41 @@ class User extends Controller {
     return users;
   }
 
-  /*@Post()
-  async add(
-    request: express.Request,
-    response: express.Response
-  ): Promise<void> {
+  @Post()
+  @ReadOnly(false)
+  async addAdminUser(params: Record<string, unknown>, manager: EntityManager): Promise<any> {
+    const person = new Person();
+    person.name = params.name as string;
+    person.lastName = params.lastName as string;
+    person.createdBy = 'admin';
+    await __(manager.save(person));
+
+    const  role = await __(Role.findOne({
+      role: 'admin'
+    }));
+
     const user = new UserModel();
-    const saltHash = genPassword('12345678');
-    const salt = saltHash.salt;
-    const hash = saltHash.hash;
+    user.person = person;
+    user.username = params.username as string;
+    const hashSalt = genPassword(params.password as string);
+    user.hash = hashSalt.hash;
+    user.salt = hashSalt.salt;
+    user.createdBy = 'admin';
+    user.roles = [role];
+    const userResult = await __(manager.save(user));
+    return { userId: userResult.userId };
+  }
 
-    user.hash = hash;
-    user.salt = salt;
-    user.username = 'gato';
-    // user.login = 'juan.perez';
-    // user.password = 'Juan123';
-    // user.token = 'ABCD123';
+  @Get()
+  @DbSettings('Orm')
+  @ReadOnly(true)
+  async genPassword(params: Record<string, unknown>): Promise<UserModel[]> {
+    const hashSalt = genPassword(params.password as string);
 
-    await getManager().save(user);
-    response.json(user);
-  }*/
-  /*
-    @Post()
-    async add(request: express.Request, response: express.Response): Promise<void> {
-      const user = new UserModel();
-      user.firstName = "Timber";
-      user.lastName = "Saw";
-      user.isActive = true;
-      await __(getManager().save(user));
-      response.json(user);
-    }*/
+    return hashSalt;
+
+  }
+
 }
 
 export default User;

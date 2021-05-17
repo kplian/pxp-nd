@@ -11,7 +11,6 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
-import { group } from 'console';
 import { EntityManager, getManager } from 'typeorm';
 import {
   Controller,
@@ -23,9 +22,6 @@ import {
   Model
 } from '../../../lib/pxp';
 import WordKeyModel from '../entity/WordKey';
-import TranslateModel from '../entity/Translate';
-import LanguageModel from '../entity/Language';
-import axios from 'axios';
 @Route('/translate/words')
 @Model('pxp/WordKey')
 class WordKey extends Controller {
@@ -37,21 +33,6 @@ class WordKey extends Controller {
     const wordKey = await manager.save(WordKeyModel, {
       ...params
     });
-
-    if(wordKey) {
-      const [langs, countLangs] = await manager.findAndCount(LanguageModel, {where: {isActive: true}});
-      const translateUrl = (lang, text) => 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170606T185752Z.72aa1b413023beed.315f7dfc0e2db9db2038b567c99f1fcd66c32fd9&lang=' + lang + '&text=' + text;
-
-      const translates = langs.map( lang => ({
-        text: wordKey.defaultText,
-        wordId: wordKey.wordKeyId,
-        state: 'AUTO',
-        languageId: lang.languageId,
-      }));
-      await manager.save(TranslateModel, translates);
-    }
-
-    console.log(wordKey);
     return wordKey;
   }
   

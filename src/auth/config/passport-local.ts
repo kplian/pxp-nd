@@ -31,6 +31,7 @@ export const verifyCallback = (
   done: any
 ): void => {
   const userRepository = getCustomRepository(UserRepository);
+
   /*
   {
         select: ['username', 'userId', 'person', 'authenticationType', 'style', 'hash', 'salt'],
@@ -82,13 +83,14 @@ function configPassportLocal(): void {
   });
   // This method is used to extract user data.
   passport.deserializeUser((userId: string, done: any) => {
+
     const userRepository = getCustomRepository(UserRepository);
 
 
     userRepository.createQueryBuilder('user')
       //.leftJoinAndSelect('role.uis', 'ui')
       .leftJoinAndSelect('user.roles', 'role', 'role.roleId = 1')
-      .where('"user".user_id = :id', { id: userId })
+      .where('user.userId = :id', { id: userId })
       .getOne()
       .then((user) => {
         done(null, user);

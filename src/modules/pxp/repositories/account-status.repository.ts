@@ -96,7 +96,7 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
         // console.log('llega aca',params);
     const getAccountStatusTypeData = await getManager()
       .createQueryBuilder(AccountStatusType, 'astm')
-      .where('"astm".code = :code', { code: params.code })
+      .where('astm.code = :code', { code: params.code })
       .select('astm.account_status_type_id as account_status_type_id').getRawOne();
 
     console.log('getAccountStatusTypeData',getAccountStatusTypeData)
@@ -134,6 +134,7 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
     const accountStatus = new AccountStatus();
     Object.assign(accountStatus, params);
     accountStatus.createdBy = (user.username as string);
+    accountStatus.date = moment().format('YYYY-MM-DD');
     accountStatus.accountStatusTypeId = getAccountStatusTypeData.account_status_type_id;
     accountStatus.amount = amount;
 

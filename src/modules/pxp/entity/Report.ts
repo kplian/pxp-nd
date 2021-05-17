@@ -36,6 +36,9 @@ export default class Report {
   @Column({ type: 'text', nullable: true })
   query?: string;
 
+  @Column({ name: 'allow_roles', type: 'varchar', nullable: true })
+  allowRoles?: Array<any>;
+
   @Column({ name: 'detail_query', type: 'text', nullable: true })
   detailQuery?: string;
   
@@ -57,7 +60,7 @@ export default class Report {
   @Column({ name: 'report_group_id',type: 'integer', nullable: true }) 
   reportGroupId?: number;
 
-  @Column({ type: 'boolean', nullable: true }) 
+  @Column({ nullable: true }) 
   active?: boolean;
 
 }

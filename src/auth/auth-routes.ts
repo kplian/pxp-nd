@@ -20,6 +20,8 @@ import { validPassword } from './utils/password';
 import { issueJWT } from './config/passport-jwt';
 import config from '../config';
 import { PxpError, errorMiddleware } from '../lib/pxp';
+import { getRoutesAuth } from './config/passport-config';
+import path from 'path';
 
 const authRouter = Router();
 authRouter.post(
@@ -67,7 +69,12 @@ authRouter.post(config.apiPrefix + '/auth/login/token', (req, res, next) => {
       );
 
       if (isValid) {
-        const tokenObject = issueJWT(user);
+        let tokenObject;
+        if (req.body.expiresIn) {
+          tokenObject = issueJWT(user, req.body.expiresIn);
+        } else {
+          tokenObject = issueJWT(user);
+        }
 
         return res.status(200).send({
           success: true,
@@ -131,4 +138,18 @@ authRouter.get(
     res.redirect('/');
   }
 );
-export { authRouter };
+
+
+const customAuthRoutes = () => {
+  const routers: any = [];
+  getRoutesAuth()
+  .forEach(module =>{
+    const authFile = path.join(module, 'auth', 'auth.js');
+
+    routers.push(import(authFile));
+  });
+  return Promise.all(routers);
+}
+
+
+export { authRouter , customAuthRoutes};

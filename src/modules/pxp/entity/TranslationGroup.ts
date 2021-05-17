@@ -30,6 +30,9 @@ export default class TranslationGroup extends PxpEntity {
   @Column({ name: 'type', type: 'varchar', length: 50, nullable: true })
   type: string;
 
+  @Column({ type: 'varchar', length: 250, nullable: true })
+  module: string;
+
   @Column({ name: 'table_name', type: 'varchar', length: 250, nullable: true })
   tableName: string;
 

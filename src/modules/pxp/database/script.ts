@@ -68,6 +68,103 @@ scriptsArray.push({
   }
 });
 
+// ROOT MENU FOR EXAMPLES
+
+scriptsArray.push({
+  scriptCode: 'JRR-PXP-20210407-001', scriptFunction: async (em) => {
+
+
+    const subsystem = new Subsystem();
+    subsystem.name = 'EXAMPLE';
+    subsystem.code = 'EXA ';
+    subsystem.folderName = 'exa';
+    subsystem.prefix = 'EXA';
+    subsystem.createdBy = 'admin';
+    await em.save(subsystem);
+
+    const rootUi = await Ui.findOne({ code: "PXP"});
+
+    const uiParent = new Ui();
+    uiParent.code = 'EXA';
+    uiParent.name = 'EXAMPLES';
+    uiParent.description = 'ROOT MENU FOR EXAMPLES';
+    uiParent.subsystem = subsystem;
+    uiParent.parent = rootUi as Ui;
+    uiParent.createdBy = 'admin';
+    await em.save(uiParent);
+
+
+    const ui1 = new Ui();
+    ui1.code = 'EXA_FormExample';
+    ui1.name = ' FORM EXAMPLES';
+    ui1.description = 'ROOT MENU FOR EXAMPLES';
+    ui1.subsystem = subsystem;
+    ui1.createdBy = 'admin';
+    ui1.parent = uiParent;
+    ui1.route = "EXA_FormExample";
+    await em.save(ui1);
+
+
+    const ui2 = new Ui();
+    ui2.code = 'EXA_PickerExample';
+    ui2.name = 'PICKER EXAMPLES';
+    ui2.description = 'ROOT MENU FOR EXAMPLES';
+    ui2.subsystem = subsystem;
+    ui2.createdBy = 'admin';
+    ui2.parent = uiParent;
+    ui2.route = "EXA_PickerExample";
+    await em.save(ui2);
+
+
+    const ui3 = new Ui();
+    ui3.code = 'EXA_TextFieldExample';
+    ui3.name = 'TEXT FIELd EXAMPLE';
+    ui3.description = 'ROOT MENU FOR EXAMPLES';
+    ui3.subsystem = subsystem;
+    ui3.createdBy = 'admin';
+    ui3.parent = uiParent;
+    ui3.route = "EXA_TextFieldExample";
+    await em.save(ui3);
+
+
+    const ui4 = new Ui();
+    ui4.code = 'EXA_AutocompleteExample';
+    ui4.name = 'AUTO COMPLETE EXAMPLE';
+    ui4.description = 'ROOT MENU FOR EXAMPLES';
+    ui4.subsystem = subsystem;
+    ui4.createdBy = 'admin';
+    ui4.parent = uiParent;
+    ui4.route = "EXA_AutocompleteExample";
+    await em.save(ui4);
+
+  
+
+    const ui5 = new Ui();
+    ui5.code = 'EXA__MapExample';
+    ui5.name = 'MAP EXAMPLE';
+    ui5.description = 'ROOT MENU FOR EXAMPLES';
+    ui5.subsystem = subsystem;
+    ui5.createdBy = 'admin';
+    ui5.parent = uiParent;
+    ui5.route = "EXA__MapExample";
+    await em.save(ui5);
+
+
+
+    const ui6 = new Ui();
+    ui6.code = 'EXALIST__options';
+    ui6.name = 'LIST EXAMPLE OPTIONS';
+    ui6.description = 'ROOT MENU FOR EXAMPLES';
+    ui6.subsystem = subsystem;
+    ui6.createdBy = 'admin';
+    ui6.parent = uiParent;
+    ui6.route = "EXALIST__options";
+    await em.save(ui6);
+
+  }
+});
+
+
 export default scriptsArray;
 
 

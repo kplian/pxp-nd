@@ -10,6 +10,8 @@
  *
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-10-13 15:36:31
+ * Last modified  : 2021-03-10 15:36:31 - Favio Figueroa
+ * Last modified  : 2021-05-01 18:35:31 - Favio Figueroa
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -116,6 +118,11 @@ class Controller implements ControllerInterface {
       (Reflect.getMetadata('dbsettings', this.constructor) as {
         [id: string]: 'Procedure' | 'Orm' | 'Query';
       }) || {};
+    // get logConfig
+    const logConfig =
+      (Reflect.getMetadata('logConfig', this.constructor) as {
+        [id: string]: {};
+      }) || {};
 
     // define basic routes
     if (this.modelString !== '') {
@@ -142,9 +149,10 @@ class Controller implements ControllerInterface {
       ) {
         this.router[route.requestMethod](
           config.apiPrefix + '/' + this.module + this.path + route.path,
-          async (req: Request, res: Response, next: NextFunction) => {
+          async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
-            const params = { ...req.query, ...req.body, ...req.params };
+            // const params = { ...req.query, ...req.body, ...req.params };
+            const params = {...req.files, ...req.paramasMerge};
             this.transactionCode = (this.module + this.path + route.path)
               .split('/')
               .join('.')
@@ -161,7 +169,8 @@ class Controller implements ControllerInterface {
                   methodDbSettings,
                   readonly[route.methodName],
                   false,
-                  log[route.methodName]
+                  log[route.methodName],
+                  logConfig[route.methodName]
                 )
               );
             } catch (ex) {
@@ -178,10 +187,11 @@ class Controller implements ControllerInterface {
                 this.module,
                 this.transactionCode,
                 '',// query
-                JSON.stringify(params),
+                params,
                 ex.stack,
                 ex.statusCode,
-                endsAt)) as number;
+                endsAt,
+                logConfig)) as number;
 
               errorMiddleware(ex, req, res);
             }
@@ -198,7 +208,7 @@ class Controller implements ControllerInterface {
           ],
           async (req: any, res: Response, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
-            const params = req.paramasMerge;
+            const params = {...req.files, ...req.paramasMerge};
             this.pxpParams = req.pxpParams;
 
             if (req.user) {
@@ -221,7 +231,8 @@ class Controller implements ControllerInterface {
                   methodDbSettings,
                   readonly[route.methodName],
                   permission[route.methodName],
-                  log[route.methodName]
+                  log[route.methodName],
+                  logConfig[route.methodName]
                 )
               );
             } catch (ex) {
@@ -230,7 +241,7 @@ class Controller implements ControllerInterface {
               const endsAt = now.valueOf() - iniAt.valueOf();
               res.logId = (await __(
                 insertLog(
-                  this.user.username,
+                  this.user && this.user.username ? this.user.username : 'nouser',
                   'mac',
                   req.ip,
                   'error',
@@ -238,10 +249,11 @@ class Controller implements ControllerInterface {
                   this.module,
                   this.transactionCode,
                   '', // query
-                  JSON.stringify(params),
+                  params,
                   ex.stack,
                   ex.statusCode,
-                  endsAt
+                  endsAt,
+                  logConfig
                 )
               )) as number;
               errorMiddleware(ex, req, res);
@@ -261,7 +273,8 @@ class Controller implements ControllerInterface {
     dbsettings: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     if (dbsettings === 'Orm') {
       await __(
@@ -273,7 +286,8 @@ class Controller implements ControllerInterface {
           methodName,
           readonly,
           permission,
-          log
+          log,
+          logConfig
         )
       );
     } else if (dbsettings === 'Procedure') {
@@ -285,7 +299,8 @@ class Controller implements ControllerInterface {
           methodName,
           readonly,
           permission,
-          log
+          log,
+          logConfig
         )
       );
     } else {
@@ -296,7 +311,8 @@ class Controller implements ControllerInterface {
         methodName,
         readonly,
         permission,
-        log
+        log,
+        logConfig
       );
     }
   }
@@ -309,7 +325,8 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
@@ -323,7 +340,7 @@ class Controller implements ControllerInterface {
       }
     }
     if (readonly) {
-      metResponse = await __(eval(`this.${methodName}(params)`));
+      metResponse = await __(eval(`this.${methodName}(params, res)`));
 
     } else {
       const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
@@ -334,7 +351,7 @@ class Controller implements ControllerInterface {
       await __(queryRunner.startTransaction());
       try {
         metResponse = (await eval(
-          `this.${methodName}(params, queryRunner.manager)`
+          `this.${methodName}(params, queryRunner.manager, res)`
         )) as Record<string, unknown>;
         await queryRunner.commitTransaction();
       } catch (err) {
@@ -351,7 +368,7 @@ class Controller implements ControllerInterface {
       const endsAt = now.valueOf() - iniAt.valueOf();
       __(
         insertLog(
-          this.user.username,
+          this.user && this.user.username ? this.user.username : 'nouser',
           'mac',
           req.ip,
           'success',
@@ -359,10 +376,11 @@ class Controller implements ControllerInterface {
           this.module,
           this.transactionCode,
           '',
-          JSON.stringify(params),
+          params,
           JSON.stringify(metResponse),
           '200',
-          endsAt
+          endsAt,
+          logConfig
         )
       );
     }
@@ -379,9 +397,35 @@ class Controller implements ControllerInterface {
   }
 
   async list(params: Record<string, unknown>): Promise<unknown> {
-    const schema = this.getListSchema();
+
+    const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
+    const queryRunner:any = connection.getMetadata(this.model).ownColumns.find(column => column.isPrimary === true);
+
+    // ffp search if in the params has been sent the primary key
+    const primaryKeyColumn = queryRunner.propertyName;
+    if(primaryKeyColumn in params) {
+      const findOne = await __(this.model.findOne({where: { [primaryKeyColumn]: params[primaryKeyColumn] }})) as unknown[];
+      return { data : findOne, count : 1 };
+    }
+
+    // filter by some column that exist in the entity
+    // ffp if some column is into of params for added in the condition
+    let ownColumnsForSchema = {};
+    const whereOwnColumns = connection.getMetadata(this.model).ownColumns.reduce((t, column) => {
+      if(`_${column.propertyName}` in params) {
+        ownColumnsForSchema = {
+          ...ownColumnsForSchema,
+          [`_${column.propertyName}`]: Joi.string()
+        }
+        t = {...t, [column.propertyName]: params[`_${column.propertyName}`]};
+      }
+      return t;
+    },{});
+
+
+    const schema = this.getListSchema(ownColumnsForSchema);
     const resParams = await __(this.schemaValidate(schema, params));
-    const listParam = this.getListParams(resParams);
+    const listParam = this.getListParams(resParams, whereOwnColumns);
     const [rows, count] = await __(this.model.findAndCount(listParam)) as unknown[];
     return { data: rows, count };
   }
@@ -427,26 +471,34 @@ class Controller implements ControllerInterface {
     return modelInstance;
   }
 
-  getListParams(params: Record<string, unknown>): ListParam {
+  getListParams(params: Record<string, unknown>, where: Record<string, unknown>): ListParam {
+
+    const whereGenericFilter = [] as any;
+    if (params.genericFilterFields) {
+      const genericFilterFields = params.genericFilterFields as string;
+      const filterFieldsArray = genericFilterFields.split('#');
+      filterFieldsArray.forEach((field) => {
+        whereGenericFilter.push({
+          [field]: Like('%' + (params.genericFilterValue as string) + '%'), ...where
+        });
+      });
+    }
+
     const res: ListParam = {
-      where: [],
+      where: whereGenericFilter.length > 0 ? whereGenericFilter : [where] ,
       skip: params.start as number,
       take: params.limit as number,
       order: {
         [params.sort as string]: String(params.dir).toUpperCase()
       }
     };
-    if (params.genericFilterFields) {
-      const genericFilterFields = params.genericFilterFields as string;
-      const filterFieldsArray = genericFilterFields.split('#');
-      filterFieldsArray.forEach((field) => {
-        if (res.where) {
-          res.where.push({
-            [field]: Like('%' + (params.genericFilterValue as string) + '%')
-          });
-        }
-      });
-    }
+
+    // ffp search if in this request is sending the id
+
+
+
+    console.log('res',res)
+
     return res;
   }
 
@@ -457,7 +509,8 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);
@@ -471,7 +524,8 @@ class Controller implements ControllerInterface {
     methodName: string,
     readonly: boolean,
     permission = true,
-    log = true
+    log = true,
+    logConfig = {}
   ): Promise<void> {
     console.log('before function');
     await eval(`this.${methodName}(req, res)`);
@@ -496,7 +550,7 @@ class Controller implements ControllerInterface {
     return value;
   }
 
-  getListSchema(): Schema {
+  getListSchema(ownColumns: Record<string, unknown>): Schema {
     const schema = Joi.object({
       start: Joi.number().integer().required(),
       limit: Joi.number().integer().positive().required(),
@@ -504,6 +558,7 @@ class Controller implements ControllerInterface {
       dir: Joi.string().min(3).max(4).required(),
       genericFilterFields: Joi.string().min(2),
       genericFilterValue: Joi.string().min(1),
+      ...ownColumns
     });
     return schema;
   }

@@ -20,7 +20,7 @@ import { PxpEntity } from '../../../lib/pxp';
 export default class Translate extends PxpEntity {
 
   @PrimaryGeneratedColumn({ name: 'translate_id' })
-  translateId: number;
+  translateId?: number;
 
   @Column({ name: 'text', type: 'text', nullable: false })
   text: string;
@@ -36,9 +36,9 @@ export default class Translate extends PxpEntity {
 
   @ManyToOne(() => Language, language => language.translates)
   @JoinColumn({ name: 'language_id' })
-  language: Language;
+  language?: Language;
 
   @ManyToOne(() => WordKey, wordKey => wordKey.translates)
   @JoinColumn({ name: 'word_id' })
-  wordKey: WordKey;
+  wordKey?: WordKey;
 }

@@ -24,7 +24,7 @@ export class WordKeySubscriber implements EntitySubscriberInterface<WordKey> {
         {
           text: wordKey.defaultText,
           wordId: wordKey.wordKeyId,
-          state: 'AUTO',
+          state: 'DRAFT',
           languageId: lang.languageId,
         }
       ));      

@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
-import { getManager, EntityManager, getConnection } from 'typeorm';
+import { getManager, EntityManager, getConnection, In } from 'typeorm';
 import {
   Controller,
   Get,
@@ -32,6 +32,8 @@ import * as _ from 'lodash';
 import { head, words } from 'lodash';
 import Language from '../entity/Language';
 import XLSX from 'xlsx';
+import { v4 as uuidv4 } from 'uuid';
+import Translate from '../entity/Translate';
 @Route('/translate/groups')
 @Model('pxp/TranslationGroup')
 class TranslationGroup extends Controller {
@@ -169,7 +171,7 @@ class TranslationGroup extends Controller {
     const files: any = [];
     Object.keys(jsonFiles).forEach(key=>{
       Object.keys(jsonFiles[key]).forEach(elem =>{
-        files.push(fs.promises.writeFile( path.join(temp, key, elem +'.json'), JSON.stringify(jsonFiles[key][elem]), 'utf8'));
+        files.push(fs.promises.writeFile( path.join(temp, key, elem +'.json'), JSON.stringify(jsonFiles[key][elem], null, 2), 'utf8'));
       });
     });
 
@@ -194,28 +196,53 @@ class TranslationGroup extends Controller {
   // @Authentication(false)
   @ReadOnly(false)
   async getCsvLanguage(params: any, manager: EntityManager, res:  any) {
-    const langs:  any = await manager.find(Language, { order:{ code: 'ASC'}});
+    const langsFilter = params.langs;
+    const groupsFilter = params.groups;
+    
+    const whereLangs = langsFilter ? {
+      where: {
+        code: In(JSON.parse(langsFilter))
+      }
+    }: null;
+
+    const whereGroups = groupsFilter ? {
+      where: {
+        code: In(JSON.parse(groupsFilter))
+      }
+    }: null;
+    
+    const langs:  any = await manager.find(Language, {
+      order:{ code: 'ASC'},
+      ...whereLangs,
+    });
     const groupInterfaces = await manager.find(TranslationGroupModel, {
       // where: {
       //   type: 'interface',
       // },
       relations: ['words'],
       order:{ type: 'ASC'},
+      ...whereGroups,
     }); 
 
     // Data
-    const header  = ['code', 'defaultText', ...langs.map((item:any) => item.code)];
+    const langsCode = langs.map((item:any) => item.code);
+    const header  = ['wordKeyId','code', 'defaultText', ...langsCode];
     
     const wb = XLSX.utils.book_new();
     
     groupInterfaces.forEach(group => {
       const items:any = [header];
       group.words.forEach(item => {
-        const translates:any = _.orderBy(item.translates, ['code'], ['asc']);
+        const translates = _.map(langs, (lang)=>{
+          const findLang: any = _.find(item.translates, { languageId: lang.languageId});
+          return findLang ? findLang.text : '';
+        })
+
         items.push([
+          item.wordKeyId,
           item.code,
           item.defaultText,
-          ...translates.map((t:any)=>t.text),
+          ...translates,
         ]);
         
       });
@@ -243,21 +270,65 @@ class TranslationGroup extends Controller {
   @Authentication(false)
   @ReadOnly(false)
   async importCsvFile(params: any, res:  any) {
-    console.log(params);
-    
-    const workbook = XLSX.readFile(params.file.buffer, {type: 'buffer'});
-    const sheetnames = Object.keys(workbook.Sheets);
+    const ext = params.file.name.split('.').pop();
+    const pathFile = path.join(__dirname, '../../../tmp/',  uuidv4() + '.' + ext );
+    await params.file.mv(pathFile);
 
-    let i = sheetnames.length;
+    const workbook = XLSX.readFile(pathFile);
+    const sheetnames = Object.keys(workbook.Sheets);
     const resData: any = {};
 
-    while (i--) {
-      const sheetname = sheetnames[i];
-      const arrayName = sheetname.toString();
+    sheetnames.forEach((sheetname)=>{
       resData[sheetname] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetname]);
-    }
+    });
+    const langs:  any = await getManager().find(Language, { order:{ code: 'ASC'}});
 
-    return {}; 
+    let translates: any[] = [];
+    Object.keys(resData).forEach((key: any) =>{
+      const wordKeys = resData[key];
+      wordKeys.forEach((wordKey:any) => {
+        langs.forEach((lang: any) => {
+          console.log(wordKey, lang.code);        
+          if(wordKey[lang.code]) {
+            translates.push({
+              text: wordKey[lang.code],
+              languageId: lang.languageId,
+              wordId: wordKey.wordKeyId,
+              state: 'REVIEW',
+            });
+          }
+        });
+      });
+      
+    });
+
+    const currentTranslates = await getManager().find(Translate, {
+      where: {
+        wordId: In(_.map(translates, 'wordId')),
+        languageId: In(_.map(translates, 'languageId')),
+      }
+    });
+
+    translates = translates.map(elem => {
+      const find = _.find(currentTranslates, {wordId: elem.wordId, languageId: elem.languageId });
+      
+      if(find?.text === elem.text) return null;
+
+      if(find) {
+        elem.translateId = find.translateId;
+      }
+      return elem;
+    });
+    translates = _.compact(translates);
+    const saveRegs = await getManager().save(Translate, translates);
+    fs.unlinkSync(pathFile);
+
+    return {
+      success: true,
+      message: 'File translates save correctly',
+      groups: _.keys(resData),
+      records: saveRegs.length,
+    }; 
   }
 }
 

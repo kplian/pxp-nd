@@ -16,25 +16,25 @@ import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
 class PxpEntity extends BaseEntity {
 
   @Column({ name: 'created_by', type: 'varchar', length: 500, default: 'admin' })
-  createdBy: string;
+  createdBy?: string;
 
   @Column({ name: 'user_id_ai', nullable: true })
-  userIdAi: number;
+  userIdAi?: number;
 
   @Column({ name: 'user_ai', type: 'varchar', length: 300, nullable: true })
-  userAi: string;
+  userAi?: string;
 
   @Column({ name: 'modified_by', nullable: true, type: 'varchar', length: 500 })
-  modifiedBy: string;
+  modifiedBy?: string;
 
   @CreateDateColumn({ name: 'created_at', nullable: false, })
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn({ name: 'modified_at', nullable: true })
-  modifiedAt: Date;
+  modifiedAt?: Date;
 
   @Column({ name: 'is_active', default: true })
-  isActive: boolean;
+  isActive?: boolean;
 
 }
 export { PxpEntity };

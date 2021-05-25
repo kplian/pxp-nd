@@ -162,7 +162,43 @@ scriptsArray.push({
     await em.save(ui6);
 
   }
-});
+},
+{
+  scriptCode: 'JDV-PXP-20210518-002', scriptFunction: async (em) => {
+
+    const subsystem = await Subsystem.findOne({ code: 'EXA' });
+    const uiTr = await Ui.findOne({ code: 'EXA' });
+
+    const ui7 = new Ui();
+    ui7.code = 'EXA_Subsystem';
+    ui7.name = 'SUBSYSTEM';
+    ui7.description = 'ROOT MENU FOR EXAMPLES';
+    ui7.subsystem = subsystem as Subsystem;
+    ui7.createdBy = 'admin';
+    ui7.parent = uiTr as Ui;
+    ui7.route = "EXA_Subsystem"; 
+    await em.save(ui7);
+  }
+},
+{
+  scriptCode: 'JDV-PXP-20210520-003', scriptFunction: async (em) => {
+
+    const subsystem = await Subsystem.findOne({ code: 'EXA' });
+    console.log('---,', subsystem);
+    const uiTr = await Ui.findOne({ code: 'EXA' });
+
+    const ui8 = new Ui();
+    ui8.code = 'EXA_Role';
+    ui8.name = 'ROLE';
+    ui8.description = 'ROOT MENU FOR EXAMPLES';
+    ui8.subsystem = subsystem as Subsystem;
+    ui8.createdBy = 'admin';
+    ui8.parent = uiTr as Ui;
+    ui8.route = "EXA_Role"; 
+    await em.save(ui8);
+  }
+},
+);
 
 
 export default scriptsArray;

@@ -44,10 +44,13 @@ export default class Role extends PxpEntity {
   })
   users: User[];
 
-  @ManyToOne(() => Subsystem, subsystem => subsystem.roles)
+  @ManyToOne(() => Subsystem, (subsystem: Subsystem) => subsystem.subsystemId, {
+    eager: true,
+    cascade: true
+  })
   @JoinColumn({ name: 'subsystem_id' })
   subsystem: Subsystem;
-
+  
   @ManyToMany(() => Ui)
   @JoinTable({
     name: 'tsec_ui_role',

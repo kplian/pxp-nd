@@ -38,7 +38,7 @@ export default class Subsystem extends PxpEntity {
   @OneToMany(() => Transaction, transaction => transaction.subsystem)
   transactions: Transaction[];
 
-  @OneToMany(() => Role, role => role.subsystem)
+  @OneToMany('Role', (role: Role) => role.roleId)
   roles: Role[];
 
   @OneToMany(() => Ui, ui => ui.subsystem)

@@ -2,6 +2,7 @@
 // export { __, PxpError, errorMiddleware } from './lib/pxp/PxpError';
 export { PxpApp } from './PxpApp';
 export {Controller} from './lib/pxp/Controller';
+export { createConnections } from './db.datasource';
 export * from './lib/pxp/ControllerInterface';
 export * from './lib/pxp/Decorators';
 export * from './lib/pxp/ListParamInterface';

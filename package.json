@@ -1,0 +1,16 @@
+{
+  "name": "root",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pxpnd",
+  "main": "index.js",
+  "author": "Kplian",
+  "license": "ISC",
+  "scripts": {
+    "build": "lerna run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
+}

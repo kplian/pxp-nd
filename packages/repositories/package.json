@@ -1,0 +1,31 @@
+{
+  "name": "@pxp-nd/repositories",
+  "version": "1.0.7",
+  "description": "Core repositories for pxp-nd",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "prepublish": "tsc",
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "start": "npm run build && node dist/index.js",
+    "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node dist/index.js\"",
+    "build:js": "babel src --out-dir dist --extensions \".ts\" --source-maps inline",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pxp-nd"
+  ],
+  "author": "Kplian",
+  "license": "ISC",
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "tsc-watch": "^4.2.9"
+  },
+  "dependencies": {
+    "@pxp-nd/core": "^1.0.7",
+    "@pxp-nd/entities": "^1.0.7",
+    "class-validator": "^0.13.1",
+    "moment": "^2.29.1",
+    "typeorm": "^0.2.32"
+  }
+}

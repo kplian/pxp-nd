@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-10-06 10:36:44
  */
-import Joi from '@hapi/joi';
+import Joi from 'joi';
 import { Controller, Get, DbSettings, ReadOnly, Model, __, Permission, Authentication, Log } from '../lib/pxp';
 import {Ui as UiModel} from '@pxp-nd/entities';
 import {User} from '@pxp-nd/entities';

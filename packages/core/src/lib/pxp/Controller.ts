@@ -17,7 +17,7 @@ import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
-import Joi, { Schema } from '@hapi/joi';
+import Joi, { Schema } from 'joi';
 import { RouteDefinition } from './RouteDefinition';
 import {
   PxpError,

@@ -1,9 +1,9 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'tcm_vendor'})
-export default class Vendor extends BaseEntity{
-  @PrimaryGeneratedColumn({ name: 'vendor_id'})
-  vendorId: number;
+@Entity({ name: 'tcm_branch'})
+export default class Branch extends BaseEntity{
+  @PrimaryGeneratedColumn({ name: 'branch_id'})
+  branchId: number;
 
   @Column({ type: 'varchar', length: 200, nullable: false})
   name: string;
@@ -17,6 +17,6 @@ export default class Vendor extends BaseEntity{
   @Column({ name: 'available_yn', type: 'varchar', length: 1, })
   availableYn: string;
 
-  @Column({ name: 'vendor_id_master_fk', type: 'varchar', length: 200, nullable: false})
-  vendorIdMaster: string;
+  @Column({ name: 'branch_id_master_fk', type: 'varchar', length: 200, nullable: false})
+  branchIdMaster: string;
 }

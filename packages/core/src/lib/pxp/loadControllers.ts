@@ -15,20 +15,20 @@ import fs from 'fs';
 import util from 'util';
 import path from 'path';
 import { ControllerInterface as Controller } from './index';
-import { ConfigPxpApp } from '../../interfaces';
-import * as controllers from '../../controllers';
+import { IConfigPxpApp } from '../../interfaces';
+// import * as controllers from '../../controllers';
 const readdir = util.promisify(fs.readdir);
 
-const loadPxpControllers = (config: ConfigPxpApp) => {
-  const pxpControllers: any = controllers;
-  return  Object.keys(pxpControllers).map(key => new pxpControllers[key]('pxp', config));
+const loadPxpControllers = (controllers: any[] = [], config: IConfigPxpApp) => {
+  // const pxpControllers: any = controllers;
+  return  Object.keys(controllers).map((key: any) => new controllers[key]('pxp', config));
 };
 
-export default async (config: ConfigPxpApp): Promise<Controller[]> => {
+export default async (pxpControllers: any[], config: IConfigPxpApp): Promise<Controller[]> => {
   // const modulesPath = `${__dirname}/../../modules`;
   const modulesPath = path.join( process.cwd(), `/dist/modules`);
   let modules: string[] = [];
-  const controllers: Controller[] = loadPxpControllers(config);
+  const controllers: Controller[] = loadPxpControllers(pxpControllers, config);
   let controllerFiles: Record<string, string>[] = [];
   let auxFiles: Record<string, string>[] = [];
   try {

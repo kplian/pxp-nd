@@ -1,5 +1,5 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
-import { User } from '@pxp-nd/entities';
+import User from './User';
 
 @Entity({ name: 'group'})
 export default class Group extends BaseEntity{

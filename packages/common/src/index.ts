@@ -1,8 +1,3 @@
-import * as entities from './entities';
-import * as controllers from './controllers';
-
-
-export {
-  entities,
-  controllers,
-}
+export * from './entities';
+export * from './controllers';
+export { PxpEntity } from './PxpEntity';

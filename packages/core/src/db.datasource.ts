@@ -7,12 +7,13 @@ const config = {
     logging: false,
     entities: [
       'dist/modules/**/entity/*.js',
-      'node_modules/@pxp-nd/entities/**/entity/*.js'
+      'dist/modules/**/entities/*.js',
+      // 'node_modules/@pxp-nd/entities/**/entity/*.js'
     ],
     migrations: ['src/migration/**/*.ts'],
     subscribers: [
       'src/subscribers/**/*.ts',
-      'node_modules/@pxp-nd/core/**/subscribers/*.js'
+      // 'node_modules/@pxp-nd/core/**/subscribers/*.js'
     ],
     cli: {
       entitiesDir: 'src/modules',
@@ -60,7 +61,7 @@ const createCommonControllers = (entities: any[]) => {
             path.join(pathCommonEntities, file ),
             path.join(pathEntities, file),
             (err) => {
-              console.log(err);  
+              if(err) console.log(err);  
             }
           )
         }
@@ -77,7 +78,7 @@ const createCommonControllers = (entities: any[]) => {
             path.join(pathCommonControllers, file ),
             path.join(pathControllers, file),
             (err) => {
-              console.log(err);  
+              if(err) console.log(err);  
             }
           )
         }
@@ -87,6 +88,6 @@ const createCommonControllers = (entities: any[]) => {
   
 }
 
-createCommonControllers([]);
+// createCommonControllers([]);
 
 export { createConnections };

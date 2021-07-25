@@ -1,0 +1,32 @@
+{
+  "name": "@pxp-nd/common",
+  "version": "1.0.0",
+  "description": "Contains common files for pxp-nd",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "prepublish": "tsc",
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "start": "npm run build && node dist/index.js",
+    "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pxp-nd"
+  ],
+  "author": "Kplian",
+  "license": "ISC",
+  "dependencies": {
+    "@pxp-nd/auth": "file:.yalc/@pxp-nd/auth",
+    "@pxp-nd/core": "^1.0.0",
+    "@pxp-nd/entities": "^1.0.10",
+    "adm-zip": "^0.5.5",
+    "joi": "^17.4.0",
+    "lodash": "^4.17.21",
+    "typeorm": "^0.2.32"
+  },
+  "peerDependencies": {
+    "@pxp-nd/core": "^1.0.0"
+  },
+  "yalcSig": "3b732ac1fd633e7e9e9d2142abb4ddff"
+}

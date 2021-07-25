@@ -49,12 +49,22 @@ const getCustomStrategies = () => {
 
 
 
-export const configPassport = (): void => {
+export const configPassport = (auth: any | boolean) => {
   getCustomStrategies();
-  configPassportJwtStrategy();
   configGoogleStrategy();
   configFacebookStrategy();
-  setTimeout(() => configPassportLocal());
+  configPassportJwtStrategy();
+  if(auth === true) {
+    setTimeout(() => configPassportLocal());
+  }
+  if(auth && auth.local) {
+    setTimeout(() => configPassportLocal(
+      auth.local.fields,
+      auth.local.verifyUser,
+      auth.serialize,
+      auth.deserialize,
+    ));
+  }
 };
 
 

@@ -28,29 +28,38 @@ import loadControllers from './lib/pxp/loadControllers';
 import { errorMiddleware } from './lib/pxp';
 import { getAuthRoutes, customAuthRoutes } from '@pxp-nd/auth';
 import { configPassport } from '@pxp-nd/auth';
-import { Session } from '@pxp-nd/entities';
+// import { Session } from '@pxp-nd/entities';
 import { TypeormStore } from 'typeorm-store';
 import { getReportsRouter } from './lib/reports/report-routes';
-import { ConfigPxpApp } from './interfaces';
+import { IConfigPxpApp } from './interfaces';
 
+const modulesPxp = {
+  auth: '@pxp-nd/auth',
+  common: '@pxp-nd/common',
+  reports: '@pxp-nd/reports',
+}
+//auth configure 
+/**
+ * 
+ * */
 class PxpApp {
   public app: express.Application;
   public controllers: Controller[];
-  config: ConfigPxpApp = {
+  config: IConfigPxpApp = {
     defaultDbSettings: 'Orm', // Orm, Procedure, Query
     apiPrefix: '/api',
     logDuration: true
   };
 
-  constructor(config: ConfigPxpApp) {
+  constructor(config: IConfigPxpApp) {
     this.folderModulesCreate();
     this.config = {...this.config, ...config};
     this.app = express();
     this.controllers = [];
     // this.initializeMiddlewares();
   }
-  public async loadControllers(): Promise<void> {
-    this.controllers = await loadControllers(this.config);
+  public async loadControllers(controllers: any): Promise<void> {
+    this.controllers = await loadControllers(controllers, this.config);
     await this.connectToTheDatabase();
     await this.initializeAuthentication();
     this.initializeRoutes();
@@ -58,7 +67,7 @@ class PxpApp {
   }
   public listen(): void {
     this.app.listen(process.env.PORT, () => {
-      console.log(`App listening on the port ${process.env.PORT}`);
+      console.log(`${'\x1b[36m'}App listening on the port ${process.env.PORT}${'\x1b[0m'}`);
     });
   }
 
@@ -120,7 +129,7 @@ class PxpApp {
   }
 
   private async initializePassport() {
-    configPassport();
+    configPassport(this.config.auth);
     this.app.use(passport.initialize());
     // @todo only validate session if authorization is not set(10/03/2021)
     this.app.use(passport.session());
@@ -171,7 +180,7 @@ class PxpApp {
     this.app.options('*', cors());
   }
   private initializeSession() {
-    const repository = getConnection().getRepository(Session);
+    const repository: any = getConnection().getRepository(this.config.session);
     this.app.use(
       session({
         secret: String(process.env.SECRET),
@@ -207,8 +216,13 @@ class PxpApp {
 
   private folderModulesCreate () {
     const dirModules = path.join(process.cwd(), 'dist/modules');
+    const dirModulesSrc = path.join(process.cwd(), 'src/modules');
     if(!fs.existsSync(dirModules)) {
       fs.mkdirSync(dirModules, '0744');
+    }
+
+    if(!fs.existsSync(dirModulesSrc)) {
+      fs.mkdirSync(dirModulesSrc, '0744');
     }
   }
 }

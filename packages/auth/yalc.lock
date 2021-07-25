@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "packages": {
+    "@pxp-nd/core": {
+      "signature": "52741ef88ae234b0b199303685f75980",
+      "file": true
+    },
+    "@pxp-nd/common": {
+      "signature": "3b732ac1fd633e7e9e9d2142abb4ddff",
+      "file": true
+    }
+  }
+}

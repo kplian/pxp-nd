@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "@pxp-nd/core": {
+      "signature": "52741ef88ae234b0b199303685f75980",
+      "file": true
+    }
+  }
+}

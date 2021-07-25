@@ -34,7 +34,7 @@ import { parseParams } from './middlewares/ParseParams';
 import { isReportMiddleware } from './middlewares/isReportMiddleware';
 import { makePdf } from '../reports/pdf';
 import { makeXlsx } from '../reports/xlsx';
-import { ConfigPxpApp } from '../../interfaces';
+import { IConfigPxpApp } from '../../interfaces';
 import * as entities from '@pxp-nd/entities';
 
 const pxpEntities: any = entities;
@@ -49,7 +49,7 @@ export class Controller implements ControllerInterface {
   public transactionCode = '';
   public user: User;
   public model: any;
-  config: ConfigPxpApp;
+  config: IConfigPxpApp;
   private basicRoutes: RouteDefinition[] = [
     { requestMethod: 'post', path: '/add', methodName: 'add' },
     { requestMethod: 'delete', path: '/delete/:id', methodName: 'delete' },
@@ -63,7 +63,7 @@ export class Controller implements ControllerInterface {
     delete: false
   };
 
-  constructor(module: string, config: ConfigPxpApp = { apiPrefix: '/api', defaultDbSettings: 'Orm'}) {
+  constructor(module: string, config: IConfigPxpApp = { apiPrefix: '/api', defaultDbSettings: 'Orm'}) {
     this.validated = false;
     this.module = module;
     this.config = config;
@@ -153,6 +153,11 @@ export class Controller implements ControllerInterface {
           ' controller.'
         );
       }
+
+      if(this.config.showRoutes) {
+        console.log(`${'\x1b[31m'}${route.requestMethod.toUpperCase()}:\t${'\x1b[32m'}${this.config.apiPrefix + '/' + this.module + this.path + route.path}${'\x1b[0m'}`);
+      }
+
       if (
         route.methodName in authentication &&
         authentication[route.methodName] === false

@@ -13,7 +13,6 @@
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
-import { verifyCallback } from './config/passport-local';
 import { isAuthenticated } from './config/passport-config';
 import { getCustomRepository } from 'typeorm';
 import { UserRepository } from '@pxp-nd/repositories';

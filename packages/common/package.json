@@ -17,14 +17,20 @@
   "author": "Kplian",
   "license": "ISC",
   "devDependencies": {
+    "@types/adm-zip": "^0.4.34",
+    "@types/lodash": "^4.14.171",
     "@types/node": "^15.3.1",
     "rimraf": "^3.0.2",
     "tsc-watch": "^4.2.9",
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "@pxp-nd/auth": "file:.yalc/@pxp-nd/auth",
+    "@pxp-nd/core": "^1.0.0",
     "@pxp-nd/entities": "^1.0.10",
+    "adm-zip": "^0.5.5",
     "joi": "^17.4.0",
+    "lodash": "^4.17.21",
     "typeorm": "^0.2.32"
   },
   "peerDependencies": {

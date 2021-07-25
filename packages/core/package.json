@@ -7,6 +7,7 @@
   "prepublish": "tsc",
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "dev:publish": "yalc publish",
     "start": "npm run build && node dist/index.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -34,7 +35,7 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@pxp-nd/auth": "^1.0.0",
+    "@pxp-nd/auth": "file:.yalc/@pxp-nd/auth",
     "@pxp-nd/entities": "^1.0.0",
     "@pxp-nd/repositories": "^1.0.1",
     "adm-zip": "^0.5.5",

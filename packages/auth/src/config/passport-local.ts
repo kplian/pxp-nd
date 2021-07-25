@@ -14,8 +14,8 @@
 import passport from 'passport';
 import * as passportLocal from 'passport-local';
 import { validPassword } from '../utils/password';
-import {User} from '@pxp-nd/entities';
-import { getCustomRepository } from 'typeorm';
+import { User } from '@pxp-nd/common';
+import { getCustomRepository, getRepository } from 'typeorm';
 import { UserRepository } from '@pxp-nd/repositories';
 
 
@@ -39,7 +39,7 @@ export const verifyCallback = (
           username
         }
       }*/
-  userRepository
+  getRepository(User)
     .createQueryBuilder('user')
     .innerJoin('user.person', 'person')
     .select([
@@ -73,21 +73,16 @@ export const verifyCallback = (
       done(err);
     });
 };
-
-function configPassportLocal(): void {
-  const strategy = new LocalStrategy(customFields, verifyCallback);
-  passport.use(strategy);
-  // This method is used to store the user identifier locally.
-  passport.serializeUser((user: any, done: any) => {
+function serializeUser(user: any, done: any) {
     done(null, user.userId);
-  });
-  // This method is used to extract user data.
-  passport.deserializeUser((userId: string, done: any) => {
+}
+
+function deserializeUser(userId: string, done: any)  {
 
     const userRepository = getCustomRepository(UserRepository);
 
 
-    userRepository.createQueryBuilder('user')
+    getRepository(User).createQueryBuilder('user')
       //.leftJoinAndSelect('role.uis', 'ui')
       .leftJoinAndSelect('user.roles', 'role', 'role.roleId = 1')
       .where('user.userId = :id', { id: userId })
@@ -96,6 +91,19 @@ function configPassportLocal(): void {
         done(null, user);
       })
       .catch((err:any) => done(err));
-  });
+};
+
+function configPassportLocal(
+  fields: any = customFields, 
+  verifyCb: any = verifyCallback, 
+  serializeUs: any = serializeUser, 
+  deserializeUs: any = deserializeUser,
+): void {
+  const strategy = new LocalStrategy(fields, verifyCb);
+  passport.use(strategy);
+  // This method is used to store the user identifier locally.
+  passport.serializeUser(serializeUs);
+  // This method is used to extract user data.
+  passport.deserializeUser(deserializeUs);
 }
 export { configPassportLocal };

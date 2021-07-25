@@ -1,0 +1,39 @@
+{
+  "name": "@pxp-nd/auth",
+  "version": "1.0.7",
+  "description": "Core auth for pxp-nd",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "prepublish": "tsc",
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "start": "npm run build && node dist/index.js",
+    "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node dist/index.js\"",
+    "build:js": "babel src --out-dir dist --extensions \".ts\" --source-maps inline",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pxp-nd"
+  ],
+  "author": "Kplian",
+  "license": "ISC",
+  "dependencies": {
+    "@pxp-nd/core": "file:.yalc/@pxp-nd/core",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "firebase-admin": "^9.8.0",
+    "passport": "^0.4.1",
+    "passport-facebook": "^3.0.0",
+    "passport-firebase-auth": "^0.0.0-beta.1",
+    "passport-google-oauth": "^2.0.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.2.32",
+    "@pxp-nd/core": "^1.0.7",
+    "@pxp-nd/entities": "^1.0.7",
+    "@pxp-nd/repositories": "^1.0.7"
+  },
+  "yalcSig": "c8114cdb0b6ff484731ec780c5ae951e"
+}

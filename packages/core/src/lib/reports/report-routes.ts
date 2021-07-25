@@ -4,10 +4,10 @@ import { makePdf } from './pdf';
 import { makeXlsx } from './xlsx';
 import { generateReport, listReports, getReport, listGroup } from './generated';
 import { isAuthenticated } from '@pxp-nd/auth';
-import { ConfigPxpApp } from '../../interfaces';
+import { IConfigPxpApp } from '../../interfaces';
 
 
-const getReportsRouter = (config: ConfigPxpApp ) => {
+const getReportsRouter = (config: IConfigPxpApp ) => {
   const reportsRouter = Router();
   const prefix = config.apiPrefix;
 

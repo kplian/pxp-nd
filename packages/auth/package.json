@@ -7,6 +7,7 @@
   "prepublish": "tsc",
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "dev:publish": "yalc publish",
     "start": "npm run build && node dist/index.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node dist/index.js\"",
     "build:js": "babel src --out-dir dist --extensions \".ts\" --source-maps inline",
@@ -30,6 +31,8 @@
     "tsc-watch": "^4.2.9"
   },
   "dependencies": {
+    "@pxp-nd/core": "file:.yalc/@pxp-nd/core",
+    "@pxp-nd/common": "file:.yalc/@pxp-nd/common",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "firebase-admin": "^9.8.0",

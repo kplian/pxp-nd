@@ -29,7 +29,7 @@ import {
   Model, __, Log
 } from '@pxp-nd/core';
 
-import {Template as TemplateModel} from '@pxp-nd/entities';
+import {Template as TemplateModel} from '../entities';
 
 @Model('common/Template')
 class Template extends Controller {

@@ -1,6 +1,4 @@
 import { BaseEntity } from 'typeorm';
-
-
 declare interface IAuthields {
   usernameField: string;
   passwordField: string;
@@ -20,8 +18,8 @@ declare interface IDeserialize {
 declare interface IAuthPxp {
   serialize: ISerialize;
   deserialize: IDeserialize;
-  local: boolean |  IAuthLocal;
-  jwt: boolean | any;
+  local?: boolean |  IAuthLocal;
+  jwt?: boolean | any;
 } 
 export interface IConfigPxpApp {
   defaultDbSettings?: string;
@@ -29,6 +27,10 @@ export interface IConfigPxpApp {
   logDuration?: boolean;
   showRoutes?: boolean;
   controllers?: any[];
+  entities?: any;
   auth?: boolean | IAuthPxp; 
+  reports?: boolean; 
   session?: any | BaseEntity;
+  middlewares?: any[];
+  scripts?: any[];
 };

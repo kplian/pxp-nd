@@ -39,7 +39,7 @@ export const setRobotoFont = (doc: any) => {
   doc.setFont('Roboto');
 };
 
-const totalRender = (columns: any =[], totals:any) => {
+const totalRender = (columns: any = [], totals:any = {}) => {
   return columns.map((column:any) => {
     if (totals[column.dataKey]) {
       return totals[column.dataKey];
@@ -55,7 +55,8 @@ const footStyles = {
 }
 export const makePdf = async (req: any, res: any) => {
   try {
-    let data, params: any, filters= null;
+    let data, params: any = null;
+    let filters = {};
     if (!req.reportData) {
       // s-params
       params  = await parseParams(req);
@@ -67,7 +68,7 @@ export const makePdf = async (req: any, res: any) => {
       params = {
         ...req.report
       };
-      filters = req.reportData.filters;
+      filters = req.reportData.filters || {};
     }
     
     const doc: any = new jsPDF({filters: ['ASCIIHexEncode']});

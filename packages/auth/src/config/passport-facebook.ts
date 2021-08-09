@@ -15,7 +15,7 @@ import passport from 'passport';
 import { Strategy, Profile, VerifyFunction } from 'passport-facebook';
 import { UserRepository } from '@pxp-nd/repositories';
 import { getCustomRepository } from 'typeorm';
-import {User} from '@pxp-nd/entities';
+import {User} from '@pxp-nd/common';
 
 const facebookStrategy = new Strategy(
   {

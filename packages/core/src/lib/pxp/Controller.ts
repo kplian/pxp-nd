@@ -29,15 +29,15 @@ import {
   insertLog
 } from './index';
 import { User } from '@pxp-nd/entities';
-import { isAuthenticated } from '@pxp-nd/auth';
+// import { isAuthenticated } from '@pxp-nd/auth';
 import { parseParams } from './middlewares/ParseParams';
 import { isReportMiddleware } from './middlewares/isReportMiddleware';
 import { makePdf } from '../reports/pdf';
 import { makeXlsx } from '../reports/xlsx';
 import { IConfigPxpApp } from '../../interfaces';
-import * as entities from '@pxp-nd/entities';
+// import * as entities from '@pxp-nd/entities';
 
-const pxpEntities: any = entities;
+// const pxpEntities: any = entities;
 export class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
@@ -63,7 +63,12 @@ export class Controller implements ControllerInterface {
     delete: false
   };
 
-  constructor(module: string, config: IConfigPxpApp = { apiPrefix: '/api', defaultDbSettings: 'Orm'}) {
+  constructor(module: string, config: IConfigPxpApp = { 
+    apiPrefix: '/api',
+    defaultDbSettings: 'Orm',
+    middlewares: [], 
+    entities: {},
+  }) {
     this.validated = false;
     this.module = module;
     this.config = config;
@@ -74,7 +79,7 @@ export class Controller implements ControllerInterface {
       const mainDir = process.cwd();
       try {
         if(this.module === 'pxp') {
-          this.model = pxpEntities[entityName];
+          this.model = config.entities[entityName];
         } else {
           import(`${mainDir}/dist/modules/${moduleName}/entity/${entityName}`).then(
           (model) => {
@@ -154,10 +159,6 @@ export class Controller implements ControllerInterface {
         );
       }
 
-      if(this.config.showRoutes) {
-        console.log(`${'\x1b[31m'}${route.requestMethod.toUpperCase()}:\t${'\x1b[32m'}${this.config.apiPrefix + '/' + this.module + this.path + route.path}${'\x1b[0m'}`);
-      }
-
       if (
         route.methodName in authentication &&
         authentication[route.methodName] === false
@@ -223,7 +224,7 @@ export class Controller implements ControllerInterface {
           this.config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
           [
-            isAuthenticated,
+            ...this.config.middlewares,
             isReportMiddleware,
             parseParams
           ],
@@ -457,7 +458,7 @@ export class Controller implements ControllerInterface {
   ): Promise<unknown> {
     const modelInstance = new this.model();
     Object.assign(modelInstance, params);
-    modelInstance.createdBy = this.user.username as string;
+    modelInstance.createdBy = this.user ? this.user.username as string: null;
     await __(this.classValidate(modelInstance));
     await manager.save(modelInstance);
     return modelInstance;
@@ -474,7 +475,7 @@ export class Controller implements ControllerInterface {
     const editParams = params;
     Object.assign(modelInstance, editParams);
     delete editParams.id;
-    modelInstance.modifiedBy = this.user.username as string;
+    modelInstance.modifiedBy = this.user ? this.user.username as string: null;
     await __(this.classValidate(modelInstance));
     await manager.save(modelInstance);
     return modelInstance;

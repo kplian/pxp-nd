@@ -22,8 +22,8 @@ import {
   Model, __, Log
 } from '@pxp-nd/core';
 
-import {AccountStatus as AccountStatusModel} from '@pxp-nd/entities';
-import {AccountStatusType as AccountStatusTypeModel} from '@pxp-nd/entities';
+import {AccountStatus as AccountStatusModel} from '../entities';
+import {AccountStatusType as AccountStatusTypeModel} from '../entities';
 import { accountStatusRepository } from '@pxp-nd/repositories';
 
 // @Route('/accountStatusType')

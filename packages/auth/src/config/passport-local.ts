@@ -30,7 +30,7 @@ export const verifyCallback = (
   password: string,
   done: any
 ): void => {
-  const userRepository = getCustomRepository(UserRepository);
+  // const userRepository = getCustomRepository(UserRepository);
 
   /*
   {
@@ -79,7 +79,7 @@ function serializeUser(user: any, done: any) {
 
 function deserializeUser(userId: string, done: any)  {
 
-    const userRepository = getCustomRepository(UserRepository);
+    // const userRepository = getCustomRepository(UserRepository);
 
 
     getRepository(User).createQueryBuilder('user')

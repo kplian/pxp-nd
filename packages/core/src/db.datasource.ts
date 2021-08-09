@@ -8,6 +8,7 @@ const config = {
     entities: [
       'dist/modules/**/entity/*.js',
       'dist/modules/**/entities/*.js',
+      'node_modules/@pxp-nd/core/**/entities/*.js'
       // 'node_modules/@pxp-nd/entities/**/entity/*.js'
     ],
     migrations: ['src/migration/**/*.ts'],

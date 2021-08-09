@@ -1,6 +1,6 @@
 {
   "name": "@pxp-nd/auth",
-  "version": "1.0.7",
+  "version": "1.1.5",
   "description": "Core auth for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,6 +8,7 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "dev:publish": "yalc publish",
+    "prod:publish": "npm publish",
     "start": "npm run build && node dist/index.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node dist/index.js\"",
     "build:js": "babel src --out-dir dist --extensions \".ts\" --source-maps inline",
@@ -31,8 +32,6 @@
     "tsc-watch": "^4.2.9"
   },
   "dependencies": {
-    "@pxp-nd/core": "file:.yalc/@pxp-nd/core",
-    "@pxp-nd/common": "file:.yalc/@pxp-nd/common",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "firebase-admin": "^9.8.0",

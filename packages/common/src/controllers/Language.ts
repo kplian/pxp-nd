@@ -21,7 +21,7 @@ import {
   ReadOnly,
   Model
 } from '@pxp-nd/core';
-import { Language as LanguageModel } from '@pxp-nd/entities';
+import { Language as LanguageModel } from '../entities';
 
 
 @Route('/languages')

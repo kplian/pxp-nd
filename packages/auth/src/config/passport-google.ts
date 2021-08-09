@@ -15,7 +15,7 @@ import passport from 'passport';
 import { OAuth2Strategy, Profile } from 'passport-google-oauth';
 import { UserRepository } from '@pxp-nd/repositories';
 import { getCustomRepository } from 'typeorm';
-import {User} from '@pxp-nd/entities';
+import { User } from '@pxp-nd/common';
 
 const googleStrategy = new OAuth2Strategy(
   {

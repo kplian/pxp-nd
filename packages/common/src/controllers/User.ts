@@ -25,9 +25,9 @@ import {
   __
 } from '@pxp-nd/core';
 import { genPassword } from '@pxp-nd/auth';
-import {User as UserModel} from '@pxp-nd/entities';
-import {Person} from '@pxp-nd/entities';
-import {Role} from '@pxp-nd/entities';
+import {User as UserModel} from '../entities';
+import {Person} from '../entities';
+import {Role} from '../entities';
 
 @Route('/user')
 @StoredProcedure('pxp.ftusuario')

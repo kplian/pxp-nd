@@ -21,7 +21,7 @@ import {
   ReadOnly,
   Model
 } from '@pxp-nd/core';
-import {Translate as TranslateModel} from '@pxp-nd/entities';
+import {Translate as TranslateModel} from '../entities';
 
 
 @Route('/translate/translations')

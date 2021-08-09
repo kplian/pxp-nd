@@ -12,16 +12,24 @@
  * Last modified  : 2020-10-23 19:32:15
  */
 import fs from 'fs';
+import path from 'path';
 import util from 'util';
 import chalk from 'chalk';
 import * as figlet from 'figlet';
 import 'reflect-metadata';
 import { ScriptInterface } from './lib/pxp/index';
 import { createConnections, getConnection } from 'typeorm';
-import {ScriptVersion} from '@pxp-nd/entities';
+import ScriptVersion from './entities/ScriptVersion';
 import pxpScripts from './database/script';
 
-let scriptArray: ScriptInterface[] = [...pxpScripts];
+async function loadCustomStripts(){
+  const dir = path.join(process.cwd(), 'dist', 'config.js');
+  const customScripts = await import(dir);
+  return customScripts.default.scripts || [];
+}
+
+let scriptArray: ScriptInterface[] = [];
+// let scriptArray: ScriptInterface[] = [...pxpScripts];
 console.log(
   chalk.red(
     figlet.textSync('script-loader', { horizontalLayout: 'default' })
@@ -86,6 +94,8 @@ const executeScripts = async (): Promise<void> => {
     const modulesPath = `${process.cwd()}/dist/modules`;
     let modules: string[] = [];
     try {
+      const customScripts = await loadCustomStripts();
+      scriptArray = [ ...scriptArray, ...customScripts];
       modules = await readdir(modulesPath);
       for (const module of modules) {
         const url = modulesPath + '/' + module + '/database/script.js';

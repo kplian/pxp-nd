@@ -13,7 +13,7 @@
  */
 import { EntityManager } from 'typeorm';
 import { Controller, Get, Post, DbSettings, ReadOnly, Log, Model, __ } from '@pxp-nd/core';
-import { Person as PersonModel} from '@pxp-nd/entities';
+import { Person as PersonModel} from '../entities';
 
 
 @Model('common/Person')

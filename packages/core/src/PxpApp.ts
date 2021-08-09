@@ -26,8 +26,8 @@ import path from 'path';
 import { ControllerInterface as Controller } from './lib/pxp';
 import loadControllers from './lib/pxp/loadControllers';
 import { errorMiddleware } from './lib/pxp';
-import { getAuthRoutes, customAuthRoutes } from '@pxp-nd/auth';
-import { configPassport } from '@pxp-nd/auth';
+// import { getAuthRoutes, customAuthRoutes } from '@pxp-nd/auth';
+// import { configPassport } from '@pxp-nd/auth';
 // import { Session } from '@pxp-nd/entities';
 import { TypeormStore } from 'typeorm-store';
 import { getReportsRouter } from './lib/reports/report-routes';
@@ -45,10 +45,15 @@ const modulesPxp = {
 class PxpApp {
   public app: express.Application;
   public controllers: Controller[];
+  private configAuth: any = null;
+  public Report: any = null;
+  public ReportGroup: any = null;
+
   config: IConfigPxpApp = {
     defaultDbSettings: 'Orm', // Orm, Procedure, Query
     apiPrefix: '/api',
-    logDuration: true
+    logDuration: true,
+    middlewares: [],
   };
 
   constructor(config: IConfigPxpApp) {
@@ -58,13 +63,19 @@ class PxpApp {
     this.controllers = [];
     // this.initializeMiddlewares();
   }
-  public async loadControllers(controllers: any): Promise<void> {
-    this.controllers = await loadControllers(controllers, this.config);
-    await this.connectToTheDatabase();
-    await this.initializeAuthentication();
+
+  set ConfigAuth(authOptions:any) {
+    this.configAuth = authOptions;
+  }
+
+  public async loadControllers(): Promise<void> {
+    // await this.connectToTheDatabase();
+    // await this.initializeAuthentication();
+    this.controllers = await loadControllers(this.config.controllers, this.config);
     this.initializeRoutes();
     this.initializeErrorHandling();
   }
+
   public listen(): void {
     this.app.listen(process.env.PORT, () => {
       console.log(`${'\x1b[36m'}App listening on the port ${process.env.PORT}${'\x1b[0m'}`);
@@ -111,24 +122,29 @@ class PxpApp {
 
       next();
     });
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: false }));
     this.app.use(fileUpload({
       limits: { fileSize: 5 * 1024 * 1024 },
     }));
     this.configCors();
   }
 
-  async initializeAuthentication() {
-    this.initializeSession();
-    await this.initializePassport();
+  public async initializeAuthentication(configAuth: any) {
+    if(configAuth) {
+      const { configPassport, getAuthRoutes, customAuthRoutes } = configAuth();
+      this.initializeSession();
+      await this.initializePassport(configPassport, getAuthRoutes, customAuthRoutes);
+    } else {
+      throw new Error('Invalid config Auth');
+    }
   }
 
   initializeErrorHandling(): void {
     this.app.use(errorMiddleware);
   }
 
-  private async initializePassport() {
+  private async initializePassport(configPassport: any, getAuthRoutes: any, customAuthRoutes: any ) {
     configPassport(this.config.auth);
     this.app.use(passport.initialize());
     // @todo only validate session if authorization is not set(10/03/2021)
@@ -157,10 +173,24 @@ class PxpApp {
 
     const routes: any = await customAuthRoutes();
     routes.forEach((route:any) => this.app.use(route.router));
-
-    this.app.use(getAuthRoutes(this.config.apiPrefix));
-    this.app.use(getReportsRouter(this.config));
-
+     
+    const authRoutes: any = getAuthRoutes(this.config.apiPrefix);
+    this.showRoutes(authRoutes);
+    this.app.use(authRoutes);
+    if(this.config.reports) {
+      if(!this.Report && !this.ReportGroup) {
+        throw new Error(`Invalid Report configuration, set Report and ReportGroup entities:\n
+          \t// App.ts file
+          \timport { Report, ReportGroup } from '@pxp-nd/auth';
+          \t//...
+          \tthis.Report  = Report;
+          \tthis.ReportGroup  = ReportGroup;
+          `)
+      }
+      const reportRouter = getReportsRouter(this.config, this.Report, this.ReportGroup);
+      this.showRoutes(reportRouter);
+      this.app.use(reportRouter);
+    }
   }
 
   private configCors() {
@@ -199,6 +229,7 @@ class PxpApp {
   private initializeRoutes() {
     this.controllers.forEach((controller) => {
       this.app.use(controller.router);
+      this.showRoutes(controller.router);
     });
     this.app.all('*', function (req, res) {
       res.status(404).json({
@@ -210,8 +241,36 @@ class PxpApp {
     });
   }
 
-  private async connectToTheDatabase(): Promise<void> {
+    // Show routes with config.showRoutes is true
+  private showRoutes(router: any): void {
+    const routes = router.stack.filter((r: any) => r.route)
+    .map((r: any) => {
+      return {
+        method: Object.keys(r.route.methods)[0].toUpperCase(),
+        path: r.route.path
+      };
+    });
+    
+    if(this.config.showRoutes) {
+      routes.forEach((route: any) => 
+        console.log(`${'\x1b[31m'}${route.method.toUpperCase()}:\t${'\x1b[32m'}${route.path}${'\x1b[0m'}`));
+      console.log('');
+    }
+  }
+
+  async connectDatabase(): Promise<void> {
     await createConnections();
+  }
+
+  async run(): Promise<void> {
+    this.initializeMiddlewares();
+    await this.connectDatabase();
+    // configure auth options
+    if(this.config.auth) {
+      await this.initializeAuthentication(this.configAuth);
+    }
+    // load controllers and routes
+    await this.loadControllers();
   }
 
   private folderModulesCreate () {

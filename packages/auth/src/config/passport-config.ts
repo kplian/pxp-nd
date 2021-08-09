@@ -50,20 +50,20 @@ const getCustomStrategies = () => {
 
 
 export const configPassport = (auth: any | boolean) => {
-  getCustomStrategies();
-  configGoogleStrategy();
-  configFacebookStrategy();
-  configPassportJwtStrategy();
   if(auth === true) {
-    setTimeout(() => configPassportLocal());
+    getCustomStrategies();
+    configGoogleStrategy();
+    configFacebookStrategy();
+    configPassportJwtStrategy();
+    configPassportLocal();
   }
   if(auth && auth.local) {
-    setTimeout(() => configPassportLocal(
+    configPassportLocal(
       auth.local.fields,
       auth.local.verifyUser,
       auth.serialize,
       auth.deserialize,
-    ));
+    );
   }
 };
 

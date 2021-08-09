@@ -13,8 +13,8 @@
  */
 import Joi from 'joi';
 import { Controller, Get, DbSettings, ReadOnly, Model, __, Permission, Authentication, Log } from '@pxp-nd/core';
-import {Ui as UiModel} from '@pxp-nd/entities';
-import {User} from '@pxp-nd/entities';
+import {Ui as UiModel} from '../entities';
+import {User} from '../entities';
 
 
 @Model('common/Ui')

@@ -21,7 +21,7 @@ import {
   ReadOnly,
   Model
 } from '@pxp-nd/core';
-import {WordKey as WordKeyModel} from '@pxp-nd/entities';
+import {WordKey as WordKeyModel} from '../entities';
 @Route('/translate/words')
 @Model('common/WordKey')
 class WordKey extends Controller {

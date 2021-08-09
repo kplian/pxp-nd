@@ -13,7 +13,8 @@
  */
 import 'reflect-metadata';
 import { getManager, EntityManager } from 'typeorm';
-import { Role, Log } from '@pxp-nd/entities';
+import { Role } from '@pxp-nd/entities';
+import Log from '../../../entities/Log';
 
 interface ScriptInterface {
   scriptCode: string,

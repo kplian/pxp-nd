@@ -13,9 +13,8 @@
  */
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import passport from 'passport';
-import { UserRepository } from '@pxp-nd/repositories';
-import { getCustomRepository } from 'typeorm';
-import {User} from '@pxp-nd/entities';
+import { getRepository } from 'typeorm';
+import {User} from '@pxp-nd/common';
 // import * as jwt from 'jsonwebtoken';
 import { sign, verify } from 'jsonwebtoken';
 const options = {
@@ -30,7 +29,7 @@ export const configPassportJwtStrategy = () => {
   passport.use(
     new Strategy(options, function (jwt_payload, done) {
       // We will assign the `sub` property on the JWT to the database ID of user
-      const UserRepo = getCustomRepository(UserRepository);
+      const UserRepo: any = getRepository(User);
       UserRepo.findOne({
         where: {
           userId: jwt_payload.sub

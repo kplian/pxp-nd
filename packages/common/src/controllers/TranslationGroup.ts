@@ -23,9 +23,9 @@ import {
   Authentication,
   Post
 } from '@pxp-nd/core';
-import {TranslationGroup as TranslationGroupModel} from '@pxp-nd/entities';
-import {WordKey as WordKeyModel} from '@pxp-nd/entities';
-import {Language} from '@pxp-nd/entities';
+import {TranslationGroup as TranslationGroupModel} from '../entities';
+import {WordKey as WordKeyModel} from '../entities';
+import {Language} from '../entities';
 import path from 'path';
 import fs from 'fs';
 import AdmZip from 'adm-zip';

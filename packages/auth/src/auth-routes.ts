@@ -14,8 +14,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { isAuthenticated } from './config/passport-config';
-import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '@pxp-nd/repositories';
+import { getRepository } from 'typeorm';
+// import { UserRepository } from '@pxp-nd/repositories';
+import { User } from '@pxp-nd/common';
 import { validPassword } from './utils/password';
 import { issueJWT } from './config/passport-jwt';
 import { PxpError, errorMiddleware } from '@pxp-nd/core';
@@ -49,8 +50,8 @@ const getAuthRoutes = (apiPrefix: string ) => {
   );
 
   authRouter.post(apiPrefix + '/auth/login/token', (req, res, next) => {
-    const userRepo = getCustomRepository(UserRepository);
-    userRepo
+    // const userRepo = getCustomRepository(UserRepository);
+    getRepository(User)
       .findOne({
         where: {
           username: req.body.username

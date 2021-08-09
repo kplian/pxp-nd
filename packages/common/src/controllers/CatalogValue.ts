@@ -11,8 +11,8 @@ import {
   ReadOnly,
   Model
 } from '@pxp-nd/core';
-import {CatalogValue as CatalogValueModel} from '@pxp-nd/entities';
-import {Catalog as CatalogModel} from '@pxp-nd/entities';
+import {CatalogValue as CatalogValueModel} from '../entities';
+import {Catalog as CatalogModel} from '../entities';
 
 @Route('/catalog-values')
 class CatalogValue extends Controller {

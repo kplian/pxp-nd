@@ -21,6 +21,15 @@ declare interface IAuthPxp {
   local?: boolean |  IAuthLocal;
   jwt?: boolean | any;
 } 
+
+declare interface IModule {
+  entities?: any,
+  controllers?: any[];
+}
+
+declare interface IModules {
+  [name: string]: IModule;
+}
 export interface IConfigPxpApp {
   defaultDbSettings?: string;
   apiPrefix?: string;
@@ -33,4 +42,5 @@ export interface IConfigPxpApp {
   session?: any | BaseEntity;
   middlewares?: any[];
   scripts?: any[];
+  modules?: IModules;
 };

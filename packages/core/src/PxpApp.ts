@@ -23,6 +23,10 @@ import { getConnection } from 'typeorm';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+/** swagger options **/
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerOptions from './swaggerOptions';
 import { ControllerInterface as Controller } from './lib/pxp';
 import loadControllers from './lib/pxp/loadControllers';
 import { errorMiddleware } from './lib/pxp';
@@ -68,10 +72,22 @@ class PxpApp {
     this.configAuth = authOptions;
   }
 
+  private initializeSwagger() {
+    const options = {
+      customCss: '.swagger-ui .topbar { display: none }',
+      explorer: true,
+    };
+    const swaggerDocs = swaggerJsDoc(swaggerOptions);
+    this.app.use('/explorer', swaggerUi.serve, swaggerUi.setup(
+      swaggerDocs, 
+      options,
+    ));
+  }
+
   public async loadControllers(): Promise<void> {
     // await this.connectToTheDatabase();
     // await this.initializeAuthentication();
-    this.controllers = await loadControllers(this.config.controllers, this.config);
+    this.controllers = await loadControllers(this.config);
     this.initializeRoutes();
     this.initializeErrorHandling();
   }
@@ -136,7 +152,12 @@ class PxpApp {
       this.initializeSession();
       await this.initializePassport(configPassport, getAuthRoutes, customAuthRoutes);
     } else {
-      throw new Error('Invalid config Auth');
+      throw new Error(`Invalid config Auth, set ConfigAuth:\n
+        \t// App.ts file
+        \timport { configAuth } from '@pxp-nd/auth';
+        \t// In construstror set...
+        \tthis.ConfigAuth  = configAuth;
+        \t//...`);
     }
   }
 
@@ -181,7 +202,7 @@ class PxpApp {
       if(!this.Report && !this.ReportGroup) {
         throw new Error(`Invalid Report configuration, set Report and ReportGroup entities:\n
           \t// App.ts file
-          \timport { Report, ReportGroup } from '@pxp-nd/auth';
+          \timport { Report, ReportGroup } from '@pxp-nd/common';
           \t//...
           \tthis.Report  = Report;
           \tthis.ReportGroup  = ReportGroup;
@@ -253,7 +274,7 @@ class PxpApp {
     
     if(this.config.showRoutes) {
       routes.forEach((route: any) => 
-        console.log(`${'\x1b[31m'}${route.method.toUpperCase()}:\t${'\x1b[32m'}${route.path}${'\x1b[0m'}`));
+      console.log(`${'\x1b[31m'}${route.method.toUpperCase()}:\t${'\x1b[32m'}${route.path}${'\x1b[0m'}`));
       console.log('');
     }
   }
@@ -263,6 +284,7 @@ class PxpApp {
   }
 
   async run(): Promise<void> {
+    this.initializeSwagger();
     this.initializeMiddlewares();
     await this.connectDatabase();
     // configure auth options

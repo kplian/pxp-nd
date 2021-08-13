@@ -13,7 +13,7 @@
  */
 import 'reflect-metadata';
 import { getManager, EntityManager } from 'typeorm';
-import { Role } from '@pxp-nd/entities';
+// import { Role } from '@pxp-nd/entities';
 import Log from '../../../entities/Log';
 
 interface ScriptInterface {
@@ -22,7 +22,7 @@ interface ScriptInterface {
 }
 
 
-const userHasPermission = async (userId: number, transaction: string): Promise<boolean> => {
+const userHasPermission = (Role: any) => async (userId: number, transaction: string): Promise<boolean> => {
 
   const user = await getManager()
     .createQueryBuilder(Role, 'role')

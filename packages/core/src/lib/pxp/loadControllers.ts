@@ -19,16 +19,26 @@ import { IConfigPxpApp } from '../../interfaces';
 // import * as controllers from '../../controllers';
 const readdir = util.promisify(fs.readdir);
 
-const loadPxpControllers = (controllers: any[] = [], config: IConfigPxpApp) => {
+const loadPxpControllers = (config: IConfigPxpApp) => {
+  const controllers: any = [];
+  if (config.modules) {
+    const modules = Object.keys(config.modules);
+    modules.forEach((name: string) => {
+      const module = config.modules[name];
+      const modControllers = module.controllers ? module.controllers: [];
+      modControllers.forEach((ctrl: any) => controllers.push(new ctrl(name, null, config)))
+    })
+  }
   // const pxpControllers: any = controllers;
-  return  Object.keys(controllers).map((key: any) => new controllers[key]('pxp', config));
+  return controllers;
+  // return  Object.keys(controllers).map((key: any) => new controllers[key]('pxp', config));
 };
 
-export default async (pxpControllers: any[], config: IConfigPxpApp): Promise<Controller[]> => {
+export default async (config: IConfigPxpApp): Promise<Controller[]> => {
   // const modulesPath = `${__dirname}/../../modules`;
   const modulesPath = path.join( process.cwd(), `/dist/modules`);
   let modules: string[] = [];
-  const controllers: Controller[] = loadPxpControllers(pxpControllers, config);
+  const controllers: Controller[] = loadPxpControllers(config);
   let controllerFiles: Record<string, string>[] = [];
   let auxFiles: Record<string, string>[] = [];
   try {
@@ -49,7 +59,7 @@ export default async (pxpControllers: any[], config: IConfigPxpApp): Promise<Con
     }
     for (const controllerFile of controllerFiles) {
       const ControllerClass = await import(controllerFile.url);
-      controllers.push(new ControllerClass.default(controllerFile.module, config));
+      controllers.push(new ControllerClass.default(controllerFile.module, null, config));
     }
 
   } catch (err) {

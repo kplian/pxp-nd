@@ -28,7 +28,7 @@ import {
   userHasPermission,
   insertLog
 } from './index';
-import { User } from '@pxp-nd/entities';
+// import { User } from '@pxp-nd/entities';
 // import { isAuthenticated } from '@pxp-nd/auth';
 import { parseParams } from './middlewares/ParseParams';
 import { isReportMiddleware } from './middlewares/isReportMiddleware';
@@ -47,7 +47,7 @@ export class Controller implements ControllerInterface {
   public module = '';
   public modelString = '';
   public transactionCode = '';
-  public user: User;
+  public user: any = {};//User;
   public model: any;
   config: IConfigPxpApp;
   private basicRoutes: RouteDefinition[] = [
@@ -63,7 +63,7 @@ export class Controller implements ControllerInterface {
     delete: false
   };
 
-  constructor(module: string, config: IConfigPxpApp = { 
+  constructor(module: string, Entity: any = null, config: IConfigPxpApp = { 
     apiPrefix: '/api',
     defaultDbSettings: 'Orm',
     middlewares: [], 
@@ -78,8 +78,11 @@ export class Controller implements ControllerInterface {
       const [moduleName, entityName] = this.modelString.split('/');
       const mainDir = process.cwd();
       try {
-        if(this.module === 'pxp') {
-          this.model = config.entities[entityName];
+        if(Entity) {
+          this.model = Entity;
+        } else if (config.modules && config.modules[this.module]) {
+          const moduleExternal: any = config.modules[this.module];
+          this.model = moduleExternal.entities[entityName];
         } else {
           import(`${mainDir}/dist/modules/${moduleName}/entity/${entityName}`).then(
           (model) => {
@@ -234,7 +237,8 @@ export class Controller implements ControllerInterface {
             this.pxpParams = req.pxpParams;
 
             if (req.user) {
-              this.user = req.user as User;
+              // this.user = req.user as User;
+              this.user = req.user;
             }
             this.transactionCode = (this.module + this.path + route.path)
               .split('/')
@@ -354,7 +358,7 @@ export class Controller implements ControllerInterface {
     if (permission) {
       if (this.user && this.user.roles && this.user.roles.length === 0) {
         const hasPermission = await __(
-          userHasPermission(this.user.userId as number, this.transactionCode)
+          userHasPermission(this.config.entities.Role)(this.user.userId as number, this.transactionCode)
         );
         if (!hasPermission) {
           throw new PxpError(403, 'Access denied to execute this method');
@@ -458,7 +462,7 @@ export class Controller implements ControllerInterface {
   ): Promise<unknown> {
     const modelInstance = new this.model();
     Object.assign(modelInstance, params);
-    modelInstance.createdBy = this.user ? this.user.username as string: null;
+    modelInstance.createdBy = this.user ? this.user.username as string: '_';
     await __(this.classValidate(modelInstance));
     await manager.save(modelInstance);
     return modelInstance;

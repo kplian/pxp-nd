@@ -13,7 +13,7 @@ const config = {
     ],
     migrations: ['src/migration/**/*.ts'],
     subscribers: [
-      'src/subscribers/**/*.ts',
+      'dist/modules/**/subscribers/*.js',
       // 'node_modules/@pxp-nd/core/**/subscribers/*.js'
     ],
     cli: {
@@ -24,8 +24,14 @@ const config = {
 };
 
 const setConfig = (connection: any) => {
+  const subscribers = connection.subscribers || [];
   if(connection.hasOwnProperty('entities')) {
-    return { ...config, ...connection, entities: [...config.entities, ...connection.entities] };
+    return { 
+      ...config, 
+      ...connection, 
+      entities: [...connection.entities, ...config.entities],
+      subscribers: [...subscribers, ...config.subscribers]
+    };
   }
 
   return { ...config, ...connection };

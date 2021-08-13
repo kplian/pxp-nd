@@ -15,7 +15,10 @@
 
 // import { ScriptInterface } from '@pxp-nd/core';
 
-import {Person , User , Role, Subsystem , Ui} from '@pxp-nd/entities';
+// import {Person , User , Role, Subsystem , Ui} from '@pxp-nd/entities';
+const Person = class{} , User =class{} , Role=class{}, Subsystem=class{} , Ui = class{
+  static findOne(filter: any) {}
+};
 import { ScriptInterface } from '../lib/pxp/utils/Security';
 const scriptsArray: ScriptInterface[] = [];
 
@@ -25,13 +28,13 @@ const scriptsArray: ScriptInterface[] = [];
 
 scriptsArray.push({
   scriptCode: 'JRR-PXP-20200601-001', scriptFunction: async (em) => {
-    const person = new Person();
+    const person: any = new Person();
     person.name = 'admin';
     person.lastName = 'admin';
     person.createdBy = 'admin';
     await em.save(person);
 
-    const subsystem = new Subsystem();
+    const subsystem: any = new Subsystem();
     subsystem.name = 'PXP';
     subsystem.code = 'PXP';
     subsystem.folderName = 'pxp';
@@ -39,14 +42,14 @@ scriptsArray.push({
     subsystem.createdBy = 'admin';
     await em.save(subsystem);
 
-    const role = new Role();
+    const role: any = new Role();
     role.role = 'admin';
     role.description = 'Pxp Administrator (equals to root)';
     role.createdBy = 'admin';
     role.subsystem = subsystem;
     await em.save(role);
 
-    const user = new User();
+    const user: any = new User();
     user.person = person;
     user.username = 'admin';
     user.hash = '201a971991b7e67d0706a829ba5fc77cf4633a57f21b27bb3fd61e3126e3ccf711282eb04f3973a68d4e1444f032e6279b4ddf09fd6bbf51ada163f2bc7f74ce';
@@ -55,7 +58,7 @@ scriptsArray.push({
     user.roles = [role];
     await em.save(user);
 
-    const ui = new Ui();
+    const ui: any = new Ui();
     ui.code = 'PXP';
     ui.name = 'Pxp (root ui)';
     ui.description = 'This should not show in menu all subsystems depend on this';
@@ -71,7 +74,7 @@ scriptsArray.push({
   scriptCode: 'JRR-PXP-20210407-001', scriptFunction: async (em) => {
 
 
-    const subsystem = new Subsystem();
+    const subsystem: any = new Subsystem();
     subsystem.name = 'EXAMPLE';
     subsystem.code = 'EXA ';
     subsystem.folderName = 'exa';
@@ -81,17 +84,17 @@ scriptsArray.push({
 
     const rootUi = await Ui.findOne({ code: "PXP"});
 
-    const uiParent = new Ui();
+    const uiParent: any = new Ui();
     uiParent.code = 'EXA';
     uiParent.name = 'EXAMPLES';
     uiParent.description = 'ROOT MENU FOR EXAMPLES';
     uiParent.subsystem = subsystem;
-    uiParent.parent = rootUi as Ui;
+    uiParent.parent = rootUi;// as Ui;
     uiParent.createdBy = 'admin';
     await em.save(uiParent);
 
 
-    const ui1 = new Ui();
+    const ui1: any = new Ui();
     ui1.code = 'EXA_FormExample';
     ui1.name = ' FORM EXAMPLES';
     ui1.description = 'ROOT MENU FOR EXAMPLES';
@@ -102,7 +105,7 @@ scriptsArray.push({
     await em.save(ui1);
 
 
-    const ui2 = new Ui();
+    const ui2: any = new Ui();
     ui2.code = 'EXA_PickerExample';
     ui2.name = 'PICKER EXAMPLES';
     ui2.description = 'ROOT MENU FOR EXAMPLES';
@@ -113,7 +116,7 @@ scriptsArray.push({
     await em.save(ui2);
 
 
-    const ui3 = new Ui();
+    const ui3: any = new Ui();
     ui3.code = 'EXA_TextFieldExample';
     ui3.name = 'TEXT FIELd EXAMPLE';
     ui3.description = 'ROOT MENU FOR EXAMPLES';
@@ -124,7 +127,7 @@ scriptsArray.push({
     await em.save(ui3);
 
 
-    const ui4 = new Ui();
+    const ui4: any = new Ui();
     ui4.code = 'EXA_AutocompleteExample';
     ui4.name = 'AUTO COMPLETE EXAMPLE';
     ui4.description = 'ROOT MENU FOR EXAMPLES';
@@ -136,7 +139,7 @@ scriptsArray.push({
 
   
 
-    const ui5 = new Ui();
+    const ui5: any = new Ui();
     ui5.code = 'EXA__MapExample';
     ui5.name = 'MAP EXAMPLE';
     ui5.description = 'ROOT MENU FOR EXAMPLES';
@@ -148,7 +151,7 @@ scriptsArray.push({
 
 
 
-    const ui6 = new Ui();
+    const ui6: any = new Ui();
     ui6.code = 'EXALIST__options';
     ui6.name = 'LIST EXAMPLE OPTIONS';
     ui6.description = 'ROOT MENU FOR EXAMPLES';

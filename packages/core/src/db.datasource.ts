@@ -26,10 +26,14 @@ const config = {
 const setConfig = (connection: any) => {
   const subscribers = connection.subscribers || [];
   if(connection.hasOwnProperty('entities')) {
+    const entities = [
+      ...config.entities, 
+      ...Object.keys(connection.entities).map((e: any) => connection.entities[e]),
+    ];
     return { 
       ...config, 
       ...connection, 
-      entities: [...connection.entities, ...config.entities],
+      entities,
       subscribers: [...subscribers, ...config.subscribers]
     };
   }

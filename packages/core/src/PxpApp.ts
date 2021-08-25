@@ -155,7 +155,7 @@ class PxpApp {
       throw new Error(`Invalid config Auth, set ConfigAuth:\n
         \t// App.ts file
         \timport { configAuth } from '@pxp-nd/auth';
-        \t// In construstror set...
+        \t// In constructror set...
         \tthis.ConfigAuth  = configAuth;
         \t//...`);
     }

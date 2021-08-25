@@ -74,7 +74,7 @@ export {
   WordKey,
 }
 
-export const entities = [
+export const entities = {
   AccountStatus,
   AccountStatusType,
   Branch,
@@ -111,4 +111,4 @@ export const entities = [
   UiTransaction,
   User,
   WordKey,
-];
+};

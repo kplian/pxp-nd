@@ -19,4 +19,7 @@ export default class Branch extends BaseEntity{
 
   @Column({ name: 'branch_id_master_fk', type: 'varchar', length: 200, nullable: false})
   branchIdMaster: string;
+
+  @Column({ name: 'location_id', type: 'varchar', length: 200, nullable: false})
+  locationId: string;
 }

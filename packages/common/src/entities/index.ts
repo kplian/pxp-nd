@@ -34,6 +34,7 @@ import Ui from './Ui';
 import UiTransaction from './UiTransaction';
 import User from './User';
 import WordKey from './WordKey';
+import Currency from './Currency';
 
 export {
   AccountStatus,
@@ -111,4 +112,5 @@ export const entities = {
   UiTransaction,
   User,
   WordKey,
+  Currency,
 };

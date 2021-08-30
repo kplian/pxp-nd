@@ -73,6 +73,7 @@ export {
   UiTransaction,
   User,
   WordKey,
+  Currency,
 }
 
 export const entities = {

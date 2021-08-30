@@ -76,6 +76,28 @@ class User extends Controller {
 
   }
 
+  @Post()
+  @ReadOnly(false)
+  async addUser(params: Record<string, unknown>, manager: EntityManager): Promise<any> {
+    const person = new Person();
+    person.name = params.name as string;
+    person.lastName = params.lastName as string;
+    person.createdBy = 'admin';
+    await __(manager.save(person));
+
+    
+    const user = new UserModel();
+    user.person = person;
+    user.username = params.username as string;
+    const hashSalt = genPassword(params.password as string);
+    user.hash = hashSalt.hash;
+    user.salt = hashSalt.salt;
+    user.createdBy = 'admin';
+    const userResult = await __(manager.save(user));
+    return { userId: userResult.userId };
+  }
+
+
 }
 
 export default User;

@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
-import { EntityManager, } from 'typeorm';
+import { EntityManager, Timestamp, } from 'typeorm';
 import { getManager } from 'typeorm';
 import {
   Controller,
@@ -93,10 +93,13 @@ class User extends Controller {
     user.hash = hashSalt.hash;
     user.salt = hashSalt.salt;
     user.createdBy = 'admin';
+    user.style= params.style as string;
+    user.authenticationType=params.authenticationType as string;
     const userResult = await __(manager.save(user));
     return { userId: userResult.userId };
   }
 
+  
 
 }
 

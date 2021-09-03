@@ -34,6 +34,8 @@ import Ui from './Ui';
 import UiTransaction from './UiTransaction';
 import User from './User';
 import WordKey from './WordKey';
+import Currency from './Currency';
+import Location from './Location';
 
 export {
   AccountStatus,
@@ -72,6 +74,8 @@ export {
   UiTransaction,
   User,
   WordKey,
+  Currency,
+  Location
 }
 
 export const entities = {
@@ -111,4 +115,6 @@ export const entities = {
   UiTransaction,
   User,
   WordKey,
+  Currency,
+  Location
 };

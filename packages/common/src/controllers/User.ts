@@ -11,7 +11,7 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-17 19:04:30
  */
-import { EntityManager, } from 'typeorm';
+import { EntityManager, Timestamp, } from 'typeorm';
 import { getManager } from 'typeorm';
 import {
   Controller,
@@ -75,6 +75,31 @@ class User extends Controller {
     return hashSalt;
 
   }
+
+  @Post()
+  @ReadOnly(false)
+  async addUser(params: Record<string, unknown>, manager: EntityManager): Promise<any> {
+    const person = new Person();
+    person.name = params.name as string;
+    person.lastName = params.lastName as string;
+    person.createdBy = 'admin';
+    await __(manager.save(person));
+
+    
+    const user = new UserModel();
+    user.person = person;
+    user.username = params.username as string;
+    const hashSalt = genPassword(params.password as string);
+    user.hash = hashSalt.hash;
+    user.salt = hashSalt.salt;
+    user.createdBy = 'admin';
+    user.style= params.style as string;
+    user.authenticationType=params.authenticationType as string;
+    const userResult = await __(manager.save(user));
+    return { userId: userResult.userId };
+  }
+
+  
 
 }
 

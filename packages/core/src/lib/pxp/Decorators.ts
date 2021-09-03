@@ -11,106 +11,61 @@
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-09-17 18:29:51
  */
-import { RouteDefinition } from './RouteDefinition';
-
-const Get = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as RouteDefinition[];
-
-    routes.push({
-      requestMethod: 'get',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
+import { RouteDefinition, Method } from './RouteDefinition';
+export declare interface IOptionsRoute {
+  readOnly?: boolean;
+  dbSettings?: 'Procedure' | 'Orm' | 'Query';
+  authentication?: boolean;
 };
 
-const Post = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as RouteDefinition[];
-
-    routes.push({
-      requestMethod: 'post',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
+const setProperty =  (target: any, propertyKey: string) => (value: any, name: string) => {
+  if (!Reflect.hasMetadata(name, target.constructor)) {
+    Reflect.defineMetadata(name, [], target.constructor);
+  }
+  const valueName = Reflect.getMetadata(name, target.constructor) as {
+    [id: string]: boolean;
   };
+  valueName[propertyKey] = value;
+  Reflect.defineMetadata(name, valueName, target.constructor);
 };
 
-const Put = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
 
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as RouteDefinition[];
 
-    routes.push({
-      requestMethod: 'put',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
+const createOptions = (options: IOptionsRoute = {
+  readOnly: true, 
+  dbSettings: 'Orm',
+  authentication: true,
+}) => (target: any, propertyKey: string): void => {
+  const newProperty = setProperty(target, propertyKey);
+  // ReadOnly
+  newProperty(options.readOnly, 'readonly');
+  // DbSettings
+  newProperty(options.dbSettings, 'dbsettings');
+  // Authentication
+  newProperty(options.authentication, 'authentication');
 };
 
-const Delete = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
+const setRoute = (path: string = '', method: Method, options?: IOptionsRoute) => (target: any, propertyKey: string) => {
+  if (!Reflect.hasMetadata('routes', target.constructor)) {
+    Reflect.defineMetadata('routes', [], target.constructor);
+  }
+  const routes = Reflect.getMetadata('routes', target.constructor) as RouteDefinition[];
 
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as RouteDefinition[];
+  routes.push({
+    requestMethod: method,
+    path: path === '' ? '/' + propertyKey : path,
+    methodName: propertyKey
+  });
+  Reflect.defineMetadata('routes', routes, target.constructor);
+  createOptions(options)(target, propertyKey);
+}
 
-    routes.push({
-      requestMethod: 'delete',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
+const Get    = (path?:string, options?: IOptionsRoute) =>  setRoute(path, Method.get, options);
+const Post   = (path?:string, options?: IOptionsRoute) =>  setRoute(path, Method.post, options);
+const Put    = (path?:string, options?: IOptionsRoute) =>  setRoute(path, Method.put, options);
+const Patch  = (path?:string, options?: IOptionsRoute) =>  setRoute(path, Method.patch, options);
+const Delete = (path?:string, options?: IOptionsRoute) =>  setRoute(path, Method.delete, options);
 
-const Patch = (path = '') => {
-  return (target: any, propertyKey: string): void => {
-    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
-    // To prevent any further validation simply set it to an empty array here.
-    if (!Reflect.hasMetadata('routes', target.constructor)) {
-      Reflect.defineMetadata('routes', [], target.constructor);
-    }
-
-    // Get the routes stored so far, extend it by the new route and re-set the metadata.
-    const routes = Reflect.getMetadata('routes', target.constructor) as RouteDefinition[];
-
-    routes.push({
-      requestMethod: 'patch',
-      path: path === '' ? '/' + propertyKey : path,
-      methodName: propertyKey
-    });
-    Reflect.defineMetadata('routes', routes, target.constructor);
-  };
-};
 
 const Route = (controllerPath = ''): ClassDecorator => {
   return (target: any) => {
@@ -135,19 +90,17 @@ const StoredProcedure = (storedProcedure: string): ClassDecorator => {
   };
 };
 
-const Authentication = (authentication = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('authentication', target.constructor)) {
-      Reflect.defineMetadata('authentication', {}, target.constructor);
-    }
-    const aut = Reflect.getMetadata('authentication', target.constructor) as {
-      [id: string]: boolean;
-    };
-    aut[propertyKey] = authentication;
+const Authentication = (authentication = true) =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(authentication, 'authentication');
 
-    Reflect.defineMetadata('authentication', aut, target.constructor);
-  };
-};
+const ReadOnly = (ronly = true) =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(ronly, 'readonly');
+
+const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(modelType, 'dbsettings');
+
+const Permission = (permission = true) =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(permission, 'permission');
 
 const Log = (log = true, config: Record<string, unknown> = {}) => {
   return (target: any, propertyKey: string): void => {
@@ -170,45 +123,6 @@ const Log = (log = true, config: Record<string, unknown> = {}) => {
   };
 };
 
-const Permission = (permission = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('permission', target.constructor)) {
-      Reflect.defineMetadata('permission', [], target.constructor);
-    }
-    const perVar = Reflect.getMetadata('permission', target.constructor) as {
-      [id: string]: boolean;
-    };
-    perVar[propertyKey] = permission;
-    Reflect.defineMetadata('permission', perVar, target.constructor);
-  };
-};
-
-const ReadOnly = (ronly = true) => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('readonly', target.constructor)) {
-      Reflect.defineMetadata('readonly', [], target.constructor);
-    }
-    const rOnlyVar = Reflect.getMetadata('readonly', target.constructor) as {
-      [id: string]: boolean;
-    };
-    rOnlyVar[propertyKey] = ronly;
-    Reflect.defineMetadata('readonly', rOnlyVar, target.constructor);
-  };
-};
-
-const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') => {
-  return (target: any, propertyKey: string): void => {
-    if (!Reflect.hasMetadata('dbsettings', target.constructor)) {
-      Reflect.defineMetadata('dbsettings', [], target.constructor);
-    }
-    const dbvar = Reflect.getMetadata('dbsettings', target.constructor) as {
-      [id: string]: 'Procedure' | 'Orm' | 'Query';
-    };
-    dbvar[propertyKey] = modelType;
-
-    Reflect.defineMetadata('dbsettings', dbvar, target.constructor);
-  };
-};
 export {
   Get,
   Post,

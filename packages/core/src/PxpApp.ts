@@ -23,6 +23,8 @@ import { getConnection } from 'typeorm';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
+import socketIO from 'socket.io';
 /** swagger options **/
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
@@ -36,6 +38,7 @@ import { errorMiddleware } from './lib/pxp';
 import { TypeormStore } from 'typeorm-store';
 import { getReportsRouter } from './lib/reports/report-routes';
 import { IConfigPxpApp } from './interfaces';
+import PxpIOServer from './sockets/pxp-io-server';
 
 const modulesPxp = {
   auth: '@pxp-nd/auth',
@@ -52,6 +55,9 @@ class PxpApp {
   private configAuth: any = null;
   public Report: any = null;
   public ReportGroup: any = null;
+  private _httpServer: http.Server;
+  public io: socketIO.Server;
+  private static _instance: PxpApp;
 
   config: IConfigPxpApp = {
     defaultDbSettings: 'Orm', // Orm, Procedure, Query
@@ -66,6 +72,10 @@ class PxpApp {
     this.app = express();
     this.controllers = [];
     // this.initializeMiddlewares();
+  }
+
+  public static get instance() {
+    return this._instance || ( this._instance = new this(null) );
   }
 
   set ConfigAuth(authOptions:any) {
@@ -87,13 +97,19 @@ class PxpApp {
   public async loadControllers(): Promise<void> {
     // await this.connectToTheDatabase();
     // await this.initializeAuthentication();
-    this.controllers = await loadControllers(this.config);
+    this.controllers = await loadControllers(this.config, this.io);
     this.initializeRoutes();
     this.initializeErrorHandling();
   }
 
+  private loadIOserver(){
+    this._httpServer = new http.Server( this.app );
+    if(this.config.enableSocket) {
+      this.io = new PxpIOServer(this._httpServer).io;
+    }
+  }
   public listen(): void {
-    this.app.listen(process.env.PORT, () => {
+    this._httpServer.listen(process.env.PORT, () => {
       console.log(`${'\x1b[36m'}App listening on the port ${process.env.PORT}${'\x1b[0m'}`);
     });
   }
@@ -291,6 +307,8 @@ class PxpApp {
     if(this.config.auth) {
       await this.initializeAuthentication(this.configAuth);
     }
+    // load ioServer 
+    this.loadIOserver();
     // load controllers and routes
     await this.loadControllers();
   }

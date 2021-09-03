@@ -18,7 +18,8 @@ import { validate } from 'class-validator';
 import _ from 'lodash';
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi, { Schema } from 'joi';
-import { RouteDefinition } from './RouteDefinition';
+import socketIO from 'socket.io';
+import { Method, RouteDefinition } from './RouteDefinition';
 import {
   PxpError,
   __,
@@ -49,12 +50,14 @@ export class Controller implements ControllerInterface {
   public transactionCode = '';
   public user: any = {};//User;
   public model: any;
+  protected io: socketIO.Server;
+
   config: IConfigPxpApp;
   private basicRoutes: RouteDefinition[] = [
-    { requestMethod: 'post', path: '/add', methodName: 'add' },
-    { requestMethod: 'delete', path: '/delete/:id', methodName: 'delete' },
-    { requestMethod: 'patch', path: '/edit/:id', methodName: 'edit' },
-    { requestMethod: 'get', path: '/list', methodName: 'list' }
+    { requestMethod: Method.post, path: '/add', methodName: 'add' },
+    { requestMethod: Method.delete, path: '/delete/:id', methodName: 'delete' },
+    { requestMethod: Method.patch, path: '/edit/:id', methodName: 'edit' },
+    { requestMethod: Method.get, path: '/list', methodName: 'list' }
   ];
   private basicReadOnly = {
     add: false,
@@ -68,10 +71,11 @@ export class Controller implements ControllerInterface {
     defaultDbSettings: 'Orm',
     middlewares: [], 
     entities: {},
-  }) {
+  }, io: any = null) {
     this.validated = false;
     this.module = module;
     this.config = config;
+    this.io = io;
 
     if (Reflect.hasMetadata('model', this.constructor)) {
       this.modelString = Reflect.getMetadata('model', this.constructor);

@@ -43,4 +43,5 @@ export interface IConfigPxpApp {
   middlewares?: any[];
   scripts?: any[];
   modules?: IModules;
+  enableSocket?: boolean;
 };

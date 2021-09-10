@@ -58,6 +58,7 @@ class PxpApp {
   private _httpServer: http.Server;
   public io: socketIO.Server;
   private static _instance: PxpApp;
+  public sockets: any = {};
 
   config: IConfigPxpApp = {
     defaultDbSettings: 'Orm', // Orm, Procedure, Query
@@ -105,7 +106,7 @@ class PxpApp {
   private loadIOserver(){
     this._httpServer = new http.Server( this.app );
     if(this.config.enableSocket) {
-      this.io = new PxpIOServer(this._httpServer).io;
+      this.io = new PxpIOServer(this._httpServer, this.sockets).io;
     }
   }
   public listen(): void {

@@ -1,28 +1,33 @@
 import { Server } from 'socket.io';
 import http from 'http';
-import * as sockets from './basic-sockets';
+import * as mainSockets from './basic-sockets';
 
 export default class PxpIOServer {
   public io: Server;
 
-  constructor(server: any) {
+  constructor(server: any, sockets?: any) {
     this.io = new Server(server);
-    this.listenSockets();     
+    this.listenSockets(sockets);     
   }
 
-  private listenSockets() {
+  private listenSockets(sockets: any= {}) {
     console.log('listen connections');
 
     this.io.on('connection', client => {
-        console.log('Cliente connected:', client);
+        // console.log('Cliente connected:', client.id);
         //connect client
-        sockets.connectClient( client, this.io );
+        mainSockets.connectClient( client, this.io );
         // user configuration
         // sockets.userConfig( client, this.io );
         // message
         // sockets.message( client, this.io );
         // disconnect client
-        sockets.disconnect( client, this.io );
-    });
+        mainSockets.disconnect( client, this.io );
+        Object.keys(sockets).forEach(key =>{
+          // console.log('on socket:', key);
+          
+          sockets[key](client, this.io);
+        });
+    }); 
   }
 }   

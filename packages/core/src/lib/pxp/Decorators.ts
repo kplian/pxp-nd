@@ -20,7 +20,7 @@ export declare interface IOptionsRoute {
 
 const setProperty =  (target: any, propertyKey: string) => (value: any, name: string) => {
   if (!Reflect.hasMetadata(name, target.constructor)) {
-    Reflect.defineMetadata(name, [], target.constructor);
+    Reflect.defineMetadata(name, {}, target.constructor);
   }
   const valueName = Reflect.getMetadata(name, target.constructor) as {
     [id: string]: boolean;

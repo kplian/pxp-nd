@@ -6,13 +6,14 @@ export default class PxpIOServer {
   public io: Server;
 
   constructor(server: any, sockets?: any) {
-    this.io = new Server(server);
+    this.io = new Server(server, { cors:{
+            origin: '*',
+    }});
     this.listenSockets(sockets);     
   }
 
   private listenSockets(sockets: any= {}) {
     console.log('listen connections');
-
     this.io.on('connection', client => {
         // console.log('Cliente connected:', client.id);
         //connect client

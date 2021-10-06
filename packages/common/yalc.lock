@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "@pxp-nd/core": {
-      "signature": "81566d3ab20a1e9a88df59351500c20b",
+      "signature": "6dea4e34ed993e3d56e8ae4822e7c084",
       "file": true
     },
     "@pxp-nd/auth": {

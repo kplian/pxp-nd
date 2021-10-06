@@ -19,7 +19,8 @@ import {
   JoinColumn,
   ManyToMany,
   JoinTable,
-  getManager
+  getManager,
+  RelationId,
 } from 'typeorm';
 import Person from './Person';
 import Role from './Role';
@@ -61,10 +62,10 @@ export default class User extends PxpEntity {
   })
   authenticationId?: string;
 
-  @Column({ name: 'hash', type: 'varchar', length: 500 })
+  @Column({ name: 'hash', type: 'varchar', length: 500, select: false })
   hash?: string;
 
-  @Column({ name: 'salt', type: 'varchar', length: 500 })
+  @Column({ name: 'salt', type: 'varchar', length: 500, select: false })
   salt?: string;
 
   @OneToOne(() => Person, {
@@ -87,6 +88,9 @@ export default class User extends PxpEntity {
     }
   })
   roles: Role[];
+
+  @RelationId((user: User) => user.roles)
+  roleIds: number[];
 
   @Column({ nullable: true, name: 'person_id' })
   personId: number;

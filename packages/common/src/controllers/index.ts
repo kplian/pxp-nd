@@ -11,6 +11,7 @@ import TranslationGroupController from './TranslationGroup';
 import TypeController from './Type';
 import UiController from './Ui';
 import UserController from './User';
+import RoleController from './Role';
 import WordKeyController from './WordKey';
 
 export {
@@ -27,6 +28,7 @@ export {
   TypeController,
   UiController,
   UserController ,
+  RoleController,
   WordKeyController,
 }
 
@@ -44,5 +46,6 @@ export const controllers = [
   TypeController,
   UiController,
   UserController ,
+  RoleController,
   WordKeyController,
 ];

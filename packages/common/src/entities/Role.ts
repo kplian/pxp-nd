@@ -24,13 +24,22 @@ export default class Role extends PxpEntity {
   @PrimaryGeneratedColumn({ name: 'role_id' })
   roleId: number;
 
-  @Column({ name: 'role', type: 'varchar', length: 100, nullable: false })
+  @Column({ name: 'role', unique: true, type: 'varchar', length: 100, nullable: false })
   role: string;
 
   @Column({ name: 'description', type: 'text', nullable: false })
   description: string;
 
-  @ManyToMany(() => User)
+  @Column({ nullable: true, name: 'user_id' })
+  userId: number;
+
+  @Column({ nullable: true, name: 'subsystem_id' })
+  subsystemId: number;
+
+  @Column({ nullable: true, name: 'iu_id' })
+  uiId: number;
+
+   @ManyToMany(() => User)
   @JoinTable({
     name: 'tsec_user_role',
     joinColumn: {
@@ -61,14 +70,4 @@ export default class Role extends PxpEntity {
     }
   })
   uis: Ui[];
-
-  @Column({ nullable: true, name: 'user_id' })
-  userId: number;
-
-  @Column({ nullable: true, name: 'subsystem_id' })
-  subsystemId: number;
-
-  @Column({ nullable: true, name: 'iu_id' })
-  uiId: number;
-
 }

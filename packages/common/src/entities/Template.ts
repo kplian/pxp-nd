@@ -20,7 +20,7 @@ import {
 import { PxpEntity } from '../PxpEntity';
 
 
-@Entity({ name: 'ttemplate' })
+@Entity({ name: 'tpar_template' })
 
 export default class Template extends PxpEntity {
 

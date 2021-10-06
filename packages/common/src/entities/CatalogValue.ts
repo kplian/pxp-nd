@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import Catalog from './Catalog';
 
-@Entity({ name: 'tcatalog_value' })
+@Entity({ name: 'tpar_catalog_value' })
 export default class CatalogValue {
   @PrimaryGeneratedColumn({ name: 'catalog_value_id' })
   catalogValueId: number;

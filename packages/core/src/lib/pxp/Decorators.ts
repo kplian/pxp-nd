@@ -12,11 +12,14 @@
  * Last modified  : 2020-09-17 18:29:51
  */
 import { RouteDefinition, Method } from './RouteDefinition';
+export declare interface ILog {
+  [field: string]: 'cc_mask' | 'complete_mask';
+};
 export declare interface IOptionsRoute {
   readOnly?: boolean;
   dbSettings?: 'Procedure' | 'Orm' | 'Query';
   authentication?: boolean;
-  log?: boolean;
+  log?: boolean | ILog;
 };
 
 const setProperty =  (target: any, propertyKey: string) => (value: any, name: string, overwrite: boolean = true) => {
@@ -36,17 +39,13 @@ const setProperty =  (target: any, propertyKey: string) => (value: any, name: st
 };
 
 
-
-const createOptions = (options: IOptionsRoute = {
-  readOnly: true, 
-  dbSettings: 'Orm',
-  authentication: true,
-}) => (target: any, propertyKey: string): void => {
+const createOptions = (options: IOptionsRoute ) => (target: any, propertyKey: string): void => {
   options = {
     ...{
       readOnly: true, 
       dbSettings: 'Orm',
       authentication: true,
+      log: true
     },
     ...options
   };
@@ -130,10 +129,10 @@ const Permission = (permission = true) =>
 const Log = (log = true, config: Record<string, unknown> = {}) => {
   return (target: any, propertyKey: string): void => {
     if (!Reflect.hasMetadata('log', target.constructor)) {
-      Reflect.defineMetadata('log', [], target.constructor);
+      Reflect.defineMetadata('log', {}, target.constructor);
     }
     if (!Reflect.hasMetadata('logConfig', target.constructor)) {
-      Reflect.defineMetadata('logConfig', [], target.constructor);
+      Reflect.defineMetadata('logConfig', {}, target.constructor);
     }
     const logVar = Reflect.getMetadata('log', target.constructor) as {
       [id: string]: boolean;

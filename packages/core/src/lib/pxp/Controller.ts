@@ -135,6 +135,7 @@ export class Controller implements ControllerInterface {
       (Reflect.getMetadata('log', this.constructor) as {
         [id: string]: boolean;
       }) || {};
+
     // get dbsettings
     const dbsettings =
       (Reflect.getMetadata('dbsettings', this.constructor) as {
@@ -149,18 +150,21 @@ export class Controller implements ControllerInterface {
     const defaultConfig: any = (Reflect.getMetadata('optionsRoute', this.constructor) as {
         [id: string]: {};
       }) || {};
-      
     // define basic routes
     if (this.modelString !== '') {
       routes = _.union(this.basicRoutes, routes);
       readonly = { ...this.basicReadOnly, ...readonly };
     }
-
     routes.forEach((route) => {
       const methodDbSettings =
         dbsettings[route.methodName] || this.config.defaultDbSettings;
       // readOnly
       const readOnlyMethod = readonly[route.methodName] !== undefined ? readonly[route.methodName] : defaultConfig[route.methodName].readOnly;
+
+      // log
+      const logMethod = log[route.methodName] !== undefined ? log[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].log : true);
+      const logValue = typeof logMethod == 'object' ? logMethod : logConfig[route.methodName];
+      const logKey = typeof logMethod == 'object' ? true : logMethod;
 
       if (readOnlyMethod === null || readOnlyMethod === undefined) {
         throw new PxpError(
@@ -207,8 +211,8 @@ export class Controller implements ControllerInterface {
                   methodDbSettings,
                   readOnlyMethod,
                   false,
-                  log[route.methodName],
-                  logConfig[route.methodName]
+                  logKey,
+                  logValue
                 )
               );
             } catch (ex) {
@@ -271,8 +275,8 @@ export class Controller implements ControllerInterface {
                   methodDbSettings,
                   readOnlyMethod,
                   permission[route.methodName],
-                  log[route.methodName],
-                  logConfig[route.methodName]
+                  logKey,
+                  logValue
                 )
               );
             } catch (ex) {
@@ -293,7 +297,7 @@ export class Controller implements ControllerInterface {
                   ex.stack,
                   ex.statusCode,
                   endsAt,
-                  logConfig
+                  {...logConfig, logValue}
                 )
               )) as number;
               errorMiddleware(ex, req, res);

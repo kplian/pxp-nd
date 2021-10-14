@@ -1,12 +1,13 @@
 {
   "name": "@pxp-nd/core",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Contains main files for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "prepublish": "tsc",
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "build-dev": "npm run build && npm run dev:publish",
     "dev:publish": "yalc publish",
     "prod:publish": "npm publish",
     "start": "npm run build && node dist/index.js",

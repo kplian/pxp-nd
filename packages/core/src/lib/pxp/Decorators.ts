@@ -26,11 +26,12 @@ const setProperty =  (target: any, propertyKey: string) => (value: any, name: st
   const valueName = Reflect.getMetadata(name, target.constructor) as {
     [id: string]: any;
   };
-  if(overwrite && valueName[propertyKey]) {
+  if(!overwrite && !valueName[propertyKey]) {
     valueName[propertyKey] = value;
-  } else if(!valueName[propertyKey]){
+  } else if(overwrite){
     valueName[propertyKey] = value;
   }
+
   Reflect.defineMetadata(name, valueName, target.constructor);
 };
 
@@ -41,13 +42,32 @@ const createOptions = (options: IOptionsRoute = {
   dbSettings: 'Orm',
   authentication: true,
 }) => (target: any, propertyKey: string): void => {
-  const newProperty = setProperty(target, propertyKey);
-  // ReadOnly
-  newProperty(options.readOnly, 'readonly', false);
-  // DbSettings
-  newProperty(options.dbSettings, 'dbsettings', false);
-  // Authentication
-  newProperty(options.authentication, 'authentication', false);
+  options = {
+    ...{
+      readOnly: true, 
+      dbSettings: 'Orm',
+      authentication: true,
+    },
+    ...options
+  };
+
+  // const newProperty = setProperty(target, propertyKey);
+  // // ReadOnly
+  // newProperty(options.readOnly, 'readonly', false);
+  // // DbSettings
+  // newProperty(options.dbSettings, 'dbsettings', false);
+  // // Authentication
+  // newProperty(options.authentication, 'authentication', false);
+
+  if (!Reflect.hasMetadata('optionsRoute', target.constructor)) {
+    Reflect.defineMetadata('optionsRoute', {}, target.constructor);
+  }
+  const optionsRoute = Reflect.getMetadata('optionsRoute', target.constructor) as {
+    [id: string]: any;
+  };
+  optionsRoute[propertyKey] = options;
+
+  Reflect.defineMetadata('optionsRoute', optionsRoute, target.constructor);
 };
 
 const setRoute = (path: string = '', method: Method, options?: IOptionsRoute) => (target: any, propertyKey: string) => {

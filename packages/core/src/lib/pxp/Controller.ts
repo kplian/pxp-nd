@@ -145,7 +145,11 @@ export class Controller implements ControllerInterface {
       (Reflect.getMetadata('logConfig', this.constructor) as {
         [id: string]: {};
       }) || {};
-
+    
+    const defaultConfig: any = (Reflect.getMetadata('optionsRoute', this.constructor) as {
+        [id: string]: {};
+      }) || {};
+      
     // define basic routes
     if (this.modelString !== '') {
       routes = _.union(this.basicRoutes, routes);
@@ -155,7 +159,10 @@ export class Controller implements ControllerInterface {
     routes.forEach((route) => {
       const methodDbSettings =
         dbsettings[route.methodName] || this.config.defaultDbSettings;
-      if (!(route.methodName in readonly)) {
+      // readOnly
+      const readOnlyMethod = readonly[route.methodName] !== undefined ? readonly[route.methodName] : defaultConfig[route.methodName].readOnly;
+
+      if (readOnlyMethod === null || readOnlyMethod === undefined) {
         throw new PxpError(
           500,
           'ReadOnly decorator was not defined for ' +
@@ -166,9 +173,11 @@ export class Controller implements ControllerInterface {
         );
       }
 
+      // auth
+      const auth = authentication[route.methodName] !== undefined ? authentication[route.methodName] : (
+        defaultConfig[route.methodName]? defaultConfig[route.methodName].authentication: true);
       if (
-        route.methodName in authentication &&
-        authentication[route.methodName] === false
+        !auth
       ) {
         this.router[route.requestMethod](
           this.config.apiPrefix + '/' + this.module + this.path + route.path,
@@ -196,7 +205,7 @@ export class Controller implements ControllerInterface {
                   res,
                   route.methodName,
                   methodDbSettings,
-                  readonly[route.methodName],
+                  readOnlyMethod,
                   false,
                   log[route.methodName],
                   logConfig[route.methodName]
@@ -260,7 +269,7 @@ export class Controller implements ControllerInterface {
                   res,
                   route.methodName,
                   methodDbSettings,
-                  readonly[route.methodName],
+                  readOnlyMethod,
                   permission[route.methodName],
                   log[route.methodName],
                   logConfig[route.methodName]

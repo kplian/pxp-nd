@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'tcm_branch'})
+@Entity({ name: 'tpar_branch'})
 export default class Branch extends BaseEntity{
   @PrimaryGeneratedColumn({ name: 'branch_id'})
   branchId: number;

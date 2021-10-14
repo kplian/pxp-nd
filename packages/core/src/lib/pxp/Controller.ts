@@ -227,6 +227,7 @@ export class Controller implements ControllerInterface {
           }
         );
       } else {
+        //NORMALMENTE VIENE POR AQUI RCM-20211011 *****
         this.router[route.requestMethod](
           this.config.apiPrefix + '/' + this.module + this.path + route.path,
           // MIDDLEWARES AREA
@@ -414,7 +415,7 @@ export class Controller implements ControllerInterface {
         )
       );
     }
-
+    //PARA REPORTES
     if (req.report && req.report.type === 'pdf' ) {
       req.reportData = metResponse;
       makePdf(req, res);

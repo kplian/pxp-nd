@@ -16,6 +16,7 @@ export declare interface IOptionsRoute {
   readOnly?: boolean;
   dbSettings?: 'Procedure' | 'Orm' | 'Query';
   authentication?: boolean;
+  log?: boolean;
 };
 
 const setProperty =  (target: any, propertyKey: string) => (value: any, name: string, overwrite: boolean = true) => {

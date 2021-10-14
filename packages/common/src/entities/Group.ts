@@ -1,7 +1,7 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
 import User from './User';
 
-@Entity({ name: 'group'})
+@Entity({ name: 'tsec_group'})
 export default class Group extends BaseEntity{
   @PrimaryGeneratedColumn({ name: 'group_id'})
   groupId: number;

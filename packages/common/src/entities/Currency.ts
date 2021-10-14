@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { PxpEntity } from '@pxp-nd/entities';
 
-@Entity({ name: 'tcm_currency' })
+@Entity({ name: 'tpar_currency' })
 export default class Currency extends PxpEntity {
 
 	@PrimaryGeneratedColumn({ name: 'currency_id' })

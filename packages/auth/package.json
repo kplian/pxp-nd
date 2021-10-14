@@ -43,9 +43,9 @@
     "passport-local": "^1.0.0"
   },
   "peerDependencies": {
-    "typeorm": "^0.2.32",
     "@pxp-nd/core": "^1.0.7",
     "@pxp-nd/entities": "^1.0.7",
-    "@pxp-nd/repositories": "^1.0.7"
+    "@pxp-nd/repositories": "^1.0.7",
+    "typeorm": "^0.2.32"
   }
 }

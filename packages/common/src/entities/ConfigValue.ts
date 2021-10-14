@@ -1,6 +1,6 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity({ name: 'config_value'})
+@Entity({ name: 'tpar_config_value'})
 export default class ConfigValue extends BaseEntity{
   @PrimaryGeneratedColumn({ name: 'config_value_id'})
   configValueId: number;

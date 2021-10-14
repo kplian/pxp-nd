@@ -7,7 +7,7 @@ export const isReportMiddleware = (
 ): void => {
 
   if (req.query.report) {
-    delete req.query.start;
+    delete req.query.start; //TODO 20211011: change for spread operator instead of delete
     delete req.query.limit;
     req.report = JSON.parse(req.query.report);
     delete req.query.report;

@@ -16,6 +16,7 @@
 // import { ScriptInterface } from '@pxp-nd/core';
 
 import {Person , User , Role, Subsystem , Ui} from '../entities';
+//import { ScriptInterface } from '@pxp-nd/core';
 import { ScriptInterface } from '@pxp-nd/core';
 const scriptsArray: ScriptInterface[] = [];
 
@@ -160,9 +161,341 @@ scriptsArray.push({
   }
 });
 
+// ROOT MENU FOR SECURITY AND PARAMETERS SYSTEMS
+scriptsArray.push({
+  scriptCode: 'RCM-PXP-20211007-001', scriptFunction: async (em) => {
+
+    //Security
+    let subsystem = new Subsystem();
+    subsystem.name = 'SECURITY';
+    subsystem.code = 'SEC';
+    subsystem.folderName = 'security';
+    subsystem.prefix = 'SEC';
+    subsystem.createdBy = 'admin';
+    await em.save(subsystem);
+
+    const rootUi = await Ui.findOne({ code: "PXP"});
+
+    let uiParent = new Ui();
+    uiParent.code = 'SEC';
+    uiParent.name = 'Security';
+    uiParent.description = 'Security System';
+    uiParent.subsystem = subsystem;
+    uiParent.parent = rootUi as Ui;
+    uiParent.createdBy = 'admin';
+    await em.save(uiParent);
+
+    let ui = new Ui();
+    ui.code = 'SEC_Log';
+    ui.name = 'Logs';
+    ui.description = 'Activity log';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Log";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_Person';
+    ui.name = 'People';
+    ui.description = 'Person information';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Person";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_Role';
+    ui.name = 'Roles';
+    ui.description = 'System Roles';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Role";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_ScriptVersion';
+    ui.name = 'Script Version';
+    ui.description = 'Scfript Version';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_ScriptVersion";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_Session';
+    ui.name = 'Session';
+    ui.description = 'Sessions';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Session";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_Transaction';
+    ui.name = 'Transactions';
+    ui.description = 'Transactions';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Transaction";
+    await em.save(ui);
+    
+    ui = new Ui();
+    ui.code = 'SEC_Subsystem';
+    ui.name = 'Systems';
+    ui.description = 'Systems';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Subsystem";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_Group';
+    ui.name = 'Groups';
+    ui.description = 'Groups';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_Group";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'SEC_User';
+    ui.name = 'Users';
+    ui.description = 'Users';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "SEC_User";
+    await em.save(ui);
+
+    //Parameters
+    subsystem = new Subsystem();
+    subsystem.name = 'PARAMETERS';
+    subsystem.code = 'PAR';
+    subsystem.folderName = 'parameters';
+    subsystem.prefix = 'PAR';
+    subsystem.createdBy = 'admin';
+    await em.save(subsystem);
+
+    uiParent = new Ui();
+    uiParent.code = 'PAR';
+    uiParent.name = 'Parameters';
+    uiParent.description = 'Parameteres System';
+    uiParent.subsystem = subsystem;
+    uiParent.parent = rootUi as Ui;
+    uiParent.createdBy = 'admin';
+    await em.save(uiParent);
+
+    
+    ui = new Ui();
+    ui.code = 'PAR_AccountStatusType';
+    ui.name = 'Account Status Type';
+    ui.description = 'Activity log';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_AccountStatusType";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_AccountStatus';
+    ui.name = 'Account Status';
+    ui.description = 'Account Status';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_AccountStatus";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Branch';
+    ui.name = 'Branch';
+    ui.description = 'Branch';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Branch";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Catalog';
+    ui.name = 'Catalogs';
+    ui.description = 'Catalogs';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Catalog";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_ChatType';
+    ui.name = 'Chat Type';
+    ui.description = 'Chat Type';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_ChatType";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Chat';
+    ui.name = 'Chat';
+    ui.description = 'Chat';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Chat";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_ChatUser';
+    ui.name = 'Chat User';
+    ui.description = 'Chat User';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_ChatUser";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Config';
+    ui.name = 'Config';
+    ui.description = 'Config';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Config";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Currency';
+    ui.name = 'Currency';
+    ui.description = 'Currency';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Currency";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_FileType';
+    ui.name = 'File types';
+    ui.description = 'File Types';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_FileType";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_File';
+    ui.name = 'Files';
+    ui.description = 'Files';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_File";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_GlobalData';
+    ui.name = 'Global Data';
+    ui.description = 'Global Data';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_GlobalData";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Language';
+    ui.name = 'Language';
+    ui.description = 'Language';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Language";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_TranslationGroup';
+    ui.name = 'Translation Group';
+    ui.description = 'Translation Group';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_TranslationGroup";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_WordKey';
+    ui.name = 'Word key';
+    ui.description = 'Word key';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_WordKey";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Message';
+    ui.name = 'Message';
+    ui.description = 'Messages';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Message";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Notification';
+    ui.name = 'Notification';
+    ui.description = 'Notifications';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Notification";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_ReportGroup';
+    ui.name = 'Reports groups';
+    ui.description = 'Reports groups';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_ReportGroup";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Template';
+    ui.name = 'Template';
+    ui.description = 'Template';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Template";
+    await em.save(ui);
+
+    ui = new Ui();
+    ui.code = 'PAR_Type';
+    ui.name = 'Type';
+    ui.description = 'Type';
+    ui.subsystem = subsystem;
+    ui.createdBy = 'admin';
+    ui.parent = uiParent;
+    ui.route = "PAR_Type";
+    await em.save(ui);
+
+  }
+
+});
 
 export default scriptsArray;
-
-
-
-

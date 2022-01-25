@@ -35,7 +35,10 @@ const getAuthRoutes = (apiPrefix: string ) => {
         }
 
         if (!user) {
-          throw new PxpError(400, info);
+          // throw new PxpError(400, info);
+          return res.status(400).json({
+            message: info,
+          });
         }
 
         req.logIn(user, function (err) {

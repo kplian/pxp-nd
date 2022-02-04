@@ -233,7 +233,7 @@ export class Controller implements ControllerInterface {
                 ex.stack,
                 ex.statusCode,
                 endsAt,
-                logConfig)) as number;
+                logValue)) as number;
 
               errorMiddleware(ex, req, res);
             }
@@ -297,7 +297,7 @@ export class Controller implements ControllerInterface {
                   ex.stack,
                   ex.statusCode,
                   endsAt,
-                  {...logConfig, logValue}
+                  logValue
                 )
               )) as number;
               errorMiddleware(ex, req, res);

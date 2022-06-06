@@ -25,7 +25,7 @@ Then install all the dependencies:
 `npm install    or     yarn install`
 
 ## Turn on
-We have to options to start the backend, one as a developer mode ant the other as production mode:
+We can start the backend in two modes:
 
 - `node run dev (developer mode)`
 - `node run prod (production mode)`

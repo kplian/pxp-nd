@@ -4,3 +4,5 @@
 
 *.yalc
 **/yalc.lock
+
+.idea/

@@ -20,7 +20,7 @@ declare interface IAuthPxp {
   deserialize: IDeserialize;
   local?: boolean |  IAuthLocal;
   jwt?: boolean | any;
-} 
+}
 
 declare interface IModule {
   entities?: any,
@@ -30,6 +30,11 @@ declare interface IModule {
 declare interface IModules {
   [name: string]: IModule;
 }
+
+declare interface IConfigExpress {
+  [name: string]: any;
+}
+
 export interface IConfigPxpApp {
   defaultDbSettings?: string;
   apiPrefix?: string;
@@ -37,11 +42,13 @@ export interface IConfigPxpApp {
   showRoutes?: boolean;
   controllers?: any[];
   entities?: any;
-  auth?: boolean | IAuthPxp; 
-  reports?: boolean; 
+  auth?: boolean | IAuthPxp;
+  reports?: boolean;
   session?: any | BaseEntity;
   middlewares?: any[];
   scripts?: any[];
   modules?: IModules;
   enableSocket?: boolean;
+  expressJsonConfig?: IConfigExpress;
+  expressUrlEncodedConfig?: IConfigExpress;
 };

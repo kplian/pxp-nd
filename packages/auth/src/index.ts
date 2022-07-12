@@ -1,13 +1,12 @@
 export { genPassword } from './utils/password';
-export { isAuthenticated } from './config';
+export { isAuthenticated, issueJWT } from './config';
 import { getAuthRoutes , customAuthRoutes } from './auth-routes';
-import { configPassport, issueJWT } from './config';
+import { configPassport } from './config';
 
 export const configAuth = () => {
   return {
     configPassport,
     getAuthRoutes,
     customAuthRoutes,
-    issueJWT
   }
 }

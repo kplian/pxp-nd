@@ -1,6 +1,6 @@
 {
   "name": "@pxp-nd/auth",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Core auth for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

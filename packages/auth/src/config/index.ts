@@ -12,5 +12,6 @@
  * Last modified  : 2020-09-17 18:42:57
  */
 import { configPassport, isAuthenticated } from './passport-config';
+import { issueJWT } from './passport-jwt';
 
-export { configPassport, isAuthenticated };
+export { configPassport, isAuthenticated, issueJWT };

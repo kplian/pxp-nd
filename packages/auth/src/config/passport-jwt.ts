@@ -11,7 +11,7 @@
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-09-17 18:46:18
  */
-import { Strategy, ExtractJwt } from 'passport-jwt';
+import { Strategy, ExtractJwt, VerifyCallback } from 'passport-jwt';
 import passport from 'passport';
 import { getRepository } from 'typeorm';
 import {User} from '@pxp-nd/common';
@@ -24,28 +24,34 @@ const options = {
 };
 
 // app.js will pass the global passport object here, and this function will configure it
-export const configPassportJwtStrategy = () => {
+export const configPassportJwtStrategy = (
+  verifyUser = verifyUserJwt, 
+) => {
   // The JWT payload is passed into the verify callback
   passport.use(
     new Strategy(options, function (jwt_payload, done) {
       // We will assign the `sub` property on the JWT to the database ID of user
-      const UserRepo: any = getRepository(User);
-      UserRepo.findOne({
-        where: {
-          userId: jwt_payload.sub
-        }
-      })
-        .then((user:any) => {
-          if (user) {
-            done(null, user);
-          } else {
-            return done(null, false);
-          }
-        })
-        .catch((err:any) => done(err, false));
+      verifyUser(jwt_payload.sub, done);
     })
   );
 };
+
+function verifyUserJwt(id: number | string, done: VerifyCallback) {
+  const UserRepo: any = getRepository(User);
+  UserRepo.findOne({
+    where: {
+      userId: id,
+    },
+  })
+    .then((user: any) => {
+      if (user) {
+        done(null, user);
+      } else {
+        return done(null, null);
+      }
+    })
+    .catch((err: any) => done(err, null));
+}
 
 /**
  * @param {*} user - The user object.  We need this to set the JWT `sub` payload property to the User ID

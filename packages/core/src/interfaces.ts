@@ -8,6 +8,10 @@ declare interface IAuthLocal {
   fields: IAuthields;
 }
 
+declare interface IAuthJWT {
+  verifyUser: any;
+}
+
 declare interface ISerialize {
   (userPayload: any, done: any): any;
 }
@@ -19,7 +23,7 @@ declare interface IAuthPxp {
   serialize: ISerialize;
   deserialize: IDeserialize;
   local?: boolean |  IAuthLocal;
-  jwt?: boolean | any;
+  jwt?: boolean | IAuthJWT;
 }
 
 declare interface IModule {

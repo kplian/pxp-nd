@@ -57,13 +57,26 @@ export const configPassport = (auth: any | boolean) => {
     configPassportJwtStrategy();
     configPassportLocal();
   }
-  if(auth && auth.local) {
+
+  if(auth && auth.local === true) {
+    configPassportLocal();
+  }
+
+  if (auth && auth.local && auth.local.verifyUser) {
     configPassportLocal(
       auth.local.fields,
       auth.local.verifyUser,
       auth.serialize,
-      auth.deserialize,
+      auth.deserialize
     );
+  }
+
+  if (auth && auth.jwt === true) {
+    configPassportJwtStrategy();
+  }
+
+  if (auth && auth.jwt && auth.jwt.verifyUser) {
+    configPassportJwtStrategy(auth.jwt.verifyUser);
   }
 };
 

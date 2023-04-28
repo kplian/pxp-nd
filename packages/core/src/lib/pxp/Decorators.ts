@@ -17,6 +17,7 @@ export declare interface ILog {
 };
 export declare interface IOptionsRoute {
   readOnly?: boolean;
+  isHtml?: boolean;
   dbSettings?: 'Procedure' | 'Orm' | 'Query';
   authentication?: boolean;
   log?: boolean | ILog;
@@ -43,6 +44,7 @@ const createOptions = (options: IOptionsRoute ) => (target: any, propertyKey: st
   options = {
     ...{
       readOnly: true, 
+      isHtml: false,
       dbSettings: 'Orm',
       authentication: true,
       log: true
@@ -120,6 +122,9 @@ const Authentication = (authentication = true) =>
 const ReadOnly = (ronly = true) =>
   (target: any, propertyKey: string) => setProperty(target, propertyKey)(ronly, 'readonly');
 
+const IsHtml = (ishtml = false) =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(ishtml, 'ishtml');
+
 const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') =>
   (target: any, propertyKey: string) => setProperty(target, propertyKey)(modelType, 'dbsettings');
 
@@ -159,6 +164,7 @@ export {
   Permission,
   DbSettings,
   ReadOnly,
+  IsHtml,
   Model,
   StoredProcedure
 };

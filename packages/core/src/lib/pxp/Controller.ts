@@ -146,7 +146,12 @@ export class Controller implements ControllerInterface {
       (Reflect.getMetadata('logConfig', this.constructor) as {
         [id: string]: {};
       }) || {};
-    
+    // get type return
+    let ishtml =
+        (Reflect.getMetadata('ishtml', this.constructor) as {
+          [id: string]: boolean;
+        }) || {};
+
     const defaultConfig: any = (Reflect.getMetadata('optionsRoute', this.constructor) as {
         [id: string]: {};
       }) || {};
@@ -165,6 +170,9 @@ export class Controller implements ControllerInterface {
       const logMethod = log[route.methodName] !== undefined ? log[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].log : true);
       const logValue = typeof logMethod == 'object' ? logMethod : logConfig[route.methodName];
       const logKey = typeof logMethod == 'object' ? true : logMethod;
+
+      // is html
+      const isHtmlMethod = ishtml[route.methodName] !== undefined ? ishtml[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].ishtml : false);
 
       if (readOnlyMethod === null || readOnlyMethod === undefined) {
         throw new PxpError(
@@ -212,7 +220,8 @@ export class Controller implements ControllerInterface {
                   readOnlyMethod,
                   false,
                   logKey,
-                  logValue
+                  logValue,
+                    isHtmlMethod
                 )
               );
             } catch (ex) {
@@ -276,7 +285,8 @@ export class Controller implements ControllerInterface {
                   readOnlyMethod,
                   permission[route.methodName],
                   logKey,
-                  logValue
+                  logValue,
+                  isHtmlMethod
                 )
               );
             } catch (ex) {
@@ -318,7 +328,8 @@ export class Controller implements ControllerInterface {
     readonly: boolean,
     permission = true,
     log = true,
-    logConfig = {}
+    logConfig = {},
+    isHtml: boolean
   ): Promise<void> {
     if (dbsettings === 'Orm') {
       await __(
@@ -331,7 +342,8 @@ export class Controller implements ControllerInterface {
           readonly,
           permission,
           log,
-          logConfig
+          logConfig,
+          isHtml
         )
       );
     } else if (dbsettings === 'Procedure') {
@@ -370,7 +382,8 @@ export class Controller implements ControllerInterface {
     readonly: boolean,
     permission = true,
     log = true,
-    logConfig = {}
+    logConfig = {},
+    isHtml: boolean = false
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
@@ -436,7 +449,12 @@ export class Controller implements ControllerInterface {
       req.reportData = metResponse;
       makeXlsx(req, res);
     } else {
-      res.json(metResponse);
+      if(isHtml) {
+        res.send(metResponse)
+      } else {
+        res.json(metResponse);
+
+      }
     }
   }
 
@@ -513,6 +531,26 @@ export class Controller implements ControllerInterface {
     }
     await manager.remove(modelInstance);
     return modelInstance;
+  }
+
+  getWhereOwnColumns(params: Record<string, unknown>, model:any): Record<any, any> {
+    const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
+
+    let ownColumnsForSchema = {};
+    const whereOwnColumns = connection.getMetadata(model).ownColumns.reduce((t, column) => {
+      if(`_${column.propertyName}` in params) {
+        ownColumnsForSchema = {
+          ...ownColumnsForSchema,
+          [`_${column.propertyName}`]: Joi.string()
+        }
+        t = {...t, [column.propertyName]: params[`_${column.propertyName}`]};
+      }
+      return t;
+    },{});
+    return {
+      whereOwnColumns,
+      ownColumnsForSchema,
+    }
   }
 
   getListParams(params: Record<string, unknown>, where: Record<string, unknown>): ListParam {

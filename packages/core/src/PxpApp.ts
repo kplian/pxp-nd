@@ -157,9 +157,11 @@ class PxpApp {
     });
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
+    const fileSizeMax:number = process.env.FILE_SIZE_MAX ? parseInt(process.env.FILE_SIZE_MAX) : 5
     this.app.use(fileUpload({
-      limits: { fileSize: 5 * 1024 * 1024 },
+      limits: { fileSize: fileSizeMax * 1024 * 1024 },
     }));
+
     this.configCors();
   }
 

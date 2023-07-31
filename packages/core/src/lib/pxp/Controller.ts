@@ -36,6 +36,7 @@ import { isReportMiddleware } from './middlewares/isReportMiddleware';
 import { makePdf } from '../reports/pdf';
 import { makeXlsx } from '../reports/xlsx';
 import { IConfigPxpApp } from '../../interfaces';
+import path from "path";
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
@@ -151,6 +152,10 @@ export class Controller implements ControllerInterface {
         (Reflect.getMetadata('ishtml', this.constructor) as {
           [id: string]: boolean;
         }) || {};
+    let isfile =
+        (Reflect.getMetadata('isfile', this.constructor) as {
+          [id: string]: boolean;
+        }) || {};
 
     const defaultConfig: any = (Reflect.getMetadata('optionsRoute', this.constructor) as {
         [id: string]: {};
@@ -173,6 +178,9 @@ export class Controller implements ControllerInterface {
 
       // is html
       const isHtmlMethod = ishtml[route.methodName] !== undefined ? ishtml[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].ishtml : false);
+
+      // is file
+      const isFileMethod = isfile[route.methodName] !== undefined ? isfile[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].isfile : false);
 
       if (readOnlyMethod === null || readOnlyMethod === undefined) {
         throw new PxpError(
@@ -221,7 +229,8 @@ export class Controller implements ControllerInterface {
                   false,
                   logKey,
                   logValue,
-                    isHtmlMethod
+                    isHtmlMethod,
+                    isFileMethod,
                 )
               );
             } catch (ex) {
@@ -286,7 +295,8 @@ export class Controller implements ControllerInterface {
                   permission[route.methodName],
                   logKey,
                   logValue,
-                  isHtmlMethod
+                  isHtmlMethod,
+                  isFileMethod
                 )
               );
             } catch (ex) {
@@ -329,7 +339,8 @@ export class Controller implements ControllerInterface {
     permission = true,
     log = true,
     logConfig = {},
-    isHtml: boolean
+    isHtml: boolean,
+    isFile: boolean
   ): Promise<void> {
     if (dbsettings === 'Orm') {
       await __(
@@ -343,7 +354,8 @@ export class Controller implements ControllerInterface {
           permission,
           log,
           logConfig,
-          isHtml
+          isHtml,
+          isFile
         )
       );
     } else if (dbsettings === 'Procedure') {
@@ -383,7 +395,8 @@ export class Controller implements ControllerInterface {
     permission = true,
     log = true,
     logConfig = {},
-    isHtml: boolean = false
+    isHtml: boolean = false,
+    isFile: boolean = false
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
@@ -449,8 +462,13 @@ export class Controller implements ControllerInterface {
       req.reportData = metResponse;
       makeXlsx(req, res);
     } else {
-      if(isHtml) {
+      if(isHtml && !isFile) {
         res.send(metResponse)
+      }
+      else if(isFile && !isHtml) {
+        if (typeof metResponse === "string") {
+          res.sendFile(metResponse)
+        }
       } else {
         res.json(metResponse);
 
@@ -483,6 +501,13 @@ export class Controller implements ControllerInterface {
       }
       return t;
     },{});
+    if(params.fetchOptions) {
+      ownColumnsForSchema = {
+        ...ownColumnsForSchema,
+        fetchOptions:Joi.any()
+      }
+    }
+
 
 
     const schema = this.getListSchema(ownColumnsForSchema);
@@ -566,13 +591,16 @@ export class Controller implements ControllerInterface {
       });
     }
 
+
+    const fetchOptions = params.fetchOptions ? JSON.parse(params.fetchOptions as string) : {};
     const res: ListParam = {
       where: whereGenericFilter.length > 0 ? whereGenericFilter : [where] ,
       skip: params.start as number,
       take: params.limit as number,
       order: {
         [params.sort as string]: String(params.dir).toUpperCase()
-      }
+      },
+      ...fetchOptions
     };
 
     // ffp search if in this request is sending the id

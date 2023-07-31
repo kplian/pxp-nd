@@ -18,6 +18,7 @@ export declare interface ILog {
 export declare interface IOptionsRoute {
   readOnly?: boolean;
   isHtml?: boolean;
+  isFile?: boolean;
   dbSettings?: 'Procedure' | 'Orm' | 'Query';
   authentication?: boolean;
   log?: boolean | ILog;
@@ -45,6 +46,7 @@ const createOptions = (options: IOptionsRoute ) => (target: any, propertyKey: st
     ...{
       readOnly: true, 
       isHtml: false,
+      isFile: false,
       dbSettings: 'Orm',
       authentication: true,
       log: true
@@ -125,6 +127,9 @@ const ReadOnly = (ronly = true) =>
 const IsHtml = (ishtml = false) =>
   (target: any, propertyKey: string) => setProperty(target, propertyKey)(ishtml, 'ishtml');
 
+const IsFile = (isFile = false) =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(isFile, 'isfile');
+
 const DbSettings = (modelType: 'Procedure' | 'Orm' | 'Query') =>
   (target: any, propertyKey: string) => setProperty(target, propertyKey)(modelType, 'dbsettings');
 
@@ -165,6 +170,7 @@ export {
   DbSettings,
   ReadOnly,
   IsHtml,
+  IsFile,
   Model,
   StoredProcedure
 };

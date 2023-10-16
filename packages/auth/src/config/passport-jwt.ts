@@ -36,7 +36,7 @@ export const configPassportJwtStrategy = (
   );
 };
 
-function verifyUserJwt(id: number | string, done: VerifyCallback) {
+export function verifyUserJwt(id: number | string, done: VerifyCallback) {
   const UserRepo: any = getRepository(User);
   UserRepo.findOne({
     where: {

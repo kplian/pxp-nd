@@ -45,8 +45,8 @@ const getAuthRoutes = (apiPrefix: string ) => {
           if (err) {
             return next(err);
           }
-          // const tokenObject = issueJWT(user);
-          return res.status(200).send(user);
+          const tokenObject = issueJWT(user);
+          return res.status(200).send({...user, tokenObject});
         });
       })(req, res, next);
     }
@@ -107,6 +107,10 @@ const getAuthRoutes = (apiPrefix: string ) => {
     res.status(200).send({
       message: 'Logout correct'
     });
+  });
+
+  authRouter.get(apiPrefix + '/auth/me', isAuthenticated, (req, res, next) => {
+    res.status(200).send(req.user);
   });
 
   //** GOOGLE */

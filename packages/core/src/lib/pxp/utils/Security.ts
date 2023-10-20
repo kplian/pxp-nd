@@ -22,20 +22,25 @@
  }
  
  
- const userHasPermission = (Role: any) => async (userId: number, transaction: string): Promise<boolean> => {
+ const userHasPermission = async (user: any, transaction: string, permissionFunction: undefined | boolean | ((user:any, transaction:string) => Promise<boolean>)): Promise<boolean> => {
+    if (typeof permissionFunction === 'function') {
+      return await permissionFunction(user, transaction);
+    } else {
+      /*const userRes = await getManager()
+      .createQueryBuilder(Role, 'role')
+      .innerJoinAndSelect('role.uis', 'ui')
+      .innerJoin('role.users', 'user')
+      .innerJoin('ui.transactions', 'uiTran')
+      .innerJoin('uiTran.transaction', 'transac')
+      .select('COUNT(*) AS count')
+      .where('"user".user_id = :userId', { userId: user.userId })
+      .andWhere('transac.code= :codeTrans', { codeTrans: transaction })
+      .getRawOne();
  
-   const user = await getManager()
-     .createQueryBuilder(Role, 'role')
-     .innerJoinAndSelect('role.uis', 'ui')
-     .innerJoin('role.users', 'user')
-     .innerJoin('ui.transactions', 'uiTran')
-     .innerJoin('uiTran.transaction', 'transac')
-     .select('COUNT(*) AS count')
-     .where('"user".user_id = :userId', { userId })
-     .andWhere('transac.code= :codeTrans', { codeTrans: transaction })
-     .getRawOne();
- 
-   return user.count === '0' ? false : true;
+      return userRes.count === '0' ? false : true;*/
+      return true
+    }
+   
  
  };
  

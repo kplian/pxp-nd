@@ -400,10 +400,8 @@ export class Controller implements ControllerInterface {
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
-      if (this.user && this.user.roles && this.user.roles.length === 0) {
-        const hasPermission = await __(
-          userHasPermission(this.config.entities.Role)(this.user.userId as number, this.transactionCode)
-        );
+      if (this.user) {
+        const hasPermission = await __( userHasPermission(this.user, this.transactionCode, this.config.permissionFunction) );
         if (!hasPermission) {
           throw new PxpError(403, 'Access denied to execute this method');
         }

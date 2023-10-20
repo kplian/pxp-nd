@@ -11,10 +11,11 @@
  * Created at     : 2020-09-17 18:55:38
  * Last modified  : 2020-09-18 14:18:09
  */
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, JoinTable, ManyToMany } from 'typeorm';
 import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
 import { PxpEntity } from '../PxpEntity';
+import Role from './Role';
 
 @Entity({ name: 'tsec_transaction' })
 export default class Transaction extends PxpEntity {
@@ -35,6 +36,20 @@ export default class Transaction extends PxpEntity {
   @OneToMany(() => UiTransaction, uiTransaction => uiTransaction.transaction)
   @JoinTable()
   uis: UiTransaction[];
+
+  @ManyToMany(() => Role)
+  @JoinTable({
+    name: 'tsec_transaction_role',
+    joinColumn: {
+      name: 'transaction_id',
+      referencedColumnName: 'transactionId'
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    }
+  })
+  roles: Role[];
 
   @Column({ nullable: true, name: 'subsystem_id' })
   subsystemId: number;

@@ -16,6 +16,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMa
 import User from './User';
 import Subsystem from './Subsystem';
 import Ui from './Ui';
+import Transaction from './Transaction';
 import { PxpEntity } from '../PxpEntity';
 
 @Entity({ name: 'tsec_role' })
@@ -70,4 +71,19 @@ export default class Role extends PxpEntity {
     }
   })
   uis: Ui[];
+
+  @ManyToMany(() => Transaction)
+  @JoinTable({
+    name: 'tsec_transaction_role',
+    joinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    },
+    inverseJoinColumn: {
+      name: 'transaction_id',
+      referencedColumnName: 'transactionId'
+    }
+  })
+  transactions: Transaction[];
+
 }

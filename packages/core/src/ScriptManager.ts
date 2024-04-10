@@ -58,7 +58,9 @@ const executeScripts = async (): Promise<void> => {
   while (scriptArray.length > 0) {
     const scriptObject = scriptArray.shift();
     if (scriptObject) {
-      const foundSV = await ScriptVersion.findOne({ scriptCode: scriptObject.scriptCode });
+      //const foundSV = await ScriptVersion.findOne({ scriptCode: scriptObject.scriptCode });
+      const foundSV = await ScriptVersion.findOne({ where: { scriptCode: scriptObject.scriptCode } });
+
       if (!foundSV) {
         let queryRunner = connection.createQueryRunner();
         try {          

@@ -37,24 +37,23 @@ class AccountStatusCustomRepository extends Repository<AccountStatus> {
       }
     });
 
+    //RAC 07/04/2024 i did changes here in order to build but i am not sure if it works TOFO check
     const accountStatusDb: any = await this.findOne({
       join: {
         alias: 'account',
         innerJoin: { type: 'account.accountStatusType' }
       },
-      where: (qb: any) => {
-        qb.where({
-          tableId: data.accountStatus.tableId,
-          accountStatusId: currentAccountId,
-        }).andWhere('type.code = :code', {
+      where: {
+        tableId: data.accountStatus.tableId,
+        accountStatusId: currentAccountId,
+        accountStatusType: {
           code: data.accountStatusType.code
-        });
+        }
       }
-      // where: { tableId: purchaseId },
-      // relations: ['accountStatusType']
     });
-    
-    
+
+
+
     const accountStatusId = currentAccountId || (accountStatusDb
       ? accountStatusDb.accountStatusId
       : null);

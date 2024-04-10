@@ -1,6 +1,6 @@
 {
   "name": "@pxp-nd/entities",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "Core entities and controllers for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,24 +18,22 @@
   "author": "Kplian",
   "license": "ISC",
   "devDependencies": {
-    "@types/adm-zip": "^0.4.34",
-    "@types/hapi__joi": "^17.1.6",
-    "@types/lodash": "^4.14.170",
-    "rimraf": "^3.0.2",
-    "tsc-watch": "^4.2.9"
+    "@types/adm-zip": "0.4.34",
+    "@types/hapi__joi": "17.1.6",
+    "@types/lodash": "4.14.170",
+    "rimraf": "3.0.2",
+    "tsc-watch": "4.2.9"
   },
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
-    "adm-zip": "^0.5.5",
-    "axios": "^0.21.1",
-    "class-validator": "^0.13.1",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.1",
-    "typeorm-store": "^2.0.0",
-    "xlsx": "^0.17.0"
+    "@hapi/joi": "17.1.1",
+    "adm-zip": "0.5.5",
+    "axios": "0.21.1",
+    "class-validator": "^0.14.1",
+    "lodash": "4.17.21",
+    "moment": "2.29.1",
+    "xlsx": "0.17.0"
   },
   "peerDependencies": {
-    "@pxp-nd/core": "^1.0.10",
-    "typeorm": "^0.2.32"
+    "typeorm": "0.3.20"
   }
 }

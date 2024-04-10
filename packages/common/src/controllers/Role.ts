@@ -23,7 +23,7 @@ import {
   __,
   Patch
 } from '@pxp-nd/core';
-import { genPassword } from '@pxp-nd/auth';
+//import { genPassword } from '@pxp-nd/auth';
 import {User as UserModel} from '../entities';
 import {Person} from '../entities';
 import {Role as ERole} from '../entities';

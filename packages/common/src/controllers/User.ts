@@ -24,11 +24,24 @@ import {
   Model,
   __
 } from '@pxp-nd/core';
-import { genPassword } from '@pxp-nd/auth';
+//import { genPassword } from '@pxp-nd/auth';
 import {User as UserModel} from '../entities';
 import {Person} from '../entities';
 import {Role} from '../entities';
 import Joi, { string } from 'joi';
+import crypto from 'crypto';
+
+export function genPassword(password: string): any {
+  const salt = crypto.randomBytes(32).toString('hex');
+  const genHash = crypto
+      .pbkdf2Sync(password, salt, 10000, 64, 'sha512')
+      .toString('hex');
+
+  return {
+    salt,
+    hash: genHash
+  };
+}
 
 @Route('/users')
 @StoredProcedure('pxp.ftusuario')
@@ -55,9 +68,9 @@ class User extends Controller {
     person.createdBy = 'admin';
     await __(manager.save(person));
 
-    const  role = await __(Role.findOne({
+    const  role = await __(Role.findOne({ where: {
       role: 'admin'
-    }));
+    }}));
 
     const user = new UserModel();
     user.person = person;

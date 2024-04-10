@@ -16,7 +16,7 @@ import Role from './Role';
 import Subsystem from './Subsystem';
 import UiTransaction from './UiTransaction';
 import { PxpEntity } from '../PxpEntity';
-import { __ } from '@pxp-nd/core';
+
 
 @Entity({ name: 'tsec_ui' })
 export default class Ui extends PxpEntity {
@@ -114,7 +114,7 @@ export default class Ui extends PxpEntity {
       qb.andWhere('ui.ui_id IN(:...uiList)', { uiList });
     }
 
-    const uis = await __(qb.getRawMany()) as Ui[];
+    const uis = await qb.getRawMany() as Ui[];
     console.log(uis);
     let resUis = uis;
     let isPush = false;
@@ -138,9 +138,9 @@ export default class Ui extends PxpEntity {
         if (newParams.folder && newParams.folder === ui.code) {
           delete newParams.folder;
         }
-        resUis.push(...await __(this.findRecursive(newParams, ui.uiId, isAdmin, uiList)) as Ui[]);
+        resUis.push(...await this.findRecursive(newParams, ui.uiId, isAdmin, uiList) as Ui[]);
       } else {
-        resUis[count].children = await __(this.findRecursive(params, ui.uiId, isAdmin, uiList)) as Ui[];
+        resUis[count].children = await this.findRecursive(params, ui.uiId, isAdmin, uiList) as Ui[];
         if (resUis[count].children.length === 0) {
           resUis[count].type = 'leaf';
         } else {

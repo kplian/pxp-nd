@@ -35,7 +35,7 @@ import { errorMiddleware } from './lib/pxp';
 // import { getAuthRoutes, customAuthRoutes } from '@pxp-nd/auth';
 // import { configPassport } from '@pxp-nd/auth';
 // import { Session } from '@pxp-nd/entities';
-import { TypeormStore } from 'typeorm-store';
+//import { TypeormStore } from 'typeorm-store';
 import { getReportsRouter } from './lib/reports/report-routes';
 import { IConfigPxpApp } from './interfaces';
 import PxpIOServer from './sockets/pxp-io-server';
@@ -250,20 +250,21 @@ class PxpApp {
     this.app.options('*', cors());
   }
   private initializeSession() {
-    const repository: any = getConnection().getRepository(this.config.session);
-    this.app.use(
-      session({
-        secret: String(process.env.SECRET),
-        resave: false,
-        saveUninitialized: true,
-        store: new TypeormStore({ repository }),
-        cookie: {
-          maxAge: 1000 * 60 * 60 * 168
-          // 24 = 1 day  <=> 168 = 7 days
-          // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
-        }
-      })
-    );
+    // const repository: any = getConnection().getRepository(this.config.session);
+    // this.app.use(
+    //   session({
+    //     secret: String(process.env.SECRET),
+    //     resave: false,
+    //     saveUninitialized: true,
+    //     store: new TypeormStore({ repository }),
+    //     cookie: {
+    //       maxAge: 1000 * 60 * 60 * 168
+    //       // 24 = 1 day  <=> 168 = 7 days
+    //       // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
+    //     }
+    //   })
+    // );
+    console.log('initializeSession')
   }
 
   private initializeRoutes() {

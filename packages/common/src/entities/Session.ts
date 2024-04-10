@@ -12,10 +12,10 @@
  * Last modified  : 2020-10-23 18:33:17
  */
 import { Column, BaseEntity, Entity, PrimaryColumn } from 'typeorm';
-import { SessionEntity } from 'typeorm-store';
+
 
 @Entity({ name: 'tsec_session' })
-export default class Session extends BaseEntity implements SessionEntity {
+export default class Session extends BaseEntity {
   @PrimaryColumn()
   id: string;
 

@@ -2,11 +2,23 @@
   "version": "v1",
   "packages": {
     "@pxp-nd/core": {
-      "signature": "52741ef88ae234b0b199303685f75980",
+      "version": "1.3.0",
+      "signature": "e71b9ef95a629b328224203270b545d7",
       "file": true
     },
     "@pxp-nd/common": {
-      "signature": "3b732ac1fd633e7e9e9d2142abb4ddff",
+      "version": "1.2.0",
+      "signature": "1aff739a6e80ade663449debdd99697f",
+      "file": true
+    },
+    "@pxp-nd/entities": {
+      "version": "1.1.0",
+      "signature": "1a5f1d8609618bb87e2645dda47c2a87",
+      "file": true
+    },
+    "@pxp-nd/repositories": {
+      "version": "1.0.7",
+      "signature": "2717d37ece47911290f009c12a51ace8",
       "file": true
     }
   }

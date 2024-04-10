@@ -1,6 +1,6 @@
 {
   "name": "@pxp-nd/auth",
-  "version": "1.1.15",
+  "version": "1.2.0",
   "description": "Core auth for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,33 +20,31 @@
   "author": "Kplian",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^4.17.12",
-    "@types/lodash": "^4.14.170",
-    "@types/node": "^15.6.1",
-    "@types/passport": "^1.0.6",
-    "@types/passport-facebook": "^2.1.10",
-    "@types/passport-google-oauth": "^1.0.41",
-    "@types/passport-jwt": "^3.0.5",
-    "@types/passport-local": "^1.0.33",
-    "rimraf": "^3.0.2",
-    "tsc-watch": "^4.2.9"
+    "@types/express": "4.17.12",
+    "@types/lodash": "4.14.170",
+    "@types/node": "15.6.1",
+    "@types/passport": "1.0.6",
+    "@types/passport-facebook": "2.1.10",
+    "@types/passport-google-oauth": "1.0.41",
+    "@types/passport-jwt": "3.0.5",
+    "@types/passport-local": "1.0.33",
+    "rimraf": "3.0.2",
+    "tsc-watch": "4.2.9"
   },
   "dependencies": {
-    "@pxp-nd/common": "^1.1.11",
-    "crypto": "^1.0.1",
-    "express": "^4.17.1",
-    "firebase-admin": "^9.8.0",
-    "passport": "^0.4.1",
-    "passport-facebook": "^3.0.0",
-    "passport-firebase-auth": "^0.0.0-beta.1",
-    "passport-google-oauth": "^2.0.0",
-    "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0"
-  },
-  "peerDependencies": {
-    "@pxp-nd/core": "^1.0.7",
-    "@pxp-nd/entities": "^1.0.7",
-    "@pxp-nd/repositories": "^1.0.7",
-    "typeorm": "^0.2.32"
+    "@pxp-nd/common": "file:.yalc/@pxp-nd/common",
+    "@pxp-nd/core": "file:.yalc/@pxp-nd/core",
+    "@pxp-nd/entities": "file:.yalc/@pxp-nd/entities",
+    "@pxp-nd/repositories": "file:.yalc/@pxp-nd/repositories",
+    "crypto": "1.0.1",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.0.0",
+    "passport": "^0.7.0",
+    "passport-facebook": "3.0.0",
+    "passport-firebase-auth": "^0.0.0",
+    "passport-google-oauth": "2.0.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "1.0.0",
+    "typeorm": "0.3.20"
   }
 }

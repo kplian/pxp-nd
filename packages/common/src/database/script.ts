@@ -79,7 +79,7 @@ scriptsArray.push({
     subsystem.createdBy = 'admin';
     await em.save(subsystem);
 
-    const rootUi = await Ui.findOne({ code: "PXP"});
+    const rootUi = await Ui.findOne({ where: { code: "PXP"}});
 
     const uiParent = new Ui();
     uiParent.code = 'EXA';
@@ -174,7 +174,7 @@ scriptsArray.push({
     subsystem.createdBy = 'admin';
     await em.save(subsystem);
 
-    const rootUi = await Ui.findOne({ code: "PXP"});
+    const rootUi = await Ui.findOne({ where: { code: "PXP"}});
 
     let uiParent = new Ui();
     uiParent.code = 'SEC';

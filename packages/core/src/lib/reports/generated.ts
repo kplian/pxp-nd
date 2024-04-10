@@ -1,5 +1,5 @@
 import { getManager } from 'typeorm';
-// import {Report, ReportGroup } from '@pxp-nd/entities';
+import {Report, ReportGroup } from '@pxp-nd/entities';
 import { startsWith, replace, get, set} from 'lodash';
 import { makePdf } from './pdf';
 import { makeXlsx } from './xlsx';
@@ -142,7 +142,7 @@ export const generateReport = (Report: any) => async (req: any, res: any) => {
 
 };
 
-export const listGroup = (ReportGroup: any) => async (req: any, res: any) => {
+export const listGroup = (reportGroup: ReportGroup) => async (req: any, res: any) => {
   const reports: any = await getManager().find(ReportGroup, {
     where: {
       active: true,
@@ -152,7 +152,7 @@ export const listGroup = (ReportGroup: any) => async (req: any, res: any) => {
   return res.send(reports)
 };
 
-export const listReports = (Report: any) => async (req: any, res: any) => {
+export const listReports = (report: Report) => async (req: any, res: any) => {
   const reports: any = await getManager().find(Report, {
     where: {
       active: true,
@@ -166,7 +166,7 @@ export const listReports = (Report: any) => async (req: any, res: any) => {
   return res.send(reports)
 };
 
-export const getReport = (Report: any) => async (req: any, res: any) => {
+export const getReport = (report: Report) => async (req: any, res: any) => {
   const report: any = await getManager().findOne(Report, {
     where: {
       reportId: req.params.id

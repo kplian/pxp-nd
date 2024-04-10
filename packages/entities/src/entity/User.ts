@@ -23,7 +23,6 @@ import {
 } from 'typeorm';
 import Person from './Person';
 import Role from './Role';
-import { __ } from '@pxp-nd/core';
 import {PxpEntity} from '../PxpEntity'
 
 @Entity({ name: 'tsec_user' })
@@ -96,14 +95,14 @@ export default class User extends PxpEntity {
 
   static async getUis(userId: number): Promise<number[]> {
 
-    const uiArray = await __(getManager()
+    const uiArray = await getManager()
       .createQueryBuilder(Role, 'role')
       .innerJoinAndSelect('role.uis', 'ui')
       .innerJoin('role.users', 'user')
       .select(['ui.ui_id'])
       .distinct(true)
       .where('"user".user_id = :userId', { userId })
-      .getRawMany());
+      .getRawMany();
 
     const result = uiArray.map((a: any) => a.ui_id);
     return result;

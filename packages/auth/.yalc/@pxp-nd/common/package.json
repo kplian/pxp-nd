@@ -1,12 +1,14 @@
 {
   "name": "@pxp-nd/common",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Contains common files for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "prepublish": "tsc",
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "dev:publish": "yalc publish",
+    "prod:publish": "npm publish",
     "start": "npm run build && node dist/index.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,16 +19,18 @@
   "author": "Kplian",
   "license": "ISC",
   "dependencies": {
-    "@pxp-nd/auth": "file:.yalc/@pxp-nd/auth",
-    "@pxp-nd/core": "^1.0.0",
-    "@pxp-nd/entities": "^1.0.10",
-    "adm-zip": "^0.5.5",
-    "joi": "^17.4.0",
-    "lodash": "^4.17.21",
-    "typeorm": "^0.2.32"
+    "@pxp-nd/core": "file:.yalc/@pxp-nd/core",
+    "@pxp-nd/entities": "file:.yalc/@pxp-nd/entities",
+    "@pxp-nd/repositories": "file:.yalc/@pxp-nd/repositories",
+    "@types/axios": "0.14.0",
+    "adm-zip": "0.5.5",
+    "axios": "0.21.1",
+    "crypto": "^1.0.1",
+    "install": "^0.13.0",
+    "joi": "17.4.0",
+    "lodash": "4.17.21",
+    "npm": "^10.5.1",
+    "typeorm": "^0.3.20"
   },
-  "peerDependencies": {
-    "@pxp-nd/core": "^1.0.0"
-  },
-  "yalcSig": "3b732ac1fd633e7e9e9d2142abb4ddff"
+  "yalcSig": "1aff739a6e80ade663449debdd99697f"
 }

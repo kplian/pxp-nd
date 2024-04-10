@@ -18,7 +18,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'tpar_report_group' })
-export default class Report {
+export default class ReportGroup {
   @PrimaryGeneratedColumn({ name: 'report_group_id' })
   reportGroupId: number;
 

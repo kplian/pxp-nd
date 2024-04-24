@@ -419,7 +419,7 @@ export class Controller implements ControllerInterface {
       await __(queryRunner.startTransaction());
       try {
         metResponse = (await eval(
-          `this.${methodName}(params, queryRunner.manager, res)`
+          `this.${methodName}(params, queryRunner.manager, res, req)`
         )) as Record<string, unknown>;
         await queryRunner.commitTransaction();
       } catch (err) {

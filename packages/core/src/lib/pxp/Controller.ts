@@ -44,6 +44,7 @@ export class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
   public pxpParams: any;
+  public headers: any;
   public router = Router();
   public path = '';
   public module = '';
@@ -271,6 +272,7 @@ export class Controller implements ControllerInterface {
             // Execute our method for this path and pass our express request and response object.
             const params = {...req.files, ...req.paramasMerge};
             this.pxpParams = req.pxpParams;
+            this.headers = req.headers;
 
             if (req.user) {
               // this.user = req.user as User;

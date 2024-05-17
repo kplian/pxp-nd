@@ -233,7 +233,7 @@ class PxpApp {
     }
   }
 
-  private configCors() {
+  protected configCors() {
     const whitelist = process.env.WHITE_LIST ? String(process.env.WHITE_LIST).split(',') :[];
 
     const corsOptions = {

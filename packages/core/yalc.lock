@@ -5,6 +5,10 @@
       "signature": "c8114cdb0b6ff484731ec780c5ae951e",
       "file": true,
       "replaced": "^1.0.0"
+    },
+    "@pxp-nd/core": {
+      "signature": "acafdfbb1bce699b8a3eff2b9bc45099",
+      "file": true
     }
   }
 }

@@ -211,6 +211,7 @@ export class Controller implements ControllerInterface {
             // const params = { ...req.query, ...req.body, ...req.params };
             const params = {...req.files, ...req.paramasMerge};
             this.pxpParams = req.pxpParams;
+            this.headers = req.headers;
 
             this.transactionCode = (this.module + this.path + route.path)
               .split('/')

@@ -55,5 +55,8 @@ export interface IConfigPxpApp {
   enableSocket?: boolean;
   expressJsonConfig?: IConfigExpress;
   expressUrlEncodedConfig?: IConfigExpress;
+
+  connectDatabase?: any;
+
   permissionFunction?: boolean | ((user:any, transaction:string) => Promise<boolean>);
 };

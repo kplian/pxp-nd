@@ -13,7 +13,7 @@
  */
 
 import 'reflect-metadata';
-import { createConnections } from 'typeorm';
+//import { createConnection } from 'typeorm';
 import * as bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
 import express from 'express';
@@ -59,12 +59,14 @@ class PxpApp {
   public io: socketIO.Server;
   private static _instance: PxpApp;
   public sockets: any = {};
+  public createConnection: any;
 
   config: IConfigPxpApp = {
     defaultDbSettings: 'Orm', // Orm, Procedure, Query
     apiPrefix: '/api',
     logDuration: true,
     middlewares: [],
+    connectDatabase: undefined
   };
 
   constructor(config: IConfigPxpApp) {
@@ -72,6 +74,7 @@ class PxpApp {
     this.config = {...this.config, ...config};
     this.app = express();
     this.controllers = [];
+    this.createConnection = config.connectDatabase;
     // this.initializeMiddlewares();
   }
 
@@ -300,7 +303,9 @@ class PxpApp {
   }
 
   async connectDatabase(): Promise<void> {
-    await createConnections();
+   // await createConnection();
+
+    await this.createConnection()
   }
 
   async run(): Promise<void> {

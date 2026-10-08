@@ -210,17 +210,20 @@ export class Controller implements ControllerInterface {
             // Execute our method for this path and pass our express request and response object.
             // const params = { ...req.query, ...req.body, ...req.params };
             const params = {...req.files, ...req.paramasMerge};
-            this.pxpParams = req.pxpParams;
-            this.headers = req.headers;
-
-            this.transactionCode = (this.module + this.path + route.path)
+            const controllerForRequest: any = Object.create(Object.getPrototypeOf(this));
+            Object.assign(controllerForRequest, this);
+            controllerForRequest.user = req.user || null;
+            controllerForRequest.headers = req.headers;
+            controllerForRequest.pxpParams = req.pxpParams;
+            controllerForRequest.transactionCode = (this.module + this.path + route.path)
               .split('/')
               .join('.')
               .toLowerCase();
-            this.validated = false;
+            
+            controllerForRequest.validated = false;
             try {
               await __(
-                this.genericMethodWrapper(
+                controllerForRequest.genericMethodWrapper(
                   params,
                   req,
                   next,
@@ -246,8 +249,8 @@ export class Controller implements ControllerInterface {
                 req.ip,
                 'error',
                 ex.tecMessage,
-                this.module,
-                this.transactionCode,
+                controllerForRequest.module,
+                controllerForRequest.transactionCode,
                 '',// query
                 params,
                 ex.stack,
@@ -272,22 +275,20 @@ export class Controller implements ControllerInterface {
           async (req: any, res: any, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = {...req.files, ...req.paramasMerge};
-            this.pxpParams = req.pxpParams;
-            this.headers = req.headers;
-
-            if (req.user) {
-              // this.user = req.user as User;
-              this.user = req.user;
-            }
-            this.transactionCode = (this.module + this.path + route.path)
+            const controllerForRequest: any = Object.create(Object.getPrototypeOf(this));
+            Object.assign(controllerForRequest, this);
+            controllerForRequest.user = req.user || null;
+            controllerForRequest.headers = req.headers;
+            controllerForRequest.pxpParams = req.pxpParams;
+            controllerForRequest.transactionCode = (this.module + this.path + route.path)
               .split('/')
               .join('.')
               .toLowerCase();
 
-            this.validated = false;
+            controllerForRequest.validated = false;  
             try {
               await __(
-                this.genericMethodWrapper(
+                controllerForRequest.genericMethodWrapper(
                   params,
                   req,
                   next,
@@ -308,13 +309,13 @@ export class Controller implements ControllerInterface {
               const endsAt = now.valueOf() - iniAt.valueOf();
               res.logId = (await __(
                 insertLog(
-                  this.user && this.user.username ? this.user.username : 'nouser',
+                  controllerForRequest.user && controllerForRequest.user.username ? controllerForRequest.user.username : 'nouser',
                   'mac',
                   req.ip,
                   'error',
                   ex.tecMessage,
-                  this.module,
-                  this.transactionCode,
+                  controllerForRequest.module,
+                  controllerForRequest.transactionCode,
                   '', // query
                   params,
                   ex.stack,

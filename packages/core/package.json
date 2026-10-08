@@ -1,6 +1,6 @@
 {
   "name": "@pxp-nd/core",
-  "version": "1.2.90",
+  "version": "1.2.91",
   "description": "Contains main files for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
     "prod:publish": "npm publish",
     "start": "npm run build && node dist/index.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand"
   },
   "keywords": [
     "pxp-nd"
@@ -28,6 +28,7 @@
     "@types/express-fileupload": "^1.1.6",
     "@types/express-session": "^1.17.3",
     "@types/figlet": "^1.5.1",
+    "@types/jest": "^27.5.2",
     "@types/joi": "^17.2.3",
     "@types/lodash": "^4.14.170",
     "@types/node": "^15.3.1",
@@ -35,7 +36,10 @@
     "@types/socket.io": "^3.0.2",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",
+    "jest": "^27.5.1",
+    "mysql2": "^2.3.3",
     "rimraf": "^3.0.2",
+    "ts-jest": "^27.1.5",
     "tsc-watch": "^4.2.9",
     "typescript": "^4.2.4"
   },
@@ -61,5 +65,23 @@
     "typeorm-store": "^2.0.0",
     "xlsx": "^0.17.0"
   },
-  "peerDependencies": {}
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/test"
+    ],
+    "testTimeout": 30000,
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "<rootDir>/test/tsconfig.json"
+      }
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
+  },
+  "overrides": {
+    "@types/babel__traverse": "7.17.1"
+  }
 }

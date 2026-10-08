@@ -14,6 +14,7 @@
  * Last modified  : 2021-05-01 18:35:31 - Favio Figueroa
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 per-request controller clone (from 1.2.89), startTransaction inside try
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
+ * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 log failures never block or crash the response (1.2.91)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -254,21 +255,26 @@ export class Controller implements ControllerInterface {
               const iniAt = req.start as Date;
               const endsAt = now.valueOf() - iniAt.valueOf();
 
-              res.logId = await __(insertLog(
-                'nouser',
-                'mac',
-                req.ip,
-                'error',
-                ex.tecMessage,
-                controllerForRequest.module,
-                controllerForRequest.transactionCode,
-                '',// query
-                params,
-                ex.stack,
-                ex.statusCode,
-                endsAt,
-                logValue)) as number;
-
+              // A failing error log (e.g. database down) must never prevent the response.
+              try {
+                res.logId = await __(insertLog(
+                  'nouser',
+                  'mac',
+                  req.ip,
+                  'error',
+                  ex.tecMessage,
+                  controllerForRequest.module,
+                  controllerForRequest.transactionCode,
+                  '',// query
+                  params,
+                  ex.stack,
+                  ex.statusCode,
+                  endsAt,
+                  logValue)) as number;
+              } catch (logErr) {
+                // __ wraps driver errors in PxpError(500) with a generic message; the real cause is tecMessage.
+                console.error('[pxp-core] error log failed', logErr && (logErr.tecMessage || logErr.message));
+              }
               errorMiddleware(ex, req, res);
             }
           }
@@ -318,23 +324,29 @@ export class Controller implements ControllerInterface {
               const now = new Date();
               const iniAt = req.start as Date;
               const endsAt = now.valueOf() - iniAt.valueOf();
-              res.logId = (await __(
-                insertLog(
-                  controllerForRequest.user && controllerForRequest.user.username ? controllerForRequest.user.username : 'nouser',
-                  'mac',
-                  req.ip,
-                  'error',
-                  ex.tecMessage,
-                  controllerForRequest.module,
-                  controllerForRequest.transactionCode,
-                  '', // query
-                  params,
-                  ex.stack,
-                  ex.statusCode,
-                  endsAt,
-                  logValue
-                )
-              )) as number;
+              // A failing error log (e.g. database down) must never prevent the response.
+              try {
+                res.logId = (await __(
+                  insertLog(
+                    controllerForRequest.user && controllerForRequest.user.username ? controllerForRequest.user.username : 'nouser',
+                    'mac',
+                    req.ip,
+                    'error',
+                    ex.tecMessage,
+                    controllerForRequest.module,
+                    controllerForRequest.transactionCode,
+                    '', // query
+                    params,
+                    ex.stack,
+                    ex.statusCode,
+                    endsAt,
+                    logValue
+                  )
+                )) as number;
+              } catch (logErr) {
+                // __ wraps driver errors in PxpError(500) with a generic message; the real cause is tecMessage.
+                console.error('[pxp-core] error log failed', logErr && (logErr.tecMessage || logErr.message));
+              }
               errorMiddleware(ex, req, res);
             }
           }
@@ -484,6 +496,7 @@ export class Controller implements ControllerInterface {
       const now = new Date();
       const iniAt = req.start as Date;
       const endsAt = now.valueOf() - iniAt.valueOf();
+      // Fire-and-forget: without the catch a failing log is an unhandledRejection (fatal on Node >= 15).
       __(
         insertLog(
           this.user && this.user.username ? this.user.username : 'nouser',
@@ -500,7 +513,7 @@ export class Controller implements ControllerInterface {
           endsAt,
           logConfig
         )
-      );
+      ).catch(err => console.error('[pxp-core] success log failed', err && (err.tecMessage || err.message)));
     }
     //PARA REPORTES
     if (req.report && req.report.type === 'pdf' ) {

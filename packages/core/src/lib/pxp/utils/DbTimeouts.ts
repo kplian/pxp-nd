@@ -9,6 +9,7 @@
  * @author Favio Figueroa
  *
  * Created at     : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
+ * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 late acquired connection is released to the pool, not destroyed (1.2.91)
  */
 import { QueryRunner } from 'typeorm';
 import { PxpError } from '../PxpError';
@@ -71,8 +72,19 @@ export async function connectWithTimeout(
     await Promise.race([connectPromise, timeoutPromise]);
   } catch (err) {
     if (timedOut) {
-      // A late connection must be destroyed, not leaked into the pool.
-      connectPromise.then(() => destroyQueryRunner(queryRunner)).catch(() => {});
+      // A late connection is pristine (no transaction was started on it), so it is returned
+      // to the pool instead of destroyed: destroying it would force the driver to open a new
+      // one and keep a residual queue after a burst. destroyQueryRunner stays for the
+      // request-timeout path, where a transaction may still be open.
+      connectPromise
+        .then(async () => {
+          try {
+            await queryRunner.release();
+          } catch (releaseErr) {
+            console.error('[pxp-core] late connection release failed', releaseErr && (releaseErr as Error).message);
+          }
+        })
+        .catch(() => {});
     }
     throw err;
   } finally {

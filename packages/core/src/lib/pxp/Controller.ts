@@ -260,8 +260,8 @@ export class Controller implements ControllerInterface {
                 req.ip,
                 'error',
                 ex.tecMessage,
-                this.module,
-                this.transactionCode,
+                controllerForRequest.module,
+                controllerForRequest.transactionCode,
                 '',// query
                 params,
                 ex.stack,
@@ -325,8 +325,8 @@ export class Controller implements ControllerInterface {
                   req.ip,
                   'error',
                   ex.tecMessage,
-                  this.module,
-                  this.transactionCode,
+                  controllerForRequest.module,
+                  controllerForRequest.transactionCode,
                   '', // query
                   params,
                   ex.stack,

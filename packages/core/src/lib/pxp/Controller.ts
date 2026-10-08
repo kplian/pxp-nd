@@ -12,6 +12,8 @@
  * Last modified  : 2020-10-13 15:36:31
  * Last modified  : 2021-03-10 15:36:31 - Favio Figueroa
  * Last modified  : 2021-05-01 18:35:31 - Favio Figueroa
+ * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 per-request controller clone (from 1.2.89), startTransaction inside try
+ * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -37,6 +39,7 @@ import { makePdf } from '../reports/pdf';
 import { makeXlsx } from '../reports/xlsx';
 import { IConfigPxpApp } from '../../interfaces';
 import path from "path";
+import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/DbTimeouts';
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
@@ -157,6 +160,11 @@ export class Controller implements ControllerInterface {
         (Reflect.getMetadata('isfile', this.constructor) as {
           [id: string]: boolean;
         }) || {};
+    // get request timeouts (@Timeout)
+    const timeouts =
+      (Reflect.getMetadata('timeout', this.constructor) as {
+        [id: string]: number;
+      }) || {};
 
     const defaultConfig: any = (Reflect.getMetadata('optionsRoute', this.constructor) as {
         [id: string]: {};
@@ -182,6 +190,9 @@ export class Controller implements ControllerInterface {
 
       // is file
       const isFileMethod = isfile[route.methodName] !== undefined ? isfile[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].isfile : false);
+
+      // request timeout (ms), undefined = no timeout
+      const timeoutMethod: number | undefined = timeouts[route.methodName] !== undefined ? timeouts[route.methodName] : (defaultConfig[route.methodName] ? defaultConfig[route.methodName].timeoutMs : undefined);
 
       if (readOnlyMethod === null || readOnlyMethod === undefined) {
         throw new PxpError(
@@ -210,17 +221,19 @@ export class Controller implements ControllerInterface {
             // Execute our method for this path and pass our express request and response object.
             // const params = { ...req.query, ...req.body, ...req.params };
             const params = {...req.files, ...req.paramasMerge};
-            this.pxpParams = req.pxpParams;
-            this.headers = req.headers;
-
-            this.transactionCode = (this.module + this.path + route.path)
+            const controllerForRequest = Object.create(Object.getPrototypeOf(this));
+            Object.assign(controllerForRequest, this);
+            controllerForRequest.user = req.user || null;
+            controllerForRequest.headers = req.headers;
+            controllerForRequest.pxpParams = req.pxpParams;
+            controllerForRequest.transactionCode = (this.module + this.path + route.path)
               .split('/')
               .join('.')
               .toLowerCase();
-            this.validated = false;
+            controllerForRequest.validated = false;
             try {
               await __(
-                this.genericMethodWrapper(
+                controllerForRequest.genericMethodWrapper(
                   params,
                   req,
                   next,
@@ -233,6 +246,7 @@ export class Controller implements ControllerInterface {
                   logValue,
                     isHtmlMethod,
                     isFileMethod,
+                    timeoutMethod,
                 )
               );
             } catch (ex) {
@@ -272,22 +286,19 @@ export class Controller implements ControllerInterface {
           async (req: any, res: any, next: NextFunction) => {
             // Execute our method for this path and pass our express request and response object.
             const params = {...req.files, ...req.paramasMerge};
-            this.pxpParams = req.pxpParams;
-            this.headers = req.headers;
-
-            if (req.user) {
-              // this.user = req.user as User;
-              this.user = req.user;
-            }
-            this.transactionCode = (this.module + this.path + route.path)
+            const controllerForRequest = Object.create(Object.getPrototypeOf(this));
+            Object.assign(controllerForRequest, this);
+            controllerForRequest.user = req.user || null;
+            controllerForRequest.headers = req.headers;
+            controllerForRequest.pxpParams = req.pxpParams;
+            controllerForRequest.transactionCode = (this.module + this.path + route.path)
               .split('/')
               .join('.')
               .toLowerCase();
-
-            this.validated = false;
+            controllerForRequest.validated = false;
             try {
               await __(
-                this.genericMethodWrapper(
+                controllerForRequest.genericMethodWrapper(
                   params,
                   req,
                   next,
@@ -299,7 +310,8 @@ export class Controller implements ControllerInterface {
                   logKey,
                   logValue,
                   isHtmlMethod,
-                  isFileMethod
+                  isFileMethod,
+                  timeoutMethod
                 )
               );
             } catch (ex) {
@@ -308,7 +320,7 @@ export class Controller implements ControllerInterface {
               const endsAt = now.valueOf() - iniAt.valueOf();
               res.logId = (await __(
                 insertLog(
-                  this.user && this.user.username ? this.user.username : 'nouser',
+                  controllerForRequest.user && controllerForRequest.user.username ? controllerForRequest.user.username : 'nouser',
                   'mac',
                   req.ip,
                   'error',
@@ -343,7 +355,8 @@ export class Controller implements ControllerInterface {
     log = true,
     logConfig = {},
     isHtml: boolean,
-    isFile: boolean
+    isFile: boolean,
+    timeoutMs?: number
   ): Promise<void> {
     if (dbsettings === 'Orm') {
       await __(
@@ -358,7 +371,8 @@ export class Controller implements ControllerInterface {
           log,
           logConfig,
           isHtml,
-          isFile
+          isFile,
+          timeoutMs
         )
       );
     } else if (dbsettings === 'Procedure') {
@@ -399,7 +413,8 @@ export class Controller implements ControllerInterface {
     log = true,
     logConfig = {},
     isHtml: boolean = false,
-    isFile: boolean = false
+    isFile: boolean = false,
+    timeoutMs?: number
   ): Promise<void> {
     let metResponse: unknown;
     if (permission) {
@@ -417,19 +432,51 @@ export class Controller implements ControllerInterface {
       const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
       const queryRunner = connection.createQueryRunner();
 
-      // establish real database connection using our new query runner
-      await __(queryRunner.connect());
-      await __(queryRunner.startTransaction());
+      // establish real database connection using our new query runner.
+      // `db` is added to IConfigPxpApp by a later change; without it this is a plain connect().
+      const acquireTimeoutMs = (this.config as any).db?.acquireTimeoutMs as number | undefined;
+      await __(connectWithTimeout(queryRunner, acquireTimeoutMs, this.transactionCode));
+      let timedOut = false;
+      let timer: NodeJS.Timeout | undefined;
       try {
-        metResponse = (await eval(
+        // Start the transaction inside try so a failure here still releases the connection
+        await __(queryRunner.startTransaction());
+        const work = Promise.resolve(eval(
           `this.${methodName}(params, queryRunner.manager, res, req)`
-        )) as Record<string, unknown>;
+        )) as Promise<unknown>;
+        if (timeoutMs && timeoutMs > 0) {
+          metResponse = await Promise.race([
+            work,
+            new Promise((_, reject) => {
+              timer = setTimeout(() => {
+                timedOut = true;
+                reject(new DbTimeoutError('request', timeoutMs, this.transactionCode));
+              }, timeoutMs);
+            })
+          ]);
+        } else {
+          metResponse = await work;
+        }
         await queryRunner.commitTransaction();
       } catch (err) {
-        await queryRunner.rollbackTransaction();
+        // On request timeout skip rollback: it would queue behind the abandoned statement and delay the 503 (destroy rolls back server-side).
+        if (!timedOut && queryRunner.isTransactionActive) {
+          try {
+            await queryRunner.rollbackTransaction();
+          } catch (_) {
+            // keep the original error; the connection is released or destroyed below
+          }
+        }
         throw err;
       } finally {
-        await __(queryRunner.release());
+        if (timer) clearTimeout(timer);
+        if (timedOut) {
+          // The handler may keep running in background; its connection is destroyed so it cannot commit.
+          console.warn(`[pxp-core] timeout-abandoned ${this.transactionCode}`);
+          await destroyQueryRunner(queryRunner);
+        } else {
+          await __(queryRunner.release());
+        }
       }
     }
 

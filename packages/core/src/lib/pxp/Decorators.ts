@@ -10,6 +10,7 @@
  *
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-09-17 18:29:51
+ * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
  */
 import { RouteDefinition, Method } from './RouteDefinition';
 export declare interface ILog {
@@ -22,6 +23,7 @@ export declare interface IOptionsRoute {
   dbSettings?: 'Procedure' | 'Orm' | 'Query';
   authentication?: boolean;
   log?: boolean | ILog;
+  timeoutMs?: number;
 };
 
 const setProperty =  (target: any, propertyKey: string) => (value: any, name: string, overwrite: boolean = true) => {
@@ -124,6 +126,11 @@ const Authentication = (authentication = true) =>
 const ReadOnly = (ronly = true) =>
   (target: any, propertyKey: string) => setProperty(target, propertyKey)(ronly, 'readonly');
 
+// Request timeout (ms) for a write transaction: on expiry the request fails with 503,
+// the transaction is rolled back and the physical connection is destroyed.
+const Timeout = (ms: number) =>
+  (target: any, propertyKey: string) => setProperty(target, propertyKey)(ms, 'timeout');
+
 const IsHtml = (ishtml = false) =>
   (target: any, propertyKey: string) => setProperty(target, propertyKey)(ishtml, 'ishtml');
 
@@ -169,6 +176,7 @@ export {
   Permission,
   DbSettings,
   ReadOnly,
+  Timeout,
   IsHtml,
   IsFile,
   Model,

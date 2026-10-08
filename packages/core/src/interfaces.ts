@@ -56,4 +56,9 @@ export interface IConfigPxpApp {
   expressJsonConfig?: IConfigExpress;
   expressUrlEncodedConfig?: IConfigExpress;
   permissionFunction?: boolean | ((user:any, transaction:string) => Promise<boolean>);
+  /** Database safety options. All optional; when omitted the behaviour is identical to <=1.2.89. */
+  db?: {
+    /** Max ms to wait for a pool connection before a non-readonly route fails with 503. Undefined/0 = wait forever (legacy). */
+    acquireTimeoutMs?: number;
+  };
 };

@@ -15,6 +15,7 @@
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 per-request controller clone (from 1.2.89), startTransaction inside try
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 log failures never block or crash the response (1.2.91)
+ * Last modified  : 2026-10-21 - logSink db | stdout | both (1.2.92)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -270,7 +271,8 @@ export class Controller implements ControllerInterface {
                   ex.stack,
                   ex.statusCode,
                   endsAt,
-                  logValue)) as number;
+                  logValue,
+                  controllerForRequest.config.logSink)) as number;
               } catch (logErr) {
                 // __ wraps driver errors in PxpError(500) with a generic message; the real cause is tecMessage.
                 console.error('[pxp-core] error log failed', logErr && (logErr.tecMessage || logErr.message));
@@ -340,7 +342,8 @@ export class Controller implements ControllerInterface {
                     ex.stack,
                     ex.statusCode,
                     endsAt,
-                    logValue
+                    logValue,
+                    controllerForRequest.config.logSink
                   )
                 )) as number;
               } catch (logErr) {
@@ -511,7 +514,8 @@ export class Controller implements ControllerInterface {
           JSON.stringify(metResponse),
           '200',
           endsAt,
-          logConfig
+          logConfig,
+          this.config.logSink
         )
       ).catch(err => console.error('[pxp-core] success log failed', err && (err.tecMessage || err.message)));
     }

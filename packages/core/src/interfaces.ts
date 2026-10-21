@@ -39,10 +39,24 @@ declare interface IConfigExpress {
   [name: string]: any;
 }
 
+/**
+ * Where a request audit line is written.
+ * `db` (default) inserts into tsec_log and returns the numeric id.
+ * `stdout` writes one JSON line and returns a uuid. No database.
+ * `both` writes the line and inserts in the background; the uuid is stored
+ * inside the row's request JSON as `__logId`.
+ */
+export type LogSink = 'db' | 'stdout' | 'both';
+
 export interface IConfigPxpApp {
   defaultDbSettings?: string;
   apiPrefix?: string;
   logDuration?: boolean;
+  /**
+   * Audit destination. Omitted or `db` matches <=1.2.91 (insert into tsec_log).
+   * `stdout` is one JSON line per request. `both` is the line plus a background insert.
+   */
+  logSink?: LogSink;
   showRoutes?: boolean;
   controllers?: any[];
   entities?: any;

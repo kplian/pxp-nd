@@ -16,6 +16,7 @@
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 log failures never block or crash the response (1.2.91)
  * Last modified  : 2026-10-21 - logSink db | stdout | both (1.2.92)
+ * Last modified  : 2026-11-04 - Rensi Arteaga - pass request source into insertLog (1.2.93)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -31,8 +32,9 @@ import {
   ControllerInterface,
   ListParam,
   userHasPermission,
-  insertLog
+  insertLog,
 } from './index';
+import type { RequestLogAudit } from './utils/Security';
 // import { User } from '@pxp-nd/entities';
 // import { isAuthenticated } from '@pxp-nd/auth';
 import { parseParams } from './middlewares/ParseParams';
@@ -45,6 +47,18 @@ import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
+
+const requestLogAuditFromUser = (user: unknown): RequestLogAudit => {
+  if (user && typeof user === 'object' && (user as { source?: string }).source === 'agent') {
+    const agentSource = (user as { agentSource?: unknown }).agentSource;
+    if (typeof agentSource === 'string' && agentSource) {
+      return { source: 'agent', agentSource };
+    }
+    return { source: 'agent' };
+  }
+  return { source: 'user' };
+};
+
 export class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
@@ -343,7 +357,8 @@ export class Controller implements ControllerInterface {
                     ex.statusCode,
                     endsAt,
                     logValue,
-                    controllerForRequest.config.logSink
+                    controllerForRequest.config.logSink,
+                    requestLogAuditFromUser(controllerForRequest.user)
                   )
                 )) as number;
               } catch (logErr) {
@@ -515,7 +530,8 @@ export class Controller implements ControllerInterface {
           '200',
           endsAt,
           logConfig,
-          this.config.logSink
+          this.config.logSink,
+          requestLogAuditFromUser(this.user)
         )
       ).catch(err => console.error('[pxp-core] success log failed', err && (err.tecMessage || err.message)));
     }

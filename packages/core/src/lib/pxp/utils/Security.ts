@@ -10,6 +10,7 @@
  *
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-10-20 17:46:24
+ * Last modified  : 2026-11-04 - Rensi Arteaga - stdout request source for CloudWatch audit
  */
  import 'reflect-metadata';
  import crypto from 'crypto';
@@ -20,6 +21,21 @@
 
  /** Max characters kept for request, response and query on a stdout line. CloudWatch drops an event past 256 KB. */
  const STDOUT_LOG_FIELD_MAX = 8192;
+
+ export type RequestLogSource = 'user' | 'agent';
+
+ export interface RequestLogAudit {
+   source?: RequestLogSource;
+   agentSource?: string;
+ }
+
+ const normalizeRequestLogAudit = (audit?: RequestLogAudit): { source: RequestLogSource; agentSource?: string } => {
+  const source = audit?.source === 'agent' ? 'agent' : 'user';
+  if (source === 'agent' && audit?.agentSource) {
+    return { source, agentSource: audit.agentSource };
+  }
+  return { source };
+ };
  
  interface ScriptInterface {
    scriptCode: string,
@@ -106,16 +122,19 @@
   req: Record<string, unknown>,
   resp: string,
   err: string,
-  timeEx: number
+  timeEx: number,
+  audit?: RequestLogAudit
  ): void => {
   const request = capField(serializeForLog(req));
   const response = capField(resp);
   const queryField = capField(query);
-  console.log(JSON.stringify({
+  const { source, agentSource } = normalizeRequestLogAudit(audit);
+  const line: Record<string, unknown> = {
     pxpLog: true,
     logId,
     type: logType,
     user: username,
+    source,
     ip,
     module: proc,
     transaction: trans,
@@ -126,7 +145,11 @@
     request: request.text,
     response: response.text,
     truncated: request.truncated || response.truncated || queryField.truncated,
-  }));
+  };
+  if (agentSource) {
+    line.agentSource = agentSource;
+  }
+  console.log(JSON.stringify(line));
  };
 
  const insertLogRow = async (username: string, macaddres: string, ip: string, logType: string, desc: string, proc: string, trans: string,
@@ -159,13 +182,13 @@
 
  const insertLog = async (username: string, macaddres: string, ip: string, logType: string, desc: string, proc: string, trans: string,
    query: string, req:  Record<string, unknown>, resp: string, err: string, timeEx: number, logConfig: Record<string, unknown>,
-   logSink: LogSink = 'db'): Promise<number | string> => {
+   logSink: LogSink = 'db', audit?: RequestLogAudit): Promise<number | string> => {
   const sink = logSink || 'db';
   if (sink === 'stdout' || sink === 'both') {
     const snapshot: Record<string, unknown> = { ...(req || {}) };
     applyLogMask(snapshot, logConfig);
     const logId = newLogId();
-    emitStdoutLog(logId, username, ip, logType, desc, proc, trans, query, snapshot, resp, err, timeEx);
+    emitStdoutLog(logId, username, ip, logType, desc, proc, trans, query, snapshot, resp, err, timeEx, audit);
     if (sink === 'both') {
       const dbReq = { ...snapshot, __logId: logId };
       insertLogRow(username, macaddres, ip, logType, desc, proc, trans, query, dbReq, resp, err, timeEx)

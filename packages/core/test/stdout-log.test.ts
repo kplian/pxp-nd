@@ -66,12 +66,23 @@ describe('insertLog sinks', () => {
     expect(line.logId).toBe(id);
     expect(line.type).toBe('success');
     expect(line.user).toBe('user');
+    expect(line.source).toBe('user');
+    expect(line.agentSource).toBeUndefined();
     expect(line.transaction).toBe('mod.tx');
     expect(line.status).toBe('200');
     expect(line.truncated).toBe(false);
     expect(line.request).toContain('************1111');
     expect(line.request).not.toContain('4111111111111111');
     expect(line.request).toContain('yes');
+  });
+
+  test('stdout records agent source without changing the username', async () => {
+    await insertLog(...baseArgs({ a: 1 }), 'stdout', { source: 'agent', agentSource: 'agent' });
+
+    const [line] = pxpLines(logSpy);
+    expect(line.user).toBe('user');
+    expect(line.source).toBe('agent');
+    expect(line.agentSource).toBe('agent');
   });
 
   test('stdout drops masked-out fields and caps oversized bodies', async () => {

@@ -4,12 +4,16 @@
   "description": "Contains main files for pxp-nd",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "prepublish": "tsc",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run build && npm test",
     "build-dev": "npm run build && npm run dev:publish",
     "dev:publish": "yalc publish",
-    "prod:publish": "npm publish",
+    "prod:publish": "npm publish --access public",
     "start": "npm run build && node dist/index.js",
     "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
     "test": "jest --runInBand"

@@ -1,4 +1,6 @@
 src/
-dist/
+test/
 .yalc/
+yalc.lock
 tsconfig.json
+*.tgz

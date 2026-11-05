@@ -16,6 +16,7 @@ import util from 'util';
 import path from 'path';
 import { ControllerInterface as Controller } from './index';
 import { IConfigPxpApp } from '../../interfaces';
+import { clearApiDocRegistry } from './apiDoc/apiDocRegistry';
 // import * as controllers from '../../controllers';
 const readdir = util.promisify(fs.readdir);
 
@@ -35,6 +36,7 @@ const loadPxpControllers = (config: IConfigPxpApp, io: any) => {
 };
 
 export default async (config: IConfigPxpApp, io: any): Promise<Controller[]> => {
+  clearApiDocRegistry();
   // const modulesPath = `${__dirname}/../../modules`;
   const modulesPath = path.join( process.cwd(), `/dist/modules`);
   let modules: string[] = [];

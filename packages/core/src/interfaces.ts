@@ -70,6 +70,10 @@ export interface IConfigPxpApp {
   expressJsonConfig?: IConfigExpress;
   expressUrlEncodedConfig?: IConfigExpress;
   permissionFunction?: boolean | ((user:any, transaction:string) => Promise<boolean>);
+  /** When true (or env API_EXPLORER_ENABLED=Y), mount Swagger UI at /explorer. Default off. */
+  apiExplorerEnabled?: boolean;
+  /** Authenticated OpenAPI URL the explorer loads. Tempo sets this. */
+  apiExplorerOpenApiUrl?: string;
   /** Database safety options. All optional; when omitted the behaviour is identical to <=1.2.89. */
   db?: {
     /** Max ms to wait for a pool connection before a non-readonly route fails with 503. Undefined/0 = wait forever (legacy). */

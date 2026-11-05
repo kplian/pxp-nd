@@ -10,6 +10,7 @@
  *
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-09-20 18:24:45
+ * Last modified  : 2026-11-05 - Rensi Arteaga - explorer off unless API_EXPLORER_ENABLED
  */
 
 import 'reflect-metadata';
@@ -25,10 +26,8 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import socketIO from 'socket.io';
-/** swagger options **/
+/** swagger UI only; the document is served by an authenticated app route */
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsDoc from 'swagger-jsdoc';
-import swaggerOptions from './swaggerOptions';
 import { ControllerInterface as Controller } from './lib/pxp';
 import loadControllers from './lib/pxp/loadControllers';
 import { errorMiddleware } from './lib/pxp';
@@ -84,15 +83,26 @@ class PxpApp {
   }
 
   private initializeSwagger() {
-    const options = {
-      customCss: '.swagger-ui .topbar { display: none }',
-      explorer: true,
-    };
-    const swaggerDocs = swaggerJsDoc(swaggerOptions);
-    this.app.use('/explorer', swaggerUi.serve, swaggerUi.setup(
-      swaggerDocs, 
-      options,
-    ));
+    const enabled =
+      this.config.apiExplorerEnabled === true || process.env.API_EXPLORER_ENABLED === 'Y';
+    if (!enabled) {
+      return;
+    }
+    const openapiUrl =
+      this.config.apiExplorerOpenApiUrl ||
+      process.env.API_EXPLORER_OPENAPI_URL ||
+      '/api/hq-nd/ApiDescription/openapi';
+    this.app.use(
+      '/explorer',
+      swaggerUi.serve,
+      swaggerUi.setup(undefined, {
+        customCss: '.swagger-ui .topbar { display: none }',
+        explorer: true,
+        swaggerOptions: {
+          url: openapiUrl,
+        },
+      })
+    );
   }
 
   public async loadControllers(): Promise<void> {

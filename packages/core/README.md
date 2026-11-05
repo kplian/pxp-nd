@@ -1,6 +1,10 @@
 # PXP-ND core
 - Core module for pxp-nd
 
+## 1.2.94
+
+`@ApiDoc` / `@ApiDocFor` next to controller methods. OpenAPI is built only from those descriptions (undocumented routes are omitted). How to document a method: [docs/API_DOC.md](./docs/API_DOC.md).
+
 ## 1.2.92
 
 Destino del audit de request. **Sin configurar nada, el comportamiento es idéntico a 1.2.91**: el default sigue siendo insertar en `tsec_log`.

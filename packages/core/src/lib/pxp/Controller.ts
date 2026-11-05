@@ -17,6 +17,7 @@
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 log failures never block or crash the response (1.2.91)
  * Last modified  : 2026-10-21 - logSink db | stdout | both (1.2.92)
  * Last modified  : 2026-11-04 - Rensi Arteaga - pass request source into insertLog (1.2.93)
+ * Last modified  : 2026-11-05 - Rensi Arteaga - register routes for OpenAPI (1.2.94)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -44,6 +45,8 @@ import { makeXlsx } from '../reports/xlsx';
 import { IConfigPxpApp } from '../../interfaces';
 import path from "path";
 import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/DbTimeouts';
+import { getControllerApiDocs } from './apiDoc/ApiDoc';
+import { registerApiDocRoute } from './apiDoc/apiDocRegistry';
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
@@ -190,7 +193,17 @@ export class Controller implements ControllerInterface {
       routes = _.union(this.basicRoutes, routes);
       readonly = { ...this.basicReadOnly, ...readonly };
     }
+    const apiDocs = getControllerApiDocs(this.constructor);
     routes.forEach((route) => {
+      const fullPath = this.config.apiPrefix + '/' + this.module + this.path + route.path;
+      registerApiDocRoute({
+        module: this.module,
+        controller: this.constructor.name,
+        methodName: route.methodName,
+        httpMethod: route.requestMethod,
+        path: fullPath,
+        apiDoc: apiDocs[route.methodName] || null,
+      });
       const methodDbSettings =
         dbsettings[route.methodName] || this.config.defaultDbSettings;
       // readOnly

@@ -15,6 +15,9 @@
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 per-request controller clone (from 1.2.89), startTransaction inside try
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 log failures never block or crash the response (1.2.91)
+ * Last modified  : 2026-10-21 - logSink db | stdout | both (1.2.92)
+ * Last modified  : 2026-11-04 - Rensi Arteaga - pass request source into insertLog (1.2.93)
+ * Last modified  : 2026-11-05 - Rensi Arteaga - register routes for OpenAPI (1.2.94)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -30,8 +33,9 @@ import {
   ControllerInterface,
   ListParam,
   userHasPermission,
-  insertLog
+  insertLog,
 } from './index';
+import type { RequestLogAudit } from './utils/Security';
 // import { User } from '@pxp-nd/entities';
 // import { isAuthenticated } from '@pxp-nd/auth';
 import { parseParams } from './middlewares/ParseParams';
@@ -41,9 +45,23 @@ import { makeXlsx } from '../reports/xlsx';
 import { IConfigPxpApp } from '../../interfaces';
 import path from "path";
 import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/DbTimeouts';
+import { getControllerApiDocs } from './apiDoc/ApiDoc';
+import { registerApiDocRoute } from './apiDoc/apiDocRegistry';
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
+
+const requestLogAuditFromUser = (user: unknown): RequestLogAudit => {
+  if (user && typeof user === 'object' && (user as { source?: string }).source === 'agent') {
+    const agentSource = (user as { agentSource?: unknown }).agentSource;
+    if (typeof agentSource === 'string' && agentSource) {
+      return { source: 'agent', agentSource };
+    }
+    return { source: 'agent' };
+  }
+  return { source: 'user' };
+};
+
 export class Controller implements ControllerInterface {
   public validated: boolean;
   public params: Record<string, unknown>[];
@@ -175,7 +193,17 @@ export class Controller implements ControllerInterface {
       routes = _.union(this.basicRoutes, routes);
       readonly = { ...this.basicReadOnly, ...readonly };
     }
+    const apiDocs = getControllerApiDocs(this.constructor);
     routes.forEach((route) => {
+      const fullPath = this.config.apiPrefix + '/' + this.module + this.path + route.path;
+      registerApiDocRoute({
+        module: this.module,
+        controller: this.constructor.name,
+        methodName: route.methodName,
+        httpMethod: route.requestMethod,
+        path: fullPath,
+        apiDoc: apiDocs[route.methodName] || null,
+      });
       const methodDbSettings =
         dbsettings[route.methodName] || this.config.defaultDbSettings;
       // readOnly
@@ -270,7 +298,8 @@ export class Controller implements ControllerInterface {
                   ex.stack,
                   ex.statusCode,
                   endsAt,
-                  logValue)) as number;
+                  logValue,
+                  controllerForRequest.config.logSink)) as number;
               } catch (logErr) {
                 // __ wraps driver errors in PxpError(500) with a generic message; the real cause is tecMessage.
                 console.error('[pxp-core] error log failed', logErr && (logErr.tecMessage || logErr.message));
@@ -340,7 +369,9 @@ export class Controller implements ControllerInterface {
                     ex.stack,
                     ex.statusCode,
                     endsAt,
-                    logValue
+                    logValue,
+                    controllerForRequest.config.logSink,
+                    requestLogAuditFromUser(controllerForRequest.user)
                   )
                 )) as number;
               } catch (logErr) {
@@ -511,7 +542,9 @@ export class Controller implements ControllerInterface {
           JSON.stringify(metResponse),
           '200',
           endsAt,
-          logConfig
+          logConfig,
+          this.config.logSink,
+          requestLogAuditFromUser(this.user)
         )
       ).catch(err => console.error('[pxp-core] success log failed', err && (err.tecMessage || err.message)));
     }

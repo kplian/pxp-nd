@@ -11,8 +11,10 @@
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-09-17 18:29:51
  * Last modified  : 2026-10-08 - Favio Figueroa - EF-23 acquire timeout + @Timeout decorator
+ * Last modified  : 2026-11-05 - Rensi Arteaga - export @ApiDoc / @ApiDocFor
  */
 import { RouteDefinition, Method } from './RouteDefinition';
+import { ApiDoc, ApiDocFor } from './apiDoc/ApiDoc';
 export declare interface ILog {
   [field: string]: 'cc_mask' | 'complete_mask';
 };
@@ -180,5 +182,7 @@ export {
   IsHtml,
   IsFile,
   Model,
-  StoredProcedure
+  StoredProcedure,
+  ApiDoc,
+  ApiDocFor
 };

@@ -1,6 +1,28 @@
 # PXP-ND core
 - Core module for pxp-nd
 
+## 1.2.94
+
+`@ApiDoc` / `@ApiDocFor` next to controller methods. OpenAPI is built only from those descriptions (undocumented routes are omitted). How to document a method: [docs/API_DOC.md](./docs/API_DOC.md).
+
+## 1.2.92
+
+Destino del audit de request. **Sin configurar nada, el comportamiento es idéntico a 1.2.91**: el default sigue siendo insertar en `tsec_log`.
+
+### `logSink` (opcional)
+
+```ts
+new PxpApp({
+  logSink: 'stdout', // 'db' | 'stdout' | 'both'
+});
+```
+
+- `db` (default): insert en `tsec_log` por `DB_LOG_CONNECTION_NAME`. El `logId` del JSON de error es el id numérico.
+- `stdout`: una línea JSON por request (`pxpLog: true`). El `logId` es un uuid, generado antes de escribir, y no se toca la base. `request`, `response` y `query` se cortan a 8 KB (`truncated: true`). CloudWatch descarta un evento de más de 256 KB.
+- `both`: la línea JSON y, en segundo plano, el insert. El uuid viaja dentro del request guardado como `__logId`. La respuesta no espera a la base.
+
+Las máscaras de `@Log` (`cc_mask`, `complete_mask`, campo en null) se aplican en los tres modos. Los decoradores existentes no hay que tocarlos.
+
 ## 1.2.91
 
 Correcciones encontradas en las pruebas de carga con la base de datos caída. Sin cambios de API ni de configuración.

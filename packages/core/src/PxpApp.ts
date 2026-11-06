@@ -11,6 +11,7 @@
  * Created at     : 2020-06-13 18:09:48
  * Last modified  : 2020-09-20 18:24:45
  * Last modified  : 2026-11-05 - Rensi Arteaga - explorer off unless API_EXPLORER_ENABLED
+ * Last modified  : 2026-11-06 - Rensi Arteaga - assign req.pxpRequestId for log correlation (1.2.96)
  */
 
 import 'reflect-metadata';
@@ -38,6 +39,7 @@ import { TypeormStore } from 'typeorm-store';
 import { getReportsRouter } from './lib/reports/report-routes';
 import { IConfigPxpApp } from './interfaces';
 import PxpIOServer from './sockets/pxp-io-server';
+import { assignPxpRequestId } from './lib/pxp/middlewares/assignPxpRequestId';
 
 const modulesPxp = {
   auth: '@pxp-nd/auth',
@@ -139,6 +141,7 @@ class PxpApp {
 
   public initializeMiddlewares() {
     this.app.use((req: any, res, next) => {
+      assignPxpRequestId(req);
       req.start = new Date();
       if (this.config.logDuration) {
         console.log(`${req.method} ${req.originalUrl} [STARTED]`);

@@ -19,6 +19,7 @@
  * Last modified  : 2026-11-04 - Rensi Arteaga - pass request source into insertLog (1.2.93)
  * Last modified  : 2026-11-05 - Rensi Arteaga - register routes for OpenAPI (1.2.94)
  * Last modified  : 2026-11-06 - Rensi Arteaga - optional @ApiDoc params validation (API_PARAM_VALIDATION) (1.2.95)
+ * Last modified  : 2026-11-06 - Rensi Arteaga - pxpRequestId on req and insertLog payload (1.2.96)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -49,6 +50,7 @@ import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/
 import { getControllerApiDocs } from './apiDoc/ApiDoc';
 import { registerApiDocRoute } from './apiDoc/apiDocRegistry';
 import { maybeValidateApiDocParams } from './apiDoc/validateApiDocParams';
+import { assignPxpRequestId } from './middlewares/assignPxpRequestId';
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
@@ -249,6 +251,7 @@ export class Controller implements ControllerInterface {
             parseParams
           ],
           async (req: any, res: any, next: NextFunction) => {
+            assignPxpRequestId(req);
             // Execute our method for this path and pass our express request and response object.
             // const params = { ...req.query, ...req.body, ...req.params };
             const params = {...req.files, ...req.paramasMerge};
@@ -271,6 +274,7 @@ export class Controller implements ControllerInterface {
                   controller: controllerForRequest.constructor.name,
                   methodName: route.methodName,
                   path: fullPath,
+                  pxpRequestId: req.pxpRequestId,
                   logId: res.logId,
                 },
                 (status, message) => {
@@ -310,7 +314,7 @@ export class Controller implements ControllerInterface {
                   controllerForRequest.module,
                   controllerForRequest.transactionCode,
                   '',// query
-                  params,
+                  { ...params, __pxpRequestId: req.pxpRequestId },
                   ex.stack,
                   ex.statusCode,
                   endsAt,
@@ -335,6 +339,7 @@ export class Controller implements ControllerInterface {
             parseParams
           ],
           async (req: any, res: any, next: NextFunction) => {
+            assignPxpRequestId(req);
             // Execute our method for this path and pass our express request and response object.
             const params = {...req.files, ...req.paramasMerge};
             const controllerForRequest = Object.create(Object.getPrototypeOf(this));
@@ -356,6 +361,7 @@ export class Controller implements ControllerInterface {
                   controller: controllerForRequest.constructor.name,
                   methodName: route.methodName,
                   path: fullPath,
+                  pxpRequestId: req.pxpRequestId,
                   logId: res.logId,
                 },
                 (status, message) => {
@@ -395,7 +401,7 @@ export class Controller implements ControllerInterface {
                     controllerForRequest.module,
                     controllerForRequest.transactionCode,
                     '', // query
-                    params,
+                    { ...params, __pxpRequestId: req.pxpRequestId },
                     ex.stack,
                     ex.statusCode,
                     endsAt,
@@ -568,7 +574,7 @@ export class Controller implements ControllerInterface {
           this.module,
           this.transactionCode,
           '',
-          params,
+          { ...params, __pxpRequestId: (req as unknown as { pxpRequestId?: string }).pxpRequestId },
           JSON.stringify(metResponse),
           '200',
           endsAt,

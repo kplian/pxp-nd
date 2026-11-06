@@ -211,8 +211,10 @@ export interface ApiParamValidationContext {
   controller: string;
   methodName: string;
   path: string;
+  /** Stable per-request id (set in PxpApp before routes). Join with insertLog payload via __pxpRequestId. */
+  pxpRequestId?: string;
   /** Correlation id when already known (e.g. after insertLog). */
-  logId?: number;
+  logId?: number | string;
 }
 
 /**

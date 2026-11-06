@@ -18,6 +18,7 @@
  * Last modified  : 2026-10-21 - logSink db | stdout | both (1.2.92)
  * Last modified  : 2026-11-04 - Rensi Arteaga - pass request source into insertLog (1.2.93)
  * Last modified  : 2026-11-05 - Rensi Arteaga - register routes for OpenAPI (1.2.94)
+ * Last modified  : 2026-11-06 - Rensi Arteaga - optional @ApiDoc params validation (API_PARAM_VALIDATION) (1.2.95)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -47,6 +48,7 @@ import path from "path";
 import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/DbTimeouts';
 import { getControllerApiDocs } from './apiDoc/ApiDoc';
 import { registerApiDocRoute } from './apiDoc/apiDocRegistry';
+import { maybeValidateApiDocParams } from './apiDoc/validateApiDocParams';
 // import * as entities from '@pxp-nd/entities';
 
 // const pxpEntities: any = entities;
@@ -261,6 +263,20 @@ export class Controller implements ControllerInterface {
               .toLowerCase();
             controllerForRequest.validated = false;
             try {
+              maybeValidateApiDocParams(
+                params,
+                apiDocs[route.methodName],
+                {
+                  module: controllerForRequest.module,
+                  controller: controllerForRequest.constructor.name,
+                  methodName: route.methodName,
+                  path: fullPath,
+                  logId: res.logId,
+                },
+                (status, message) => {
+                  throw new PxpError(status, message);
+                }
+              );
               await __(
                 controllerForRequest.genericMethodWrapper(
                   params,
@@ -332,6 +348,20 @@ export class Controller implements ControllerInterface {
               .toLowerCase();
             controllerForRequest.validated = false;
             try {
+              maybeValidateApiDocParams(
+                params,
+                apiDocs[route.methodName],
+                {
+                  module: controllerForRequest.module,
+                  controller: controllerForRequest.constructor.name,
+                  methodName: route.methodName,
+                  path: fullPath,
+                  logId: res.logId,
+                },
+                (status, message) => {
+                  throw new PxpError(status, message);
+                }
+              );
               await __(
                 controllerForRequest.genericMethodWrapper(
                   params,

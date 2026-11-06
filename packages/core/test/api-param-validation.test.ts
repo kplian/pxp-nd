@@ -14,6 +14,10 @@ import {
   getApiParamValidationMode,
   maybeValidateApiDocParams,
 } from '../src/lib/pxp/apiDoc/validateApiDocParams';
+import {
+  ValidateApiParams,
+  getApiParamValidationOverride,
+} from '../src/lib/pxp/apiDoc/ValidateApiParams';
 import { ApiDocSpec } from '../src/lib/pxp/apiDoc/ApiDocTypes';
 import { PxpError } from '../src/lib/pxp/PxpError';
 
@@ -119,5 +123,52 @@ describe('maybeValidateApiDocParams', () => {
         throw new PxpError(s, m);
       })
     ).not.toThrow();
+  });
+
+  it('mode override enforce throws when env is warn', () => {
+    process.env.API_PARAM_VALIDATION = 'warn';
+    expect(() =>
+      maybeValidateApiDocParams(
+        { flowId: 'x' } as unknown as Record<string, unknown>,
+        schemaDoc,
+        ctx,
+        (s, m) => {
+          throw new PxpError(s, m);
+        },
+        'enforce'
+      )
+    ).toThrow(PxpError);
+  });
+
+  it('mode override off skips validation when env is enforce', () => {
+    process.env.API_PARAM_VALIDATION = 'enforce';
+    expect(() =>
+      maybeValidateApiDocParams(
+        { flowId: 'x' } as unknown as Record<string, unknown>,
+        schemaDoc,
+        ctx,
+        (s, m) => {
+          throw new PxpError(s, m);
+        },
+        'off'
+      )
+    ).not.toThrow();
+  });
+});
+
+describe('getApiParamValidationOverride', () => {
+  it('returns method override over class default', () => {
+    @ValidateApiParams({ mode: 'warn' })
+    class C1 {
+      @ValidateApiParams({ mode: 'enforce' })
+      m1(): void {
+        return;
+      }
+      m2(): void {
+        return;
+      }
+    }
+    expect(getApiParamValidationOverride(C1, 'm1')).toBe('enforce');
+    expect(getApiParamValidationOverride(C1, 'm2')).toBe('warn');
   });
 });

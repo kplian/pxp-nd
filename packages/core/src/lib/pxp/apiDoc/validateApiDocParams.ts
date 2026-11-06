@@ -227,9 +227,11 @@ export function maybeValidateApiDocParams(
   params: Record<string, unknown>,
   apiDoc: ApiDocSpec | null | undefined,
   ctx: ApiParamValidationContext,
-  throwFn: (status: number, message: string) => void
+  throwFn: (status: number, message: string) => void,
+  /** When set (e.g. from @ValidateApiParams), overrides API_PARAM_VALIDATION for this route. */
+  modeOverride?: ApiParamValidationMode
 ): void {
-  const mode = getApiParamValidationMode();
+  const mode = modeOverride !== undefined ? modeOverride : getApiParamValidationMode();
   if (mode === 'off' || !apiDoc || !apiDoc.params) {
     return;
   }

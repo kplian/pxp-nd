@@ -49,6 +49,7 @@ import path from "path";
 import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/DbTimeouts';
 import { getControllerApiDocs } from './apiDoc/ApiDoc';
 import { registerApiDocRoute } from './apiDoc/apiDocRegistry';
+import { getApiParamValidationOverride } from './apiDoc/ValidateApiParams';
 import { maybeValidateApiDocParams } from './apiDoc/validateApiDocParams';
 import { assignPxpRequestId } from './middlewares/assignPxpRequestId';
 // import * as entities from '@pxp-nd/entities';
@@ -279,7 +280,11 @@ export class Controller implements ControllerInterface {
                 },
                 (status, message) => {
                   throw new PxpError(status, message);
-                }
+                },
+                getApiParamValidationOverride(
+                  controllerForRequest.constructor as Function,
+                  route.methodName
+                )
               );
               await __(
                 controllerForRequest.genericMethodWrapper(
@@ -366,7 +371,11 @@ export class Controller implements ControllerInterface {
                 },
                 (status, message) => {
                   throw new PxpError(status, message);
-                }
+                },
+                getApiParamValidationOverride(
+                  controllerForRequest.constructor as Function,
+                  route.methodName
+                )
               );
               await __(
                 controllerForRequest.genericMethodWrapper(

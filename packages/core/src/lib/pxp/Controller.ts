@@ -20,6 +20,7 @@
  * Last modified  : 2026-11-05 - Rensi Arteaga - register routes for OpenAPI (1.2.94)
  * Last modified  : 2026-11-06 - Rensi Arteaga - optional @ApiDoc params validation (API_PARAM_VALIDATION) (1.2.95)
  * Last modified  : 2026-11-06 - Rensi Arteaga - pxpRequestId on req and insertLog payload (1.2.96)
+ * Last modified  : 2026-11-10 - Rensi Arteaga - collect OpenAPI routes without registering them (1.2.98)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -48,7 +49,7 @@ import { IConfigPxpApp } from '../../interfaces';
 import path from "path";
 import { connectWithTimeout, destroyQueryRunner, DbTimeoutError } from './utils/DbTimeouts';
 import { getControllerApiDocs } from './apiDoc/ApiDoc';
-import { registerApiDocRoute } from './apiDoc/apiDocRegistry';
+import { ApiDocRouteEntry } from './apiDoc/ApiDocTypes';
 import { getApiParamValidationOverride } from './apiDoc/ValidateApiParams';
 import { maybeValidateApiDocParams } from './apiDoc/validateApiDocParams';
 import { assignPxpRequestId } from './middlewares/assignPxpRequestId';
@@ -73,6 +74,8 @@ export class Controller implements ControllerInterface {
   public pxpParams: any;
   public headers: any;
   public router = Router();
+  /** Filled in the constructor. PxpApp registers these; a hand-built controller does not. */
+  public apiDocRouteEntries: ApiDocRouteEntry[] = [];
   public path = '';
   public module = '';
   public modelString = '';
@@ -201,7 +204,7 @@ export class Controller implements ControllerInterface {
     const apiDocs = getControllerApiDocs(this.constructor);
     routes.forEach((route) => {
       const fullPath = this.config.apiPrefix + '/' + this.module + this.path + route.path;
-      registerApiDocRoute({
+      this.apiDocRouteEntries.push({
         module: this.module,
         controller: this.constructor.name,
         methodName: route.methodName,

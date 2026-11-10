@@ -116,6 +116,50 @@ describe('maybeValidateApiDocParams', () => {
     }
   });
 
+  it('ignores vendorId, _vendorId and vendor_id at any depth in enforce mode', () => {
+    process.env.API_PARAM_VALIDATION = 'enforce';
+    const nested: ApiDocSpec = {
+      ...schemaDoc,
+      params: {
+        type: 'object',
+        properties: {
+          flowId: { type: 'integer', minimum: 1 },
+          substitutionsSchemaJson: {
+            type: 'object',
+            properties: { keyword: { type: 'string' } },
+            additionalProperties: false,
+          },
+        },
+        required: ['flowId'],
+        additionalProperties: false,
+      },
+    };
+    expect(() =>
+      maybeValidateApiDocParams(
+        {
+          flowId: 1,
+          _vendorId: 99,
+          vendor_id: 3,
+          substitutionsSchemaJson: { vendorId: 5, keyword: 'a' },
+        },
+        nested,
+        ctx,
+        (s, m) => {
+          throw new PxpError(s, m);
+        }
+      )
+    ).not.toThrow();
+  });
+
+  it('still rejects an unknown property in enforce mode', () => {
+    process.env.API_PARAM_VALIDATION = 'enforce';
+    expect(() =>
+      maybeValidateApiDocParams({ flowId: 1, extra: true } as unknown as Record<string, unknown>, schemaDoc, ctx, (s, m) => {
+        throw new PxpError(s, m);
+      })
+    ).toThrow(PxpError);
+  });
+
   it('accepts string integer for query-style input', () => {
     process.env.API_PARAM_VALIDATION = 'enforce';
     expect(() =>

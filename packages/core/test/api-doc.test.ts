@@ -14,7 +14,7 @@
 import 'reflect-metadata';
 import { Controller } from '../src/lib/pxp/Controller';
 import { ApiDoc, ApiDocFor, Get, Post, ReadOnly } from '../src/lib/pxp/Decorators';
-import { clearApiDocRegistry, getApiDocRegistry } from '../src/lib/pxp/apiDoc/apiDocRegistry';
+import { clearApiDocRegistry, getApiDocRegistry, registerMountedApiDocs } from '../src/lib/pxp/apiDoc/apiDocRegistry';
 import {
   buildOpenApiDocument,
   hashOpenApiPaths,
@@ -89,6 +89,12 @@ describe('schemaContainsVendorField', () => {
         properties: { flowId: { type: 'integer' } },
       })
     ).toBe(false);
+    expect(
+      schemaContainsVendorField({
+        type: 'object',
+        properties: { vendor_id: { type: 'integer' } },
+      })
+    ).toBe(true);
   });
 });
 
@@ -173,21 +179,66 @@ describe('buildOpenApiDocument', () => {
 });
 
 describe('Controller registry', () => {
+  const pxpConfig = { apiPrefix: '/api', defaultDbSettings: 'Orm' as const, middlewares: [] as any[] };
+
   beforeEach(() => {
     clearApiDocRegistry();
   });
 
-  it('registers documented and undocumented methods; builder keeps only documented', () => {
-    new FlowHQ('hq-nd', null, { apiPrefix: '/api', defaultDbSettings: 'Orm', middlewares: [] });
+  it('does not register a controller created by hand', () => {
+    for (let i = 0; i < 100; i += 1) {
+      new FlowHQ('hq-nd/FlowHQ', null, pxpConfig);
+    }
+    expect(getApiDocRegistry()).toEqual([]);
+  });
+
+  it('registers each mounted method and path once', () => {
+    const ctrl = new FlowHQ('hq-nd', null, pxpConfig);
+    registerMountedApiDocs(ctrl);
+    registerMountedApiDocs(ctrl);
     const registered = getApiDocRegistry();
-    const names = registered.map((r) => r.methodName);
-    expect(names).toContain('getFlowLockState');
-    expect(names).toContain('hiddenList');
+    expect(registered.filter((r) => r.methodName === 'getFlowLockState')).toHaveLength(1);
+    expect(registered.map((r) => r.methodName)).toContain('hiddenList');
     const hidden = registered.find((r) => r.methodName === 'hiddenList');
     expect(hidden.apiDoc).toBeNull();
+    expect(registered.find((r) => r.path.includes('/FlowHQ/FlowHQ/'))).toBeUndefined();
     const doc = buildOpenApiDocument(registered);
     expect(Object.keys(doc.paths as object)).toEqual([
       '/api/hq-nd/FlowHQ/getFlowLockState',
     ]);
+  });
+});
+
+describe('duplicate operationId', () => {
+  const first: ApiDocRouteEntry = {
+    module: 'hq-nd',
+    controller: 'FlowHQ',
+    methodName: 'basicFlowList',
+    httpMethod: 'get',
+    path: '/api/hq-nd/FlowHQ/basicFlowList',
+    apiDoc: lockDoc,
+  };
+  const phantom: ApiDocRouteEntry = {
+    ...first,
+    path: '/api/hq-nd/FlowHQ/FlowHQ/basicFlowList',
+  };
+  const previous = process.env.NODE_ENV;
+
+  afterEach(() => {
+    process.env.NODE_ENV = previous;
+  });
+
+  it('fails outside production', () => {
+    process.env.NODE_ENV = 'test';
+    expect(() => buildOpenApiDocument([phantom, first])).toThrow(/Duplicate operationId/);
+  });
+
+  it('keeps the first operation in production', () => {
+    process.env.NODE_ENV = 'production';
+    const err = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const doc = buildOpenApiDocument([first, phantom]);
+    expect(Object.keys(doc.paths as object)).toEqual(['/api/hq-nd/FlowHQ/basicFlowList']);
+    expect(err).toHaveBeenCalled();
+    err.mockRestore();
   });
 });

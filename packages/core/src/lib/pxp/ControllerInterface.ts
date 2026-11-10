@@ -12,8 +12,10 @@
  * Last modified  : 2020-09-17 18:28:21
  */
 import { Router } from 'express';
+import { ApiDocRouteEntry } from './apiDoc/ApiDocTypes';
 
 export interface ControllerInterface {
   path: string;
   router: Router;
+  apiDocRouteEntries?: ApiDocRouteEntry[];
 }

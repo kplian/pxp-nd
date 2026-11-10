@@ -31,6 +31,8 @@ import socketIO from 'socket.io';
 import swaggerUi from 'swagger-ui-express';
 import { ControllerInterface as Controller } from './lib/pxp';
 import loadControllers from './lib/pxp/loadControllers';
+import { getApiDocRegistry, registerMountedApiDocs } from './lib/pxp/apiDoc/apiDocRegistry';
+import { buildOpenApiDocument } from './lib/pxp/apiDoc/buildOpenApiDocument';
 import { errorMiddleware } from './lib/pxp';
 // import { getAuthRoutes, customAuthRoutes } from '@pxp-nd/auth';
 // import { configPassport } from '@pxp-nd/auth';
@@ -281,9 +283,11 @@ class PxpApp {
 
   private initializeRoutes() {
     this.controllers.forEach((controller) => {
+      registerMountedApiDocs(controller);
       this.app.use(controller.router);
       this.showRoutes(controller.router);
     });
+    buildOpenApiDocument(getApiDocRegistry());
     this.app.all('*', function (req, res) {
       res.status(404).json({
         error: {

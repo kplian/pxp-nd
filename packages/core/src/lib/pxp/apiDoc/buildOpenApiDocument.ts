@@ -14,7 +14,9 @@
 import { createHash } from 'crypto';
 import { ApiDocRouteEntry, ApiDocSchema, ApiDocSpec } from './ApiDocTypes';
 
-const FORBIDDEN_VENDOR_KEYS = new Set(['vendorId', '_vendorId']);
+const FORBIDDEN_VENDOR_KEYS = new Set(['vendorId', '_vendorId', 'vendor_id']);
+
+const reportedDuplicateOperationIds = new Set<string>();
 
 export function schemaContainsVendorField(schema: ApiDocSchema | undefined): boolean {
   if (!schema || typeof schema !== 'object') {
@@ -100,6 +102,7 @@ export function buildOpenApiDocument(
   }
 
   const paths: Record<string, Record<string, unknown>> = {};
+  const operationPaths = new Map<string, string>();
 
   for (const entry of documented) {
     const spec = entry.apiDoc as ApiDocSpec;
@@ -108,6 +111,12 @@ export function buildOpenApiDocument(
     const http = String(entry.httpMethod).toLowerCase();
     const postSuffix = verbs != null && verbs.has('get') && verbs.has('post') && http === 'post';
     const operationId = defaultOperationId(entry, spec, postSuffix);
+    const keptPath = operationPaths.get(operationId);
+    if (keptPath != null) {
+      reportDuplicateOperationId(operationId, keptPath, entry.path);
+      continue;
+    }
+    operationPaths.set(operationId, entry.path);
     const tags = spec.tags && spec.tags.length ? spec.tags : [entry.module];
 
     const operation: Record<string, unknown> = {
@@ -164,4 +173,21 @@ export function buildOpenApiDocument(
     },
     paths: sortedPaths,
   };
+}
+
+/**
+ * A duplicate operationId fails the build outside production so local, dev and tests
+ * catch it. Production keeps the first (mounted) operation and logs once.
+ */
+function reportDuplicateOperationId(operationId: string, keptPath: string, skippedPath: string): void {
+  const message =
+    `Duplicate operationId ${operationId} for ${skippedPath}; keeping ${keptPath}`;
+  if (process.env.NODE_ENV === 'production') {
+    if (!reportedDuplicateOperationIds.has(operationId)) {
+      reportedDuplicateOperationIds.add(operationId);
+      console.error(`[pxp-core] ${message}`);
+    }
+    return;
+  }
+  throw new Error(message);
 }

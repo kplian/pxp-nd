@@ -158,6 +158,9 @@ function validateAgainstSchema(
     const additional = schema.additionalProperties;
 
     for (const key of Object.keys(obj)) {
+      if (key === 'vendorId' || key === '_vendorId' || key === 'vendor_id') {
+        continue;
+      }
       if (!(key in props)) {
         if (additional === false) {
           errors.push(`${path}.${key}: unknown property`);

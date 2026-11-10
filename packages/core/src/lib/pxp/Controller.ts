@@ -137,6 +137,13 @@ export class Controller implements ControllerInterface {
     this.initializeRoutes();
   }
 
+  private buildTransactionCode(route: { path: string; methodName: string }): string {
+    if (this.config.transactionCodeFormat === 'class') {
+      return `${this.module}.${this.constructor.name}.${route.methodName}`;
+    }
+    return (this.module + this.path + route.path).split('/').join('.').toLowerCase();
+  }
+
   private initializeRoutes() {
     let routes = Reflect.getMetadata(
       'routes',
@@ -264,10 +271,7 @@ export class Controller implements ControllerInterface {
             controllerForRequest.user = req.user || null;
             controllerForRequest.headers = req.headers;
             controllerForRequest.pxpParams = req.pxpParams;
-            controllerForRequest.transactionCode = (this.module + this.path + route.path)
-              .split('/')
-              .join('.')
-              .toLowerCase();
+            controllerForRequest.transactionCode = this.buildTransactionCode(route);
             controllerForRequest.validated = false;
             try {
               maybeValidateApiDocParams(
@@ -355,10 +359,7 @@ export class Controller implements ControllerInterface {
             controllerForRequest.user = req.user || null;
             controllerForRequest.headers = req.headers;
             controllerForRequest.pxpParams = req.pxpParams;
-            controllerForRequest.transactionCode = (this.module + this.path + route.path)
-              .split('/')
-              .join('.')
-              .toLowerCase();
+            controllerForRequest.transactionCode = this.buildTransactionCode(route);
             controllerForRequest.validated = false;
             try {
               maybeValidateApiDocParams(
@@ -510,7 +511,13 @@ export class Controller implements ControllerInterface {
     let metResponse: unknown;
     if (permission) {
       if (this.user) {
-        const hasPermission = await __( userHasPermission(this.user, this.transactionCode, this.config.permissionFunction) );
+        const hasPermission = await __( userHasPermission(this.user, this.transactionCode, this.config.permissionFunction, {
+          requestId: req?.pxpRequestId,
+          ip: req?.ip,
+          userAgent: req?.headers?.['user-agent'],
+          httpMethod: req?.method,
+          path: req?.originalUrl,
+        }) );
         if (!hasPermission) {
           throw new PxpError(403, 'Access denied to execute this method');
         }

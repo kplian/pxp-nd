@@ -17,7 +17,7 @@
  import { getManager, EntityManager } from 'typeorm';
  // import { Role } from '@pxp-nd/entities';
  import Log from '../../../entities/Log';
- import { LogSink } from '../../../interfaces';
+ import { IPermissionContext, LogSink } from '../../../interfaces';
 
  /** Max characters kept for request, response and query on a stdout line. CloudWatch drops an event past 256 KB. */
  const STDOUT_LOG_FIELD_MAX = 8192;
@@ -43,9 +43,9 @@
  }
  
  
- const userHasPermission = async (user: any, transaction: string, permissionFunction: undefined | boolean | ((user:any, transaction:string) => Promise<boolean>)): Promise<boolean> => {
+ const userHasPermission = async (user: any, transaction: string, permissionFunction: undefined | boolean | ((user:any, transaction:string, context?: IPermissionContext) => Promise<boolean>), context?: IPermissionContext): Promise<boolean> => {
     if (typeof permissionFunction === 'function') {
-      return await permissionFunction(user, transaction);
+      return await permissionFunction(user, transaction, context);
     } else {
       /*const userRes = await getManager()
       .createQueryBuilder(Role, 'role')

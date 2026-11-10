@@ -48,6 +48,15 @@ declare interface IConfigExpress {
  */
 export type LogSink = 'db' | 'stdout' | 'both';
 
+/** Request data passed as the third argument of `permissionFunction`. */
+export interface IPermissionContext {
+  requestId?: string;
+  ip?: string;
+  userAgent?: string;
+  httpMethod?: string;
+  path?: string;
+}
+
 export interface IConfigPxpApp {
   defaultDbSettings?: string;
   apiPrefix?: string;
@@ -69,7 +78,9 @@ export interface IConfigPxpApp {
   enableSocket?: boolean;
   expressJsonConfig?: IConfigExpress;
   expressUrlEncodedConfig?: IConfigExpress;
-  permissionFunction?: boolean | ((user:any, transaction:string) => Promise<boolean>);
+  permissionFunction?: boolean | ((user:any, transaction:string, context?: IPermissionContext) => Promise<boolean>);
+  /** 'path' (default): module + class + route path, lowercased. 'class': `${module}.${ClassName}.${methodName}`, case preserved, no route params. */
+  transactionCodeFormat?: 'path' | 'class';
   /** When true (or env API_EXPLORER_ENABLED=Y), mount Swagger UI at /explorer. Default off. */
   apiExplorerEnabled?: boolean;
   /** Authenticated OpenAPI URL the explorer loads. Tempo sets this. */

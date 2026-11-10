@@ -10,6 +10,12 @@ export * from './lib/pxp/apiDoc/ApiDocTypes';
 export { ApiDoc, ApiDocFor, getControllerApiDocs } from './lib/pxp/apiDoc/ApiDoc';
 export { getApiDocRegistry, clearApiDocRegistry, registerApiDocRoute } from './lib/pxp/apiDoc/apiDocRegistry';
 export { buildOpenApiDocument, hashOpenApiPaths, schemaContainsVendorField } from './lib/pxp/apiDoc/buildOpenApiDocument';
+export { getApiParamValidationMode, maybeValidateApiDocParams } from './lib/pxp/apiDoc/validateApiDocParams';
+export {
+  ValidateApiParams,
+  getApiParamValidationOverride,
+} from './lib/pxp/apiDoc/ValidateApiParams';
+export { assignPxpRequestId } from './lib/pxp/middlewares/assignPxpRequestId';
 export * from './lib/pxp/ListParamInterface';
 export * from './lib/pxp/PxpError';
 export * from './lib/pxp/RouteDefinition';

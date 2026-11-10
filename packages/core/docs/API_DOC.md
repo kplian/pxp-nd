@@ -1,6 +1,8 @@
 # How to document a PXP controller (`@ApiDoc`)
 
-From `@pxp-nd/core` **1.2.94**. The OpenAPI document is built from these decorators. **A method without `@ApiDoc` does not appear** in the JSON. There is no `undocumented` list.
+From `@pxp-nd/core` **1.2.94+**. The OpenAPI document is built from these decorators. **A method without `@ApiDoc` does not appear** in the JSON. There is no `undocumented` list.
+
+**Param validation (1.2.95+):** global `API_PARAM_VALIDATION` (`off` | `warn` | `enforce`). **Per-route override (1.2.97+):** `@ValidateApiParams({ mode: 'off' | 'warn' | 'enforce' })` on the **method** or **class** (class default; method wins). When set, it replaces the env for that route. Use with `@ApiDoc` `params` schema.
 
 Tempo will serve the document from an authenticated route (for example `GET /api/hq-nd/ApiDescription/openapi`). This package only stores the descriptions and builds the JSON.
 
@@ -109,7 +111,26 @@ Do **not** use: `$ref`, `oneOf`, `anyOf`, `allOf`, `nullable`, `const`, or `type
 
 ---
 
-## 6. Checklist in the PR
+## 6. Strict validation on one route (`@ValidateApiParams`)
+
+```ts
+import { Get, ReadOnly, ApiDoc, ValidateApiParams } from '@pxp-nd/core';
+
+@Get()
+@ReadOnly(true)
+@ApiDoc({ /* ... params schema ... */ })
+@ValidateApiParams({ mode: 'enforce' })
+async myEndpoint(params: Record<string, unknown>): Promise<unknown> {
+  // Rejects with 400 when params mismatch @ApiDoc, even if API_PARAM_VALIDATION=warn
+}
+```
+
+- Put `@ValidateApiParams` **after** `@ApiDoc` (or any order; both apply to the same method).
+- `@ValidateApiParams({ mode: 'off' })` on a method skips validation for that route even if the env is `enforce`.
+
+---
+
+## 7. Checklist in the PR
 
 - [ ] Description sits next to the method (or `@ApiDocFor` on the class for Model CRUD).
 - [ ] `params` matches what the handler actually reads.

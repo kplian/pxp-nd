@@ -21,6 +21,7 @@
  * Last modified  : 2026-11-06 - Rensi Arteaga - optional @ApiDoc params validation (API_PARAM_VALIDATION) (1.2.95)
  * Last modified  : 2026-11-06 - Rensi Arteaga - pxpRequestId on req and insertLog payload (1.2.96)
  * Last modified  : 2026-11-10 - Rensi Arteaga - collect OpenAPI routes without registering them (1.2.98)
+ * Last modified  : 2026-11-17 - Rensi Arteaga - optional statement-scoped write (1.2.100)
  */
 import { Like, getConnection, EntityManager } from 'typeorm';
 import { validate } from 'class-validator';
@@ -526,13 +527,41 @@ export class Controller implements ControllerInterface {
     if (readonly) {
       metResponse = await __(eval(`this.${methodName}(params, res)`));
 
+    } else if (this.config.db?.transactionScope === 'statement') {
+      // No query runner. Each statement borrows a pool connection and returns it, so HTTP
+      // between queries does not hold a write slot. Atomic blocks call manager.transaction().
+      const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
+      const work = Promise.resolve(eval(
+        `this.${methodName}(params, connection.manager, res, req)`
+      )) as Promise<unknown>;
+      if (timeoutMs && timeoutMs > 0) {
+        let timer: NodeJS.Timeout | undefined;
+        let timedOut = false;
+        try {
+          metResponse = await Promise.race([
+            work,
+            new Promise((_, reject) => {
+              timer = setTimeout(() => {
+                timedOut = true;
+                reject(new DbTimeoutError('request', timeoutMs, this.transactionCode));
+              }, timeoutMs);
+            })
+          ]);
+        } finally {
+          if (timer) clearTimeout(timer);
+          if (timedOut) {
+            console.warn(`[pxp-core] timeout-abandoned ${this.transactionCode}`);
+          }
+        }
+      } else {
+        metResponse = await work;
+      }
     } else {
       const connection = getConnection(process.env.DB_WRITE_CONNECTION_NAME);
       const queryRunner = connection.createQueryRunner();
 
       // establish real database connection using our new query runner.
-      // `db` is added to IConfigPxpApp by a later change; without it this is a plain connect().
-      const acquireTimeoutMs = (this.config as any).db?.acquireTimeoutMs as number | undefined;
+      const acquireTimeoutMs = this.config.db?.acquireTimeoutMs;
       await __(connectWithTimeout(queryRunner, acquireTimeoutMs, this.transactionCode));
       let timedOut = false;
       let timer: NodeJS.Timeout | undefined;

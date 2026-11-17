@@ -85,9 +85,17 @@ export interface IConfigPxpApp {
   apiExplorerEnabled?: boolean;
   /** Authenticated OpenAPI URL the explorer loads. Tempo sets this. */
   apiExplorerOpenApiUrl?: string;
-  /** Database safety options. All optional; when omitted the behaviour is identical to <=1.2.89. */
+  /** Database safety options. All optional; when omitted the behaviour is identical to <=1.2.99. */
   db?: {
     /** Max ms to wait for a pool connection before a non-readonly route fails with 503. Undefined/0 = wait forever (legacy). */
     acquireTimeoutMs?: number;
+    /**
+     * 'handler' (default): one write transaction wraps the whole method. The connection stays
+     * checked out until the method returns, including any HTTP, S3 or Firebase inside it.
+     * 'statement': no outer transaction. The method receives the pool manager, so each SQL
+     * checks out a connection only for that statement. A multi-statement block uses
+     * manager.transaction().
+     */
+    transactionScope?: 'handler' | 'statement';
   };
 };

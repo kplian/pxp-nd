@@ -1,6 +1,22 @@
 # PXP-ND core
 - Core module for pxp-nd
 
+## 1.2.100
+
+Transacción de escritura por sentencia, opt-in. **Sin configurar nada, el comportamiento es el de 1.2.99**: la ruta no-readonly sigue abriendo una transacción y la retiene hasta que el método termina.
+
+### `db.transactionScope` (opcional)
+
+```ts
+new PxpApp({
+  db: { transactionScope: 'statement' }, // 'handler' | 'statement'
+});
+```
+
+- `handler` (default): un query runner de `write` envuelve todo el método. La conexión sigue ocupada si el método llama HTTP, S3 o Firebase.
+- `statement`: no hay transacción exterior. El método recibe el manager del pool. Cada SQL toma una conexión y la devuelve. Un bloque atómico va dentro de `manager.transaction(async (tx) => { ... })`, con el HTTP fuera de ese callback.
+- En `statement`, un error no deshace sentencias ya ejecutadas. `@Timeout` responde 503, pero no puede destruir la conexión de una sentencia que ya volvió al pool.
+
 ## 1.2.94
 
 `@ApiDoc` / `@ApiDocFor` next to controller methods. OpenAPI is built only from those descriptions (undocumented routes are omitted). How to document a method: [docs/API_DOC.md](./docs/API_DOC.md).
